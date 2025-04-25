@@ -2,10 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Facebook, Instagram, Twitter } from "lucide-react";
-
-export function Footer() {
+import { cn } from "@/lib/utils";
+type FooterProps = {
+  className?: string;
+};
+export function Footer({ className = "" }: FooterProps) {
   return (
-    <footer className="border-t bg-background">
+    <footer className={cn("border-t bg-background", className)}>
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
