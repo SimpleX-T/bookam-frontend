@@ -1,15 +1,43 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { motion } from "motion/react"
-import Link from "next/link"
-import { ArrowLeft, ArrowRight, Info } from "lucide-react"
-import BusLayout from "@/components/seat-selection/bus-layout"
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bus,
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+} from "lucide-react";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Info } from "lucide-react";
+import BusLayout from "@/components/seat-selection/bus-layout";
+import { Badge } from "@/components/ui/badge";
+
+type SeatStatus = "available" | "occupied" | "selected";
+
+interface Seat {
+  id: string;
+  status: SeatStatus;
+  price: number;
+  type: "standard" | "premium" | "business";
+}
 
 // Dummy journey data
 const journeyData = {
@@ -52,278 +80,452 @@ const journeyData = {
   regularTotalPrice: 15000,
   save: 150,
   totalPrice: 14850,
-}
-
-// Seat types and their prices
-const seatTypes = {
-  standard: {
-    name: "Standard",
-    price: 0,
-    color: "bg-blue-500",
-  },
-  premium: {
-    name: "Premium",
-    price: 2000,
-    color: "bg-purple-500",
-  },
-  business: {
-    name: "Business",
-    price: 5000,
-    color: "bg-amber-500",
-  },
-}
-
-// Generate bus layout
-const generateBusLayout = () => {
-  // 44-seater bus with 11 rows, 4 seats per row (2-2 configuration)
-  const rows = 11
-  const seatsPerRow = 4
-  const layout = []
-
-  // Random occupied seats (about 30% of seats)
-  const occupiedSeats = new Set()
-  const totalSeats = rows * seatsPerRow
-  const occupiedCount = Math.floor(totalSeats * 0.3)
-
-  while (occupiedSeats.size < occupiedCount) {
-    const randomRow = Math.floor(Math.random() * rows) + 1
-    const randomSeat = String.fromCharCode(65 + Math.floor(Math.random() * seatsPerRow))
-    occupiedSeats.add(`${randomRow}${randomSeat}`)
-  }
-
-  // Generate seat types
-  const seatTypeMap = {}
-  for (let row = 1; row <= rows; row++) {
-    for (let seat = 0; seat < seatsPerRow; seat++) {
-      const seatLetter = String.fromCharCode(65 + seat)
-      const seatId = `${row}${seatLetter}`
-
-      // First 2 rows are business class
-      if (row <= 2) {
-        seatTypeMap[seatId] = "business"
-      }
-      // Next 3 rows are premium
-      else if (row <= 5) {
-        seatTypeMap[seatId] = "premium"
-      }
-      // Rest are standard
-      else {
-        seatTypeMap[seatId] = "standard"
-      }
-    }
-  }
-
-  // Create layout
-  for (let row = 1; row <= rows; row++) {
-    const rowSeats = []
-    for (let seat = 0; seat < seatsPerRow; seat++) {
-      const seatLetter = String.fromCharCode(65 + seat)
-      const seatId = `${row}${seatLetter}`
-
-      rowSeats.push({
-        id: seatId,
-        row: row,
-        seat: seatLetter,
-        position: seat < seatsPerRow / 2 ? "left" : "right",
-        occupied: occupiedSeats.has(seatId),
-        type: seatTypeMap[seatId],
-      })
-    }
-    layout.push(rowSeats)
-  }
-
-  return layout
-}
+};
 
 export default function SeatSelectionClientPage() {
-  // In a real app, this would come from the route or context
-  const journeyId = "j123456"
-  const journeyDetails = {
-    from: "Lagos",
-    to: "Abuja",
-    date: "May 15, 2025",
-    time: "10:30 AM",
-    busType: "Executive",
-    price: 12500,
-  }
-  const router = useRouter()
-  const [busLayout, setBusLayout] = useState<any[]>([])
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([])
-  const [passengerCount, setPassengerCount] = useState(1)
-  const [deck, setDeck] = useState("lower")
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [seats, setSeats] = useState<Record<string, Seat>>({});
+  const [passengerCount, setPassengerCount] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(journeyData.price);
 
+  // Generate dummy seat data
   useEffect(() => {
-    setBusLayout(generateBusLayout())
-  }, [])
+    const generateSeats = (): Record<string, Seat> => {
+      const seats: Record<string, Seat> = {};
 
-  const handleSeatClick = (seatId: string, occupied: boolean) => {
-    if (occupied) return
+      // Generate seats for rows 1-10 and columns A-E
+      const rows = Array.from({ length: 10 }, (_, i) => i + 1);
+      const columns = ["A", "B", "C", "D", "E"];
 
-    setSelectedSeats((prev) => {
-      // If already selected, remove it
-      if (prev.includes(seatId)) {
-        return prev.filter((id) => id !== seatId)
+      rows.forEach((row) => {
+        columns.forEach((col) => {
+          const id = `${row}${col}`;
+
+          // Randomly mark some seats as occupied (about 30%)
+          const randomStatus = Math.random() < 0.3 ? "occupied" : "available";
+
+          // Determine seat type based on position
+          let type: "standard" | "premium" | "business" = "standard";
+          let price = journeyData.price;
+
+          if (row <= 2) {
+            type = "business";
+            price = journeyData.price * 1.5;
+          } else if (row <= 5) {
+            type = "premium";
+            price = journeyData.price * 1.2;
+          }
+
+          seats[id] = {
+            id,
+            status: randomStatus,
+            price,
+            type,
+          };
+        });
+      });
+
+      return seats;
+    };
+
+    setSeats(generateSeats());
+
+    // Get passenger count from URL
+    const passengers = searchParams.get("passengers");
+    if (passengers) {
+      setPassengerCount(parseInt(passengers, 10));
+    }
+  }, [searchParams]);
+
+  const handleSeatClick = (seatId: string) => {
+    const seat = seats[seatId];
+
+    if (seat.status === "occupied") return;
+
+    if (seat.status === "selected") {
+      // Deselect seat
+      setSelectedSeats(selectedSeats.filter((id) => id !== seatId));
+      setSeats({
+        ...seats,
+        [seatId]: {
+          ...seat,
+          status: "available",
+        },
+      });
+    } else {
+      // Check if we've already selected the maximum number of seats
+      if (
+        selectedSeats.length >= passengerCount &&
+        seat.status === "available"
+      ) {
+        alert(
+          `You can only select ${passengerCount} seat(s) for this booking.`
+        );
+        return;
       }
 
-      // If we already have enough seats selected, remove the first one
-      if (prev.length >= passengerCount) {
-        return [...prev.slice(1), seatId]
-      }
+      // Select seat
+      setSelectedSeats([...selectedSeats, seatId]);
+      setSeats({
+        ...seats,
+        [seatId]: {
+          ...seat,
+          status: "selected",
+        },
+      });
+    }
+  };
 
-      // Otherwise add it
-      return [...prev, seatId]
-    })
-  }
+  // Calculate total price based on selected seats
+  useEffect(() => {
+    let price = 0;
+    selectedSeats.forEach((seatId) => {
+      price += seats[seatId]?.price || 0;
+    });
+    setTotalPrice(price);
+  }, [selectedSeats, seats]);
 
-  const getSeatPrice = (seatId: string) => {
-    const seat = busLayout.flat().find((s) => s.id === seatId)
-    if (!seat) return 0
-    return seatTypes[seat.type].price
-  }
+  const handleContinue = () => {
+    if (selectedSeats.length < passengerCount) {
+      alert(`Please select ${passengerCount} seat(s) to continue.`);
+      return;
+    }
 
-  const getTotalPrice = () => {
-    const baseFare = journeyData.totalPrice
-    const extraFees = selectedSeats.reduce((total, seatId) => {
-      return total + getSeatPrice(seatId)
-    }, 0)
-    return baseFare + extraFees
-  }
+    // Construct query params with selected seats
+    const params = new URLSearchParams({
+      journey: journeyData.id,
+      seats: selectedSeats.join(","),
+      price: totalPrice.toString(),
+    });
 
-  const getSeatType = (seatId: string) => {
-    const seat = busLayout.flat().find((s) => s.id === seatId)
-    if (!seat) return null
-    return seatTypes[seat.type]
-  }
+    router.push(`/booking/steps/passenger?${params.toString()}`);
+  };
+
+  const getSeatColor = (seat: Seat) => {
+    if (seat.status === "occupied") return "bg-gray-400 cursor-not-allowed";
+    if (seat.status === "selected") return "bg-primary hover:bg-primary/90";
+
+    // Available seats with different types
+    switch (seat.type) {
+      case "business":
+        return "bg-purple-500 hover:bg-purple-600";
+      case "premium":
+        return "bg-amber-500 hover:bg-amber-600";
+      default:
+        return "bg-green-500 hover:bg-green-600";
+    }
+  };
 
   return (
-    <div className="container max-w-7xl py-6 space-y-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <h1 className="text-3xl font-bold tracking-tight">Seat Selection</h1>
-        <p className="text-muted-foreground mt-2">
-          Select your preferred seat(s) for your journey from {journeyDetails.from} to {journeyDetails.to}
-        </p>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card className="overflow-hidden">
-            <CardHeader className="bg-muted/50">
-              <CardTitle className="flex items-center justify-between">
-                <span>Select Your Seat</span>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Info className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="w-80">
-                      <p>Click on an available seat to select it. You can select multiple seats for group bookings.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </CardTitle>
-              <CardDescription>Bus layout may vary slightly from the actual vehicle</CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center mb-4 space-x-6">
-                <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-sm bg-green-500 mr-2"></div>
-                  <span className="text-sm">Available</span>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 bg-muted/30">
+        <div className="container py-6">
+          <div className="mb-8">
+            <Button
+              variant="ghost"
+              className="mb-4"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Search Results
+            </Button>
+            <h1 className="text-2xl font-bold mb-4">Select Your Seat</h1>
+            <div className="relative flex items-center justify-between max-w-md mb-6">
+              <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-muted"></div>
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                  1
                 </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-sm bg-gray-400 mr-2"></div>
-                  <span className="text-sm">Occupied</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 rounded-sm bg-primary mr-2"></div>
-                  <span className="text-sm">Selected</span>
-                </div>
+                <span className="text-sm mt-1 text-primary">
+                  Seat Selection
+                </span>
               </div>
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                  2
+                </div>
+                <span className="text-sm mt-1 text-muted-foreground">
+                  Passenger Details
+                </span>
+              </div>
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                  3
+                </div>
+                <span className="text-sm mt-1 text-muted-foreground">
+                  Payment
+                </span>
+              </div>
+            </div>
+          </div>
 
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="relative"
-              >
-                <BusLayout />
-              </motion.div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Bus Seat Layout</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-center mb-6">
+                    <div className="flex gap-4 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-green-500"></div>
+                        <span className="text-sm">Standard</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-amber-500"></div>
+                        <span className="text-sm">Premium</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-purple-500"></div>
+                        <span className="text-sm">Business</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-primary"></div>
+                        <span className="text-sm">Selected</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-gray-400"></div>
+                        <span className="text-sm">Occupied</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bus layout */}
+                  <div className="relative bg-muted rounded-3xl p-8 pb-16 max-w-2xl mx-auto">
+                    {/* Driver area */}
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20">
+                      <div className="relative w-full h-full">
+                        <div className="absolute inset-0 bg-muted border-2 border-border rounded-full"></div>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-center">
+                          Driver
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Entrance */}
+                    <div className="absolute top-8 right-0 transform translate-x-1/2 w-6 h-16 bg-muted border-2 border-border rounded-r-lg flex items-center justify-center">
+                      <span className="text-xs -rotate-90">Entrance</span>
+                    </div>
+
+                    {/* Seats layout */}
+                    <div className="grid grid-cols-5 gap-3">
+                      {/* Row numbers */}
+                      <div className="col-span-5 grid grid-cols-5 gap-3 mb-2">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <div key={`col-${i}`} className="flex justify-center">
+                            <span className="text-xs font-medium">
+                              {String.fromCharCode(65 + i)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Seats */}
+                      {Array.from({ length: 10 }, (_, row) => (
+                        <React.Fragment key={`row-${row + 1}`}>
+                          {/* Row number */}
+                          <div className="col-span-5 grid grid-cols-5 gap-3">
+                            {Array.from({ length: 5 }, (_, col) => {
+                              const seatId = `${row + 1}${String.fromCharCode(
+                                65 + col
+                              )}`;
+                              const seat = seats[seatId];
+
+                              return seat ? (
+                                <motion.button
+                                  key={seatId}
+                                  whileTap={{
+                                    scale:
+                                      seat.status !== "occupied" ? 0.95 : 1,
+                                  }}
+                                  className={cn(
+                                    "w-10 h-10 rounded-sm flex items-center justify-center text-white font-medium text-xs",
+                                    getSeatColor(seat)
+                                  )}
+                                  onClick={() => handleSeatClick(seatId)}
+                                  disabled={seat.status === "occupied"}
+                                >
+                                  {seatId}
+                                </motion.button>
+                              ) : (
+                                <div
+                                  key={`empty-${row}-${col}`}
+                                  className="w-10 h-10"
+                                ></div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Add aisle after every 2 rows */}
+                          {(row + 1) % 2 === 0 && row < 9 && (
+                            <div className="col-span-5 h-2 flex items-center justify-center my-1">
+                              <div className="w-full h-0.5 border-t border-dashed border-border"></div>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+
+                    {/* Bus front */}
+                    <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-8 bg-muted border-2 border-border rounded-b-full flex items-center justify-center">
+                      <span className="text-xs">Front</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 text-center">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Please select {passengerCount} seat(s) to continue. You
+                      have selected {selectedSeats.length} seat(s).
+                    </p>
+                    {selectedSeats.length > 0 && (
+                      <div className="flex flex-wrap gap-2 justify-center mb-4">
+                        {selectedSeats.map((seatId) => (
+                          <Badge
+                            key={seatId}
+                            variant="outline"
+                            className="text-primary"
+                          >
+                            Seat {seatId}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <Button
+                      onClick={handleContinue}
+                      disabled={selectedSeats.length < passengerCount}
+                      className="w-full md:w-auto"
+                    >
+                      Continue to Passenger Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <div>
+              <Card className="sticky top-6">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center gap-3 pb-4 border-b">
+                    <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
+                      <span className="font-medium text-primary">
+                        {journeyData.logo}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-medium">{journeyData.company}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {journeyData.journeyNumber}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{journeyData.date}</span>
+                    </div>
+
+                    <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          {journeyData.from.time}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {journeyData.from.terminal}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          {journeyData.to.time}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {journeyData.to.terminal}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Bus className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{journeyData.bus.type}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">
+                        {passengerCount} Passenger(s)
+                      </span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <h3 className="font-medium">Selected Seats</h3>
+                    {selectedSeats.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedSeats.map((seatId) => (
+                          <div
+                            key={seatId}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>
+                              Seat {seatId} ({seats[seatId]?.type})
+                            </span>
+                            <span>
+                              ₦{seats[seatId]?.price.toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground">
+                        No seats selected yet
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex justify-between font-medium">
+                    <span>Total</span>
+                    <span className="text-lg">
+                      ₦{totalPrice.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <Button
+                    onClick={handleContinue}
+                    disabled={selectedSeats.length < passengerCount}
+                    className="w-full"
+                  >
+                    Continue
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
-
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Journey Summary</CardTitle>
-              <CardDescription>Review your journey details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">From</span>
-                  <span className="font-medium">{journeyDetails.from}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">To</span>
-                  <span className="font-medium">{journeyDetails.to}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Date</span>
-                  <span className="font-medium">{journeyDetails.date}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Time</span>
-                  <span className="font-medium">{journeyDetails.time}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Bus Type</span>
-                  <span className="font-medium">{journeyDetails.busType}</span>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Selected Seats</span>
-                  <span className="font-medium">2 (A3, A4)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Price per seat</span>
-                  <span className="font-medium">₦{journeyDetails.price.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Booking fee</span>
-                  <span className="font-medium">₦500</span>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
-                <span>₦{(journeyDetails.price * 2 + 500).toLocaleString()}</span>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <Button asChild className="w-full">
-                <Link href={`/booking/steps/multi-passenger`}>
-                  Continue to Passenger Details
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="w-full">
-                <Link href={`/journey/${journeyId}`}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Journey Details
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
+      </main>
+      <Footer />
     </div>
-  )
+  );
 }

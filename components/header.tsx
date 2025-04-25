@@ -1,30 +1,35 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ModeToggle } from "@/components/mode-toggle"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { LogOut, User } from "lucide-react"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { useEffect, useState } from "react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, MenuIcon, User } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export function Header() {
-  const pathname = usePathname()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   // Check if user is logged in
   useEffect(() => {
-    setMounted(true)
-    const user = localStorage.getItem("user")
+    setMounted(true);
+    const user = localStorage.getItem("user");
     if (user) {
-      setIsLoggedIn(true)
+      setIsLoggedIn(true);
     }
-  }, [])
+  }, []);
 
-  if (!mounted) return null
+  if (!mounted) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -46,7 +51,7 @@ export function Header() {
                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-nigeria-green">N-Journey</span>
+            <span className="text-xl font-bold text-nigeria-green">bookAM</span>
           </Link>
         </div>
 
@@ -55,7 +60,7 @@ export function Header() {
             href="/"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/" ? "text-primary" : "text-muted-foreground",
+              pathname === "/" ? "text-primary" : "text-muted-foreground"
             )}
           >
             Home
@@ -64,7 +69,7 @@ export function Header() {
             href="/routes"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/routes" ? "text-primary" : "text-muted-foreground",
+              pathname === "/routes" ? "text-primary" : "text-muted-foreground"
             )}
           >
             Routes
@@ -73,7 +78,9 @@ export function Header() {
             href="/promotions"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/promotions" ? "text-primary" : "text-muted-foreground",
+              pathname === "/promotions"
+                ? "text-primary"
+                : "text-muted-foreground"
             )}
           >
             Promotions
@@ -82,7 +89,7 @@ export function Header() {
             href="/about"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/about" ? "text-primary" : "text-muted-foreground",
+              pathname === "/about" ? "text-primary" : "text-muted-foreground"
             )}
           >
             About Us
@@ -91,7 +98,7 @@ export function Header() {
             href="/contact"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/contact" ? "text-primary" : "text-muted-foreground",
+              pathname === "/contact" ? "text-primary" : "text-muted-foreground"
             )}
           >
             Contact
@@ -99,14 +106,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">NGN</span>
-          </div>
           <ModeToggle />
           {isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 rounded-full"
+                >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/placeholder-user.jpg" alt="User" />
                     <AvatarFallback>NU</AvatarFallback>
@@ -122,8 +129,8 @@ export function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    localStorage.removeItem("user")
-                    setIsLoggedIn(false)
+                    localStorage.removeItem("user");
+                    setIsLoggedIn(false);
                   }}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -133,16 +140,33 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" asChild>
-                <Link href="/login">Log in</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign up</Link>
-              </Button>
+              <>
+                <div className="hidden md:flex items-center gap-2">
+                  <Button variant="ghost" asChild>
+                    <Link href="/login">Log in</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/signup">Sign up</Link>
+                  </Button>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild className="md:hidden">
+                    <MenuIcon className="size-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href="/login">Log in</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/signup">Sign up</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             </div>
           )}
         </div>
       </div>
     </header>
-  )
+  );
 }
