@@ -1,11 +1,16 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
+const bricolage_grotesque = Bricolage_Grotesque({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-bricolage-grotesque",
+});
 
 export const metadata: Metadata = {
   title: "bookAM | Nigerian Bus Transport System",
@@ -20,10 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${bricolage_grotesque.className}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >

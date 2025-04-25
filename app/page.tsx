@@ -5,16 +5,9 @@ import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 
 import SimplifiedSearch from "@/components/simplified-search";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
 import {
   ArrowRight,
   Bus,
@@ -23,10 +16,8 @@ import {
   MapPin,
   Star,
   TrendingUp,
-  Users,
 } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -34,35 +25,39 @@ import Link from "next/link";
 const popularRoutes = [
   {
     id: 1,
-    from: "Lagos",
-    to: "Abuja",
-    price: 14850,
+    from: "Abakpa",
+    to: "Gariki",
+    price: 800,
     duration: "8h 10m",
-    image: "/placeholder.svg?height=200&width=300",
+    image:
+      "https://www.shutterstock.com/shutterstock/videos/3458108987/thumb/1.jpg?ip=x480",
   },
   {
     id: 2,
-    from: "Lagos",
-    to: "Ibadan",
-    price: 5500,
+    from: "Enugu",
+    to: "Nsukka",
+    price: 2500,
     duration: "2h 30m",
-    image: "/placeholder.svg?height=200&width=300",
+    image:
+      "https://as2.ftcdn.net/jpg/05/11/87/61/1000_F_511876132_lvR1nkSpnniH26xvN5bX84CZCPDScVFI.jpg",
   },
   {
     id: 3,
     from: "Abuja",
     to: "Kaduna",
-    price: 7200,
+    price: 17200,
     duration: "3h 15m",
-    image: "/placeholder.svg?height=200&width=300",
+    image:
+      "https://www.shutterstock.com/image-photo/aerial-view-bustling-urban-landscape-600nw-2550888697.jpg",
   },
   {
     id: 4,
-    from: "Port Harcourt",
+    from: "PH",
     to: "Owerri",
-    price: 6300,
+    price: 1200,
     duration: "2h 45m",
-    image: "/placeholder.svg?height=200&width=300",
+    image:
+      "https://www.nairaland.com/attachments/5928171_2127234810287541038941947456967265889492231n_jpega075271d01fed7cb95498c07e6fe6075",
   },
 ];
 
@@ -99,7 +94,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative bg-muted/30">
+        <section className="relative bg-muted/30 font-bricolage">
           <section className="relative h-full">
             <div className="hero-pattern py-12 md:py-24">
               <div className="container">
@@ -110,7 +105,7 @@ export default function HomePage() {
                     transition={{ duration: 0.5 }}
                     className="space-y-4 text-white"
                   >
-                    <h1 className="text-4xl md:text-6xl font-bold">
+                    <h1 className="text-4xl md:text-6xl font-bold font-bricolage">
                       Where Will the Road Take{" "}
                       <span className="text-yellow-300">You</span> Today?
                     </h1>
@@ -210,7 +205,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold">Popular Routes</h2>
               <Button variant="outline" asChild>
-                <Link href="/search">
+                <Link href="/routes">
                   View All Routes
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
