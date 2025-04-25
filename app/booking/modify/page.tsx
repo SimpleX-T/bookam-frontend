@@ -16,7 +16,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { format } from "date-fns"
 import { CalendarIcon, Search, ArrowRight, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
 
 // Dummy bookings data

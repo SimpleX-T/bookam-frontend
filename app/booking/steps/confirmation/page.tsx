@@ -6,7 +6,7 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
 
 // Dummy journey data

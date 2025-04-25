@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { ArrowRight, Bus, Calendar, Download } from "lucide-react"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
 
 // Dummy bookings data

@@ -12,7 +12,7 @@ import { format } from "date-fns"
 import { CalendarIcon, MapPin, Bus, Clock } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import * as motion from "motion/react"
+import {motion} from "motion/react"
 import Image from "next/image"
 import Link from "next/link"
 

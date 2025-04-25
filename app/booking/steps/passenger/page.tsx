@@ -18,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 
 // Dummy journey data
 const journeyData = {
