@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Facebook, Instagram, Twitter } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export function Footer() {
   return (
@@ -25,10 +25,16 @@ export function Footer() {
                   <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-nigeria-green">N-Journey</span>
+              <span className="text-xl font-bold text-nigeria-green">
+                bookAM
+              </span>
             </Link>
             <div className="flex items-center gap-4">
-              <Input type="email" placeholder="Enter your email" className="max-w-[220px]" />
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                className="max-w-[220px]"
+              />
               <Button>Subscribe</Button>
             </div>
           </div>
@@ -37,12 +43,18 @@ export function Footer() {
               <h3 className="text-sm font-medium">About us</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link
+                    href="/about"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
                     How to book
                   </Link>
                 </li>
                 <li>
-                  <Link href="/help" className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link
+                    href="/help"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
                     Help center
                   </Link>
                 </li>
@@ -52,12 +64,18 @@ export function Footer() {
               <h3 className="text-sm font-medium">Journey</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/booking" className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link
+                    href="/booking"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
                     Booking easily
                   </Link>
                 </li>
                 <li>
-                  <Link href="/promotions" className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link
+                    href="/promotions"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
                     Promotions
                   </Link>
                 </li>
@@ -67,15 +85,24 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Contact us</h3>
             <div className="flex items-center gap-4">
-              <Link href="https://facebook.com" className="text-muted-foreground hover:text-foreground">
+              <Link
+                href="https://facebook.com"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
-              <Link href="https://twitter.com" className="text-muted-foreground hover:text-foreground">
+              <Link
+                href="https://twitter.com"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </Link>
-              <Link href="https://instagram.com" className="text-muted-foreground hover:text-foreground">
+              <Link
+                href="https://instagram.com"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
@@ -83,9 +110,9 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>© 2025 N-Journey, Inc. • Privacy • Terms</p>
+          <p>© 2025 bookAM, Inc. • Privacy • Terms</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

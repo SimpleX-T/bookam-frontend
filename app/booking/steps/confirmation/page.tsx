@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { motion } from "motion/react"
-import Link from "next/link"
+import { useRouter } from "next/navigation";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { motion } from "motion/react";
+import Link from "next/link";
 
 // Dummy journey data
 const journeyData = {
@@ -80,10 +80,10 @@ const journeyData = {
       time: "1:40",
     },
   },
-}
+};
 
 export default function ConfirmationPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -110,13 +110,19 @@ export default function ConfirmationPage() {
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                   3
                 </div>
-                <span className="text-sm mt-1 text-primary">Get your E-ticket</span>
+                <span className="text-sm mt-1 text-primary">
+                  Get your E-ticket
+                </span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
               <Card className="mb-6">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
@@ -135,7 +141,9 @@ export default function ConfirmationPage() {
                       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                       <polyline points="22 4 12 14.01 9 11.01" />
                     </svg>
-                    <h2 className="text-lg font-medium text-primary">Your journey is booked successfully!</h2>
+                    <h2 className="text-lg font-medium text-primary">
+                      Your journey is booked successfully!
+                    </h2>
                   </div>
                   <p className="text-sm text-muted-foreground mb-6">
                     Present E-ticket and valid identification at check-in
@@ -145,15 +153,21 @@ export default function ConfirmationPage() {
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
-                          <span className="font-medium text-primary">{journeyData.logo}</span>
+                          <span className="font-medium text-primary">
+                            {journeyData.logo}
+                          </span>
                         </div>
                         <div>
-                          <div className="font-medium">{journeyData.company}</div>
+                          <div className="font-medium">
+                            {journeyData.company}
+                          </div>
                         </div>
                       </div>
 
                       <div className="text-sm">
-                        <div className="font-medium mb-1">Passenger: {journeyData.passenger.name}</div>
+                        <div className="font-medium mb-1">
+                          Passenger: {journeyData.passenger.name}
+                        </div>
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -174,22 +188,39 @@ export default function ConfirmationPage() {
                       </div>
 
                       <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-                        <div className="text-2xl font-bold">{journeyData.from.time}</div>
+                        <div className="text-2xl font-bold">
+                          {journeyData.from.time}
+                        </div>
                         <div>
                           <div className="font-medium">
-                            {journeyData.from.city} ({journeyData.from.city.substring(0, 3).toUpperCase()})
+                            {journeyData.from.city} (
+                            {journeyData.from.city
+                              .substring(0, 3)
+                              .toUpperCase()}
+                            )
                           </div>
-                          <div className="text-sm text-muted-foreground">{journeyData.from.terminal}</div>
-                          <div className="text-sm text-muted-foreground">{journeyData.date}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.from.terminal}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.date}
+                          </div>
                         </div>
 
-                        <div className="text-2xl font-bold">{journeyData.to.time}</div>
+                        <div className="text-2xl font-bold">
+                          {journeyData.to.time}
+                        </div>
                         <div>
                           <div className="font-medium">
-                            {journeyData.to.city} ({journeyData.to.city.substring(0, 3).toUpperCase()})
+                            {journeyData.to.city} (
+                            {journeyData.to.city.substring(0, 3).toUpperCase()})
                           </div>
-                          <div className="text-sm text-muted-foreground">{journeyData.to.terminal}</div>
-                          <div className="text-sm text-muted-foreground">{journeyData.date}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.to.terminal}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.date}
+                          </div>
                         </div>
                       </div>
 
@@ -235,7 +266,14 @@ export default function ConfirmationPage() {
                             <path d="M9 10h.01" />
                             <path d="M6 10h.01" />
                             <path d="M12 10h.01" />
-                            <rect x="14" y="18" width="8" height="4" rx="1" ry="1" />
+                            <rect
+                              x="14"
+                              y="18"
+                              width="8"
+                              height="4"
+                              rx="1"
+                              ry="1"
+                            />
                           </svg>
                           <span className="text-sm">{journeyData.luggage}</span>
                         </div>
@@ -257,32 +295,47 @@ export default function ConfirmationPage() {
                             <rect width="12" height="8" x="6" y="11" rx="2" />
                             <path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5" />
                           </svg>
-                          <span className="text-sm">{journeyData.handLuggage}</span>
+                          <span className="text-sm">
+                            {journeyData.handLuggage}
+                          </span>
                         </div>
                       </div>
 
                       <div className="text-sm">
                         <div className="font-medium">
-                          Check-in: {journeyData.checkIn.date} at {journeyData.checkIn.time}
+                          Check-in: {journeyData.checkIn.date} at{" "}
+                          {journeyData.checkIn.time}
                         </div>
-                        <div className="text-xs text-muted-foreground">*All time displayed are local</div>
+                        <div className="text-xs text-muted-foreground">
+                          *All time displayed are local
+                        </div>
                       </div>
                     </div>
 
                     <div className="bg-primary/10 rounded-lg p-4 flex flex-col justify-between">
                       <div className="text-center mb-4">
-                        <div className="text-lg font-bold text-primary">N-Journey</div>
+                        <div className="text-lg font-bold text-primary">
+                          bookAM
+                        </div>
                       </div>
 
                       <div className="space-y-4">
                         <div>
-                          <div className="text-sm text-muted-foreground">Booking ID</div>
-                          <div className="text-lg font-bold">{journeyData.bookingId}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Booking ID
+                          </div>
+                          <div className="text-lg font-bold">
+                            {journeyData.bookingId}
+                          </div>
                         </div>
 
                         <div>
-                          <div className="text-sm text-muted-foreground">Bus Booking Code</div>
-                          <div className="text-lg font-bold">{journeyData.bookingCode}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Bus Booking Code
+                          </div>
+                          <div className="text-lg font-bold">
+                            {journeyData.bookingCode}
+                          </div>
                         </div>
                       </div>
 
@@ -296,31 +349,181 @@ export default function ConfirmationPage() {
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <rect width="120" height="40" fill="white" />
-                            <rect x="10" y="5" width="2" height="30" fill="black" />
-                            <rect x="15" y="5" width="1" height="30" fill="black" />
-                            <rect x="18" y="5" width="2" height="30" fill="black" />
-                            <rect x="22" y="5" width="3" height="30" fill="black" />
-                            <rect x="27" y="5" width="1" height="30" fill="black" />
-                            <rect x="30" y="5" width="2" height="30" fill="black" />
-                            <rect x="35" y="5" width="3" height="30" fill="black" />
-                            <rect x="40" y="5" width="1" height="30" fill="black" />
-                            <rect x="43" y="5" width="2" height="30" fill="black" />
-                            <rect x="48" y="5" width="1" height="30" fill="black" />
-                            <rect x="51" y="5" width="3" height="30" fill="black" />
-                            <rect x="56" y="5" width="2" height="30" fill="black" />
-                            <rect x="60" y="5" width="1" height="30" fill="black" />
-                            <rect x="63" y="5" width="3" height="30" fill="black" />
-                            <rect x="68" y="5" width="2" height="30" fill="black" />
-                            <rect x="72" y="5" width="1" height="30" fill="black" />
-                            <rect x="75" y="5" width="2" height="30" fill="black" />
-                            <rect x="80" y="5" width="3" height="30" fill="black" />
-                            <rect x="85" y="5" width="1" height="30" fill="black" />
-                            <rect x="88" y="5" width="2" height="30" fill="black" />
-                            <rect x="93" y="5" width="3" height="30" fill="black" />
-                            <rect x="98" y="5" width="1" height="30" fill="black" />
-                            <rect x="101" y="5" width="2" height="30" fill="black" />
-                            <rect x="106" y="5" width="1" height="30" fill="black" />
-                            <rect x="109" y="5" width="2" height="30" fill="black" />
+                            <rect
+                              x="10"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="15"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="18"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="22"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="27"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="30"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="35"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="40"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="43"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="48"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="51"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="56"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="60"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="63"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="68"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="72"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="75"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="80"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="85"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="88"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="93"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="98"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="101"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="106"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="109"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
                           </svg>
                         </div>
                       </div>
@@ -333,15 +536,21 @@ export default function ConfirmationPage() {
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
-                          <span className="font-medium text-primary">{journeyData.logo}</span>
+                          <span className="font-medium text-primary">
+                            {journeyData.logo}
+                          </span>
                         </div>
                         <div>
-                          <div className="font-medium">{journeyData.company}</div>
+                          <div className="font-medium">
+                            {journeyData.company}
+                          </div>
                         </div>
                       </div>
 
                       <div className="text-sm">
-                        <div className="font-medium mb-1">Passenger: {journeyData.passenger.name}</div>
+                        <div className="font-medium mb-1">
+                          Passenger: {journeyData.passenger.name}
+                        </div>
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -362,24 +571,42 @@ export default function ConfirmationPage() {
                       </div>
 
                       <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-                        <div className="text-2xl font-bold">{journeyData.secondLeg.from.time}</div>
+                        <div className="text-2xl font-bold">
+                          {journeyData.secondLeg.from.time}
+                        </div>
                         <div>
                           <div className="font-medium">
                             {journeyData.secondLeg.from.city} (
-                            {journeyData.secondLeg.from.city.substring(0, 3).toUpperCase()})
+                            {journeyData.secondLeg.from.city
+                              .substring(0, 3)
+                              .toUpperCase()}
+                            )
                           </div>
-                          <div className="text-sm text-muted-foreground">{journeyData.secondLeg.from.terminal}</div>
-                          <div className="text-sm text-muted-foreground">{journeyData.secondLeg.date}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.secondLeg.from.terminal}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.secondLeg.date}
+                          </div>
                         </div>
 
-                        <div className="text-2xl font-bold">{journeyData.secondLeg.to.time}</div>
+                        <div className="text-2xl font-bold">
+                          {journeyData.secondLeg.to.time}
+                        </div>
                         <div>
                           <div className="font-medium">
                             {journeyData.secondLeg.to.city} (
-                            {journeyData.secondLeg.to.city.substring(0, 3).toUpperCase()})
+                            {journeyData.secondLeg.to.city
+                              .substring(0, 3)
+                              .toUpperCase()}
+                            )
                           </div>
-                          <div className="text-sm text-muted-foreground">{journeyData.secondLeg.to.terminal}</div>
-                          <div className="text-sm text-muted-foreground">{journeyData.secondLeg.date}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.secondLeg.to.terminal}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {journeyData.secondLeg.date}
+                          </div>
                         </div>
                       </div>
 
@@ -425,7 +652,14 @@ export default function ConfirmationPage() {
                             <path d="M9 10h.01" />
                             <path d="M6 10h.01" />
                             <path d="M12 10h.01" />
-                            <rect x="14" y="18" width="8" height="4" rx="1" ry="1" />
+                            <rect
+                              x="14"
+                              y="18"
+                              width="8"
+                              height="4"
+                              rx="1"
+                              ry="1"
+                            />
                           </svg>
                           <span className="text-sm">{journeyData.luggage}</span>
                         </div>
@@ -447,32 +681,47 @@ export default function ConfirmationPage() {
                             <rect width="12" height="8" x="6" y="11" rx="2" />
                             <path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5" />
                           </svg>
-                          <span className="text-sm">{journeyData.handLuggage}</span>
+                          <span className="text-sm">
+                            {journeyData.handLuggage}
+                          </span>
                         </div>
                       </div>
 
                       <div className="text-sm">
                         <div className="font-medium">
-                          Check-in: {journeyData.secondLeg.checkIn.date} at {journeyData.secondLeg.checkIn.time}
+                          Check-in: {journeyData.secondLeg.checkIn.date} at{" "}
+                          {journeyData.secondLeg.checkIn.time}
                         </div>
-                        <div className="text-xs text-muted-foreground">*All time displayed are local</div>
+                        <div className="text-xs text-muted-foreground">
+                          *All time displayed are local
+                        </div>
                       </div>
                     </div>
 
                     <div className="bg-primary/10 rounded-lg p-4 flex flex-col justify-between">
                       <div className="text-center mb-4">
-                        <div className="text-lg font-bold text-primary">N-Journey</div>
+                        <div className="text-lg font-bold text-primary">
+                          bookAM
+                        </div>
                       </div>
 
                       <div className="space-y-4">
                         <div>
-                          <div className="text-sm text-muted-foreground">Booking ID</div>
-                          <div className="text-lg font-bold">{journeyData.secondLeg.bookingId}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Booking ID
+                          </div>
+                          <div className="text-lg font-bold">
+                            {journeyData.secondLeg.bookingId}
+                          </div>
                         </div>
 
                         <div>
-                          <div className="text-sm text-muted-foreground">Bus Booking Code</div>
-                          <div className="text-lg font-bold">{journeyData.secondLeg.bookingCode}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Bus Booking Code
+                          </div>
+                          <div className="text-lg font-bold">
+                            {journeyData.secondLeg.bookingCode}
+                          </div>
                         </div>
                       </div>
 
@@ -486,31 +735,181 @@ export default function ConfirmationPage() {
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <rect width="120" height="40" fill="white" />
-                            <rect x="10" y="5" width="2" height="30" fill="black" />
-                            <rect x="15" y="5" width="1" height="30" fill="black" />
-                            <rect x="18" y="5" width="2" height="30" fill="black" />
-                            <rect x="22" y="5" width="3" height="30" fill="black" />
-                            <rect x="27" y="5" width="1" height="30" fill="black" />
-                            <rect x="30" y="5" width="2" height="30" fill="black" />
-                            <rect x="35" y="5" width="3" height="30" fill="black" />
-                            <rect x="40" y="5" width="1" height="30" fill="black" />
-                            <rect x="43" y="5" width="2" height="30" fill="black" />
-                            <rect x="48" y="5" width="1" height="30" fill="black" />
-                            <rect x="51" y="5" width="3" height="30" fill="black" />
-                            <rect x="56" y="5" width="2" height="30" fill="black" />
-                            <rect x="60" y="5" width="1" height="30" fill="black" />
-                            <rect x="63" y="5" width="3" height="30" fill="black" />
-                            <rect x="68" y="5" width="2" height="30" fill="black" />
-                            <rect x="72" y="5" width="1" height="30" fill="black" />
-                            <rect x="75" y="5" width="2" height="30" fill="black" />
-                            <rect x="80" y="5" width="3" height="30" fill="black" />
-                            <rect x="85" y="5" width="1" height="30" fill="black" />
-                            <rect x="88" y="5" width="2" height="30" fill="black" />
-                            <rect x="93" y="5" width="3" height="30" fill="black" />
-                            <rect x="98" y="5" width="1" height="30" fill="black" />
-                            <rect x="101" y="5" width="2" height="30" fill="black" />
-                            <rect x="106" y="5" width="1" height="30" fill="black" />
-                            <rect x="109" y="5" width="2" height="30" fill="black" />
+                            <rect
+                              x="10"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="15"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="18"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="22"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="27"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="30"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="35"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="40"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="43"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="48"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="51"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="56"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="60"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="63"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="68"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="72"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="75"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="80"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="85"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="88"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="93"
+                              y="5"
+                              width="3"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="98"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="101"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="106"
+                              y="5"
+                              width="1"
+                              height="30"
+                              fill="black"
+                            />
+                            <rect
+                              x="109"
+                              y="5"
+                              width="2"
+                              height="30"
+                              fill="black"
+                            />
                           </svg>
                         </div>
                       </div>
@@ -528,7 +927,9 @@ export default function ConfirmationPage() {
               <Card className="sticky top-6">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-primary">Price details</h3>
+                    <h3 className="text-lg font-medium text-primary">
+                      Price details
+                    </h3>
                   </div>
 
                   <div className="space-y-2 mb-4">
@@ -542,7 +943,9 @@ export default function ConfirmationPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Regular total price</span>
-                      <span>₦{journeyData.regularTotalPrice.toLocaleString()}</span>
+                      <span>
+                        ₦{journeyData.regularTotalPrice.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between text-primary">
                       <span>Save</span>
@@ -554,7 +957,9 @@ export default function ConfirmationPage() {
 
                   <div className="flex justify-between font-medium">
                     <span>Total</span>
-                    <span className="text-lg text-primary">₦{journeyData.totalPrice.toLocaleString()}</span>
+                    <span className="text-lg text-primary">
+                      ₦{journeyData.totalPrice.toLocaleString()}
+                    </span>
                   </div>
 
                   <Separator className="my-4" />
@@ -565,11 +970,17 @@ export default function ConfirmationPage() {
                     <div className="bg-muted/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">{journeyData.logo}</span>
+                          <span className="text-xs font-medium text-primary">
+                            {journeyData.logo}
+                          </span>
                         </div>
-                        <span className="text-sm font-medium">Cloudy Transit</span>
+                        <span className="text-sm font-medium">
+                          Cloudy Transit
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground mb-1">HOU - LAS</div>
+                      <div className="text-sm text-muted-foreground mb-1">
+                        HOU - LAS
+                      </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -629,17 +1040,25 @@ export default function ConfirmationPage() {
                           <span>Direct</span>
                         </span>
                       </div>
-                      <div className="text-xs text-primary">Reschedule Available</div>
+                      <div className="text-xs text-primary">
+                        Reschedule Available
+                      </div>
                     </div>
 
                     <div className="bg-muted/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">{journeyData.logo}</span>
+                          <span className="text-xs font-medium text-primary">
+                            {journeyData.logo}
+                          </span>
                         </div>
-                        <span className="text-sm font-medium">Cloudy Transit</span>
+                        <span className="text-sm font-medium">
+                          Cloudy Transit
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground mb-1">LAS - LAX</div>
+                      <div className="text-sm text-muted-foreground mb-1">
+                        LAS - LAX
+                      </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -699,7 +1118,9 @@ export default function ConfirmationPage() {
                           <span>Direct</span>
                         </span>
                       </div>
-                      <div className="text-xs text-primary">Reschedule Available</div>
+                      <div className="text-xs text-primary">
+                        Reschedule Available
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -710,5 +1131,5 @@ export default function ConfirmationPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

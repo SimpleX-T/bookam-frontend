@@ -1,24 +1,35 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { motion } from "motion/react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Eye, EyeOff } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { motion } from "motion/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Eye, EyeOff } from "lucide-react";
 
 const signupSchema = z
   .object({
-    fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
+    fullName: z
+      .string()
+      .min(2, { message: "Full name must be at least 2 characters" }),
     email: z.string().email({ message: "Please enter a valid email address" }),
-    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" }),
     confirmPassword: z.string(),
     terms: z.boolean().refine((val) => val === true, {
       message: "You must agree to the terms and conditions",
@@ -27,14 +38,14 @@ const signupSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  })
+  });
 
-type SignupFormValues = z.infer<typeof signupSchema>
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -49,14 +60,17 @@ export default function SignupPage() {
       confirmPassword: "",
       terms: false,
     },
-  })
+  });
 
   const onSubmit = (data: SignupFormValues) => {
-    console.log(data)
+    console.log(data);
     // Store user in localStorage for demo purposes
-    localStorage.setItem("user", JSON.stringify({ email: data.email, name: data.fullName }))
-    router.push("/")
-  }
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ email: data.email, name: data.fullName })
+    );
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
@@ -82,25 +96,45 @@ export default function SignupPage() {
               <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
             </svg>
           </div>
-          <span className="text-xl font-bold text-nigeria-green">N-Journey</span>
+          <span className="text-xl font-bold text-nigeria-green">bookAM</span>
         </Link>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-center">Create an account</CardTitle>
-            <CardDescription className="text-center">Enter your details to create your account</CardDescription>
+            <CardTitle className="text-2xl text-center">
+              Create an account
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your details to create your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" placeholder="John Doe" {...register("fullName")} />
-                {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+                <Input
+                  id="fullName"
+                  placeholder="John Doe"
+                  {...register("fullName")}
+                />
+                {errors.fullName && (
+                  <p className="text-sm text-destructive">
+                    {errors.fullName.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" placeholder="name@example.com" {...register("email")} />
-                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+                <Input
+                  id="email"
+                  placeholder="name@example.com"
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -118,11 +152,21 @@ export default function SignupPage() {
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                 </div>
-                {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="text-sm text-destructive">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -140,11 +184,21 @@ export default function SignupPage() {
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    <span className="sr-only">{showConfirmPassword ? "Hide password" : "Show password"}</span>
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {showConfirmPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                 </div>
-                {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="terms" {...register("terms")} />
@@ -155,7 +209,11 @@ export default function SignupPage() {
                   </Link>
                 </Label>
               </div>
-              {errors.terms && <p className="text-sm text-destructive">{errors.terms.message}</p>}
+              {errors.terms && (
+                <p className="text-sm text-destructive">
+                  {errors.terms.message}
+                </p>
+              )}
               <Button type="submit" className="w-full">
                 Create account
               </Button>
@@ -167,7 +225,9 @@ export default function SignupPage() {
                 <span className="w-full border-t"></span>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full">
@@ -184,5 +244,5 @@ export default function SignupPage() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }
