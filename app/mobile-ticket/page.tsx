@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Share2, Printer, ArrowLeft, ArrowRight } from "lucide-react"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 
 // Dummy journey data
 const journeyData = {

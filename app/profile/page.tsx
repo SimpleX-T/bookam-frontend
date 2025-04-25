@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
 
 const profileSchema = z.object({

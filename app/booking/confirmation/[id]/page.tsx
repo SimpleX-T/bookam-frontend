@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { ArrowRight, Bus, Calendar, Download, Share2, User } from "lucide-react"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
 
 // Dummy journey data

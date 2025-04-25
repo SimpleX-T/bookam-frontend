@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Bus, X, CheckCircle2 } from "lucide-react"
-import * as motion from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
 
 // Dummy journey data
