@@ -1,70 +1,86 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { motion } from "motion/react"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { motion } from "motion/react";
+import Link from "next/link";
 
 const profileSchema = z.object({
-  fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
+  username: z
+    .string()
+    .min(2, { message: "Username must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   zipCode: z.string().optional(),
-})
+});
 
-type ProfileFormValues = z.infer<typeof profileSchema>
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
-    newPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
-    confirmPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
+    currentPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" }),
+    newPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" }),
+    confirmPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  })
+  });
 
-type PasswordFormValues = z.infer<typeof passwordSchema>
+type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function ProfilePage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(
+    null
+  );
 
   useEffect(() => {
     // Check if user is logged in
-    const userData = localStorage.getItem("user")
+    const userData = localStorage.getItem("user");
     if (!userData) {
-      router.push("/login")
-      return
+      router.push("/login");
+      return;
     }
 
     try {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
     } catch (error) {
-      console.error("Failed to parse user data:", error)
-      router.push("/login")
+      console.error("Failed to parse user data:", error);
+      router.push("/login");
     }
 
-    setIsLoading(false)
-  }, [router])
+    setIsLoading(false);
+  }, [router]);
 
   const {
     register: registerProfile,
@@ -73,7 +89,7 @@ export default function ProfilePage() {
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "John Doe",
+      username: "John Doe",
       email: "john.doe@example.com",
       phone: "+234 800 123 4567",
       address: "123 Main Street",
@@ -81,7 +97,7 @@ export default function ProfilePage() {
       state: "Lagos State",
       zipCode: "100001",
     },
-  })
+  });
 
   const {
     register: registerPassword,
@@ -94,19 +110,19 @@ export default function ProfilePage() {
       newPassword: "",
       confirmPassword: "",
     },
-  })
+  });
 
   const onSubmitProfile = (data: ProfileFormValues) => {
-    console.log("Profile data:", data)
+    console.log("Profile data:", data);
     // Show success message
-    alert("Profile updated successfully!")
-  }
+    alert("Profile updated successfully!");
+  };
 
   const onSubmitPassword = (data: PasswordFormValues) => {
-    console.log("Password data:", data)
+    console.log("Password data:", data);
     // Show success message
-    alert("Password updated successfully!")
-  }
+    alert("Password updated successfully!");
+  };
 
   if (isLoading) {
     return (
@@ -120,7 +136,7 @@ export default function ProfilePage() {
         </main>
         <Footer />
       </div>
-    )
+    );
   }
 
   return (
@@ -138,14 +154,20 @@ export default function ProfilePage() {
                   </Avatar>
                   <div className="text-center">
                     <h2 className="text-xl font-bold">John Doe</h2>
-                    <p className="text-sm text-muted-foreground">Premium Member</p>
+                    <p className="text-sm text-muted-foreground">
+                      Premium Member
+                    </p>
                   </div>
                 </div>
 
                 <Separator className="my-6" />
 
                 <nav className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -165,7 +187,11 @@ export default function ProfilePage() {
                       Profile
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile/bookings">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +215,11 @@ export default function ProfilePage() {
                       My Bookings
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile/payments">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +239,11 @@ export default function ProfilePage() {
                       Payment Methods
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile/preferences">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -237,8 +271,8 @@ export default function ProfilePage() {
                   variant="destructive"
                   className="w-full"
                   onClick={() => {
-                    localStorage.removeItem("user")
-                    router.push("/login")
+                    localStorage.removeItem("user");
+                    router.push("/login");
                   }}
                 >
                   <svg
@@ -266,12 +300,16 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Profile Settings</CardTitle>
-                  <CardDescription>Manage your account details and preferences</CardDescription>
+                  <CardDescription>
+                    Manage your account details and preferences
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="personal" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="personal">Personal Information</TabsTrigger>
+                      <TabsTrigger value="personal">
+                        Personal Information
+                      </TabsTrigger>
                       <TabsTrigger value="security">Security</TabsTrigger>
                     </TabsList>
 
@@ -281,20 +319,34 @@ export default function ProfilePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <form onSubmit={handleSubmitProfile(onSubmitProfile)} className="space-y-6">
+                        <form
+                          onSubmit={handleSubmitProfile(onSubmitProfile)}
+                          className="space-y-6"
+                        >
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label htmlFor="fullName">Full Name</Label>
-                              <Input id="fullName" {...registerProfile("fullName")} />
-                              {profileErrors.fullName && (
-                                <p className="text-sm text-destructive">{profileErrors.fullName.message}</p>
+                              <Label htmlFor="username">Username</Label>
+                              <Input
+                                id="username"
+                                {...registerProfile("username")}
+                              />
+                              {profileErrors.username && (
+                                <p className="text-sm text-destructive">
+                                  {profileErrors.username.message}
+                                </p>
                               )}
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="email">Email</Label>
-                              <Input id="email" type="email" {...registerProfile("email")} />
+                              <Input
+                                id="email"
+                                type="email"
+                                {...registerProfile("email")}
+                              />
                               {profileErrors.email && (
-                                <p className="text-sm text-destructive">{profileErrors.email.message}</p>
+                                <p className="text-sm text-destructive">
+                                  {profileErrors.email.message}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -304,12 +356,17 @@ export default function ProfilePage() {
                               <Label htmlFor="phone">Phone Number</Label>
                               <Input id="phone" {...registerProfile("phone")} />
                               {profileErrors.phone && (
-                                <p className="text-sm text-destructive">{profileErrors.phone.message}</p>
+                                <p className="text-sm text-destructive">
+                                  {profileErrors.phone.message}
+                                </p>
                               )}
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="address">Address</Label>
-                              <Input id="address" {...registerProfile("address")} />
+                              <Input
+                                id="address"
+                                {...registerProfile("address")}
+                              />
                             </div>
                           </div>
 
@@ -324,7 +381,10 @@ export default function ProfilePage() {
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="zipCode">Zip Code</Label>
-                              <Input id="zipCode" {...registerProfile("zipCode")} />
+                              <Input
+                                id="zipCode"
+                                {...registerProfile("zipCode")}
+                              />
                             </div>
                           </div>
 
@@ -339,28 +399,53 @@ export default function ProfilePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <form onSubmit={handleSubmitPassword(onSubmitPassword)} className="space-y-6">
+                        <form
+                          onSubmit={handleSubmitPassword(onSubmitPassword)}
+                          className="space-y-6"
+                        >
                           <div className="space-y-2">
-                            <Label htmlFor="currentPassword">Current Password</Label>
-                            <Input id="currentPassword" type="password" {...registerPassword("currentPassword")} />
+                            <Label htmlFor="currentPassword">
+                              Current Password
+                            </Label>
+                            <Input
+                              id="currentPassword"
+                              type="password"
+                              {...registerPassword("currentPassword")}
+                            />
                             {passwordErrors.currentPassword && (
-                              <p className="text-sm text-destructive">{passwordErrors.currentPassword.message}</p>
+                              <p className="text-sm text-destructive">
+                                {passwordErrors.currentPassword.message}
+                              </p>
                             )}
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label htmlFor="newPassword">New Password</Label>
-                              <Input id="newPassword" type="password" {...registerPassword("newPassword")} />
+                              <Input
+                                id="newPassword"
+                                type="password"
+                                {...registerPassword("newPassword")}
+                              />
                               {passwordErrors.newPassword && (
-                                <p className="text-sm text-destructive">{passwordErrors.newPassword.message}</p>
+                                <p className="text-sm text-destructive">
+                                  {passwordErrors.newPassword.message}
+                                </p>
                               )}
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                              <Input id="confirmPassword" type="password" {...registerPassword("confirmPassword")} />
+                              <Label htmlFor="confirmPassword">
+                                Confirm New Password
+                              </Label>
+                              <Input
+                                id="confirmPassword"
+                                type="password"
+                                {...registerPassword("confirmPassword")}
+                              />
                               {passwordErrors.confirmPassword && (
-                                <p className="text-sm text-destructive">{passwordErrors.confirmPassword.message}</p>
+                                <p className="text-sm text-destructive">
+                                  {passwordErrors.confirmPassword.message}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -378,5 +463,5 @@ export default function ProfilePage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

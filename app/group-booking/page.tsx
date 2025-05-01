@@ -473,7 +473,7 @@ export default function GroupBookingPage() {
                               onChange={(e) =>
                                 handleInputChange("name", e.target.value)
                               }
-                              placeholder="Full name"
+                              placeholder="Username"
                             />
                           </div>
 

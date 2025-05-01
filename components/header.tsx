@@ -13,23 +13,11 @@ import {
 import { LogOut, MenuIcon, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/auth-context";
 
 export function Header() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  // Check if user is logged in
-  useEffect(() => {
-    setMounted(true);
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsLoggedIn(true);
-    }
-  }, []);
-
-  if (!mounted) return null;
+  const { user, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -107,7 +95,7 @@ export function Header() {
 
         <div className="flex items-center gap-4">
           <ModeToggle />
-          {isLoggedIn ? (
+          {user && user.email ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -116,7 +104,11 @@ export function Header() {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/placeholder-user.jpg" alt="User" />
-                    <AvatarFallback>NU</AvatarFallback>
+                    <AvatarFallback>{`${user.username
+                      .split("")[0]
+                      .toUpperCase()}${user.username
+                      .split("")[1]
+                      .toUpperCase()}`}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -127,12 +119,7 @@ export function Header() {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    localStorage.removeItem("user");
-                    setIsLoggedIn(false);
-                  }}
-                >
+                <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

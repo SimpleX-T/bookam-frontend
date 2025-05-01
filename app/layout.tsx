@@ -4,6 +4,8 @@ import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
+import { Providers } from "@/components/providers";
+import { ToastProvider } from "@/components/toast-provider";
 
 // const inter = Inter({ subsets: ["latin"] });
 const bricolage_grotesque = Bricolage_Grotesque({
@@ -32,7 +34,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <Providers>
+              <ToastProvider />
+              {children}
+            </Providers>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
