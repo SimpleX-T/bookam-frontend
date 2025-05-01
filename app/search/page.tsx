@@ -628,7 +628,10 @@ export default function SearchPage() {
               <span>
                 Showing journeys{" "}
                 {fromCity && toCity
-                  ? `from ${fromCity} to ${toCity} on ${searchDate}`
+                  ? `from ${fromCity} to ${toCity} on ${format(
+                      searchDate || "",
+                      "PPP"
+                    )}`
                   : "for selected criteria"}
               </span>
               {/* Optional: Add Price History or other info here */}
