@@ -22,9 +22,8 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "Contact Us | N-Journey",
-  description:
-    "Get in touch with N-Journey for inquiries, feedback, or support",
+  title: "Contact Us | bookAM",
+  description: "Get in touch with bookAM for inquiries, feedback, or support",
 };
 
 export default function ContactPage() {
@@ -86,10 +85,10 @@ export default function ContactPage() {
                       <div>
                         <h3 className="font-semibold">Email</h3>
                         <p className="text-muted-foreground">
-                          General Inquiries: info@n-journey.com
+                          General Inquiries: info@bookAM.com
                         </p>
                         <p className="text-muted-foreground">
-                          Customer Support: support@n-journey.com
+                          Customer Support: support@bookAM.com
                         </p>
                       </div>
                     </div>
@@ -98,7 +97,7 @@ export default function ContactPage() {
                       <div>
                         <h3 className="font-semibold">Head Office</h3>
                         <p className="text-muted-foreground">
-                          N-Journey Tower, 123 Broad Street
+                          bookAM Tower, 123 Broad Street
                           <br />
                           Lagos Island, Lagos, Nigeria
                         </p>
@@ -192,7 +191,7 @@ export default function ContactPage() {
                     Lagos Head Office
                   </h3>
                   <p className="mb-4 text-muted-foreground">
-                    N-Journey Tower, 123 Broad Street
+                    bookAM Tower, 123 Broad Street
                     <br />
                     Lagos Island, Lagos, Nigeria
                   </p>
@@ -208,7 +207,7 @@ export default function ContactPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-primary" />
-                      <span>lagos@n-journey.com</span>
+                      <span>lagos@bookAM.com</span>
                     </div>
                   </div>
                 </div>
@@ -229,7 +228,7 @@ export default function ContactPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-primary" />
-                      <span>lagosterminal@n-journey.com</span>
+                      <span>lagosterminal@bookAM.com</span>
                     </div>
                   </div>
                 </div>
@@ -253,7 +252,7 @@ export default function ContactPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-primary" />
-                    <span>abuja@n-journey.com</span>
+                    <span>abuja@bookAM.com</span>
                   </div>
                 </div>
               </div>
@@ -280,7 +279,7 @@ export default function ContactPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-primary" />
-                    <span>portharcourt@n-journey.com</span>
+                    <span>portharcourt@bookAM.com</span>
                   </div>
                 </div>
               </div>
@@ -303,7 +302,7 @@ export default function ContactPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-primary" />
-                    <span>kano@n-journey.com</span>
+                    <span>kano@bookAM.com</span>
                   </div>
                 </div>
               </div>
@@ -325,7 +324,7 @@ export default function ContactPage() {
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger>
-                How do I book a ticket with N-Journey?
+                How do I book a ticket with bookAM?
               </AccordionTrigger>
               <AccordionContent>
                 You can book tickets through our website, mobile app, or by
@@ -373,9 +372,9 @@ export default function ContactPage() {
               </AccordionTrigger>
               <AccordionContent>
                 Yes, we offer special rates for group bookings of 10 or more
-                passengers. Please contact our sales team at
-                groups@n-journey.com or call +234 800 555 7890 for more
-                information and to arrange your group travel.
+                passengers. Please contact our sales team at groups@bookAM.com
+                or call +234 800 555 7890 for more information and to arrange
+                your group travel.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

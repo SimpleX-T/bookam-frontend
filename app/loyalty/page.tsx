@@ -213,7 +213,7 @@ export default function LoyaltyPage() {
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
               <div>
-                <h1 className="text-2xl font-bold">N-Journey Rewards</h1>
+                <h1 className="text-2xl font-bold">bookAM Rewards</h1>
                 <p className="text-muted-foreground">
                   Earn points and enjoy exclusive benefits
                 </p>
@@ -308,7 +308,7 @@ export default function LoyaltyPage() {
               <TabsContent value="overview" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Welcome to N-Journey Rewards</CardTitle>
+                    <CardTitle>Welcome to bookAM Rewards</CardTitle>
                     <CardDescription>
                       Earn points every time you travel with us and redeem them
                       for exciting rewards
@@ -325,8 +325,8 @@ export default function LoyaltyPage() {
                             <h3 className="font-medium">Earn Points</h3>
                             <p className="text-sm text-muted-foreground">
                               Earn points every time you book a journey with
-                              N-Journey. The higher your tier, the more points
-                              you earn.
+                              bookAM. The higher your tier, the more points you
+                              earn.
                             </p>
                           </div>
                         </div>

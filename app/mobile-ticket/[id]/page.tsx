@@ -111,7 +111,7 @@ export default function MobileTicketPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "My N-Journey Ticket",
+          title: "My bookAM Ticket",
           text: `My journey from ${booking.journey.from.city} to ${booking.journey.to.city} on ${booking.journey.date}. Booking reference: ${booking.reference}`,
           url: window.location.href,
         });

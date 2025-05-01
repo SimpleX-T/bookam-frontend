@@ -1,445 +1,781 @@
 "use client";
 
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input"; // Assuming Input is still used in SimplifiedSearch
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import SimplifiedSearch from "@/components/simplified-search";
+import SimplifiedSearch from "@/components/simplified-search"; // Assuming this component handles the main search inputs
 import {
-  CalendarIcon,
   ChevronDown,
-  Search,
-  ArrowRight,
   Filter,
+  Clock,
+  MapPin,
+  Luggage,
+  Users,
+  DollarSign,
+  CalendarDays,
+  Bus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+import { motion } from "framer-motion"; // Use framer-motion for easier animations
+import { format, addDays } from "date-fns";
 
-// Dummy data for bus routes
-const busRoutes = [
+// --- Interfaces ---
+interface BusRoute {
+  id: number;
+  company: string;
+  logo: string; // Could be URL in real app
+  departureTime: string; // Consider using Date objects if complex time logic needed
+  arrivalTime: string; // Consider using Date objects
+  duration: string;
+  stops: number; // 0 for direct
+  price: number; // Assuming integer price in smallest currency unit (e.g., kobo for NGN)
+  available_seats: number;
+  originCity: string;
+  destinationCity: string;
+  // transitPoints?: string[]; // Add this if you want to filter by specific transit points later
+}
+
+interface DateInfo {
+  day: string;
+  date: string;
+  fullDate: Date; // Store the actual date object
+}
+
+interface AppliedFilters {
+  price: number[];
+  stops: number[]; // Use numbers: 0 for direct, 1 for 1 stop, etc.
+  sortBy: "lowest" | "highest" | null;
+}
+
+// --- Updated Dummy Data ---
+const allBusRoutes: BusRoute[] = [
   {
     id: 1,
     company: "HorizonJet",
     logo: "HJ",
-    departureTime: "10:25PM",
-    arrivalTime: "7:06AM",
+    departureTime: "22:25", // Use 24hr format for easier sorting/comparison if needed
+    arrivalTime: "07:06",
     duration: "8h 41m",
     stops: 1,
     price: 27550,
-    date: "Fri, 16 Feb",
-    datePrice: 148,
     available_seats: 23,
+    originCity: "Lagos",
+    destinationCity: "Abuja",
   },
   {
     id: 2,
     company: "Altitude Express",
     logo: "AE",
-    departureTime: "6:30AM",
-    arrivalTime: "7:55AM",
+    departureTime: "06:30",
+    arrivalTime: "07:55",
     duration: "1h 25m",
-    stops: 1,
+    stops: 0, // Direct
     price: 20600,
-    date: "Sat, 17 Feb",
-    datePrice: 160,
     available_seats: 15,
+    originCity: "Lagos",
+    destinationCity: "Ibadan",
   },
   {
     id: 3,
     company: "Cloudy Transit",
     logo: "CT",
-    departureTime: "1:19PM",
-    arrivalTime: "2:45PM",
+    departureTime: "13:19",
+    arrivalTime: "14:45",
     duration: "1h 26m",
-    stops: 1,
+    stops: 0, // Direct
     price: 14850,
-    date: "Sun, 18 Feb",
-    datePrice: 170,
     available_seats: 32,
+    originCity: "Lagos",
+    destinationCity: "Ibadan",
   },
   {
     id: 4,
     company: "Cloudy Transit",
     logo: "CT",
-    departureTime: "6:13PM",
-    arrivalTime: "7:40PM",
-    duration: "1h 27m",
+    departureTime: "18:13",
+    arrivalTime: "03:40", // Next day arrival
+    duration: "9h 27m",
     stops: 1,
     price: 38015,
-    date: "Mon, 19 Feb",
-    datePrice: 150,
     available_seats: 8,
+    originCity: "Lagos",
+    destinationCity: "Abuja",
   },
   {
     id: 5,
     company: "Altitude Express",
     logo: "AE",
-    departureTime: "6:20AM",
-    arrivalTime: "7:46AM",
-    duration: "1h 26m",
+    departureTime: "06:20",
+    arrivalTime: "15:46",
+    duration: "9h 26m",
     stops: 2,
     price: 26910,
-    date: "Tue, 20 Feb",
-    datePrice: 146,
     available_seats: 19,
+    originCity: "Lagos",
+    destinationCity: "Abuja",
   },
   {
     id: 6,
     company: "HorizonJet",
     logo: "HJ",
-    departureTime: "7:15PM",
-    arrivalTime: "8:45PM",
-    duration: "1h 30m",
-    stops: 0,
+    departureTime: "19:15",
+    arrivalTime: "04:45", // Next day
+    duration: "9h 30m",
+    stops: 0, // Direct
     price: 54910,
-    date: "Wed, 21 Feb",
-    datePrice: 155,
     available_seats: 27,
+    originCity: "Lagos",
+    destinationCity: "Abuja",
   },
   {
     id: 7,
     company: "HorizonJet",
     logo: "HJ",
-    departureTime: "6:01AM",
-    arrivalTime: "7:28AM",
+    departureTime: "06:01",
+    arrivalTime: "07:28",
     duration: "1h 27m",
-    stops: 0,
+    stops: 0, // Direct
     price: 20050,
-    date: "Thu, 22 Feb",
-    datePrice: 142,
     available_seats: 11,
+    originCity: "Lagos",
+    destinationCity: "Ibadan",
   },
   {
     id: 8,
     company: "FlyScape",
     logo: "FS",
-    departureTime: "8:40AM",
-    arrivalTime: "10:00AM",
-    duration: "1h 20m",
-    stops: 0,
+    departureTime: "08:40",
+    arrivalTime: "18:00",
+    duration: "9h 20m",
+    stops: 1,
     price: 54910,
-    date: "Fri, 23 Feb",
-    datePrice: 160,
     available_seats: 5,
+    originCity: "Lagos",
+    destinationCity: "Abuja",
+  },
+  {
+    id: 9,
+    company: "Capital Connect",
+    logo: "CC",
+    departureTime: "09:00",
+    arrivalTime: "18:30",
+    duration: "9h 30m",
+    stops: 0,
+    price: 42000,
+    available_seats: 30,
+    originCity: "Abuja",
+    destinationCity: "Lagos",
+  },
+  {
+    id: 10,
+    company: "Capital Connect",
+    logo: "CC",
+    departureTime: "21:00",
+    arrivalTime: "06:30", // Next day
+    duration: "9h 30m",
+    stops: 1,
+    price: 39500,
+    available_seats: 12,
+    originCity: "Abuja",
+    destinationCity: "Lagos",
+  },
+  {
+    // Example for a route that might not be commonly searched
+    id: 11,
+    company: "Northern Star",
+    logo: "NS",
+    departureTime: "07:00",
+    arrivalTime: "15:00",
+    duration: "8h 00m",
+    stops: 1,
+    price: 35000,
+    available_seats: 25,
+    originCity: "Abuja",
+    destinationCity: "Kano",
   },
 ];
+
+// --- Helper Function ---
+const generateDates = (startDate: Date, count: number): DateInfo[] => {
+  const dates: DateInfo[] = [];
+  for (let i = 0; i < count; i++) {
+    const currentDate = addDays(startDate, i);
+    dates.push({
+      day: format(currentDate, "EEE"), // Short day name (e.g., Fri)
+      date: format(currentDate, "d MMM"), // Day and short month (e.g., 16 Feb)
+      fullDate: currentDate,
+    });
+  }
+  return dates;
+};
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [priceRange, setPriceRange] = useState([0, 60000]);
-  const [transitFilter, setTransitFilter] = useState<string[]>([]);
-  const [transitPointFilter, setTransitPointFilter] = useState<string[]>([]);
-  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  // --- State ---
+  // Search criteria from URL
   const [fromCity, setFromCity] = useState<string>("");
   const [toCity, setToCity] = useState<string>("");
+  const [searchDate, setSearchDate] = useState<Date | undefined>(undefined); // Date from URL param
   const [passengers, setPassengers] = useState<string>("1");
 
+  // Filter state (temporary selections)
+  const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>([
+    0, 60000,
+  ]);
+  const [selectedStopsFilter, setSelectedStopsFilter] = useState<number[]>([]); // Store numbers (0, 1, 2...)
+  const [selectedSort, setSelectedSort] = useState<"lowest" | "highest" | null>(
+    null
+  );
+
+  // Applied filters state (used for actual filtering)
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
+    price: [0, 60000],
+    stops: [],
+    sortBy: null,
+  });
+
+  // UI state
+  const [showFilters, setShowFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start loading
+  const [showDateSelector, setShowDateSelector] = useState(false);
+  const [displayDates, setDisplayDates] = useState<DateInfo[]>([]);
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0); // Index for the horizontal date selector
+
+  // --- Effects ---
+  // Effect to parse URL search params
   useEffect(() => {
-    // Get search parameters from URL
+    console.log("Parsing search params...");
     const from = searchParams.get("from");
     const to = searchParams.get("to");
     const dateParam = searchParams.get("date");
     const passengersParam = searchParams.get("passengers");
 
-    if (from) setFromCity(from);
-    if (to) setToCity(to);
-    if (passengersParam) setPassengers(passengersParam);
+    setFromCity(from || ""); // Default to empty if not present
+    setToCity(to || "");
+    setPassengers(passengersParam || "1");
+
     if (dateParam) {
       try {
-        setDate(new Date(dateParam));
+        const parsedDate = new Date(dateParam);
+        // Basic validation: Check if it's a valid date
+        if (!isNaN(parsedDate.getTime())) {
+          setSearchDate(parsedDate);
+          setShowDateSelector(false); // Hide date selector if URL has date
+          console.log("Date from URL:", parsedDate);
+        } else {
+          console.error("Invalid date format in URL:", dateParam);
+          setSearchDate(undefined);
+          setShowDateSelector(true); // Show selector if URL date is invalid
+        }
       } catch (e) {
-        console.error("Invalid date format:", e);
+        console.error("Error parsing date:", e);
+        setSearchDate(undefined);
+        setShowDateSelector(true); // Show selector on error
       }
+    } else {
+      setSearchDate(undefined);
+      setShowDateSelector(true); // Show date selector if no date in URL
+      console.log("No date in URL, showing date selector.");
     }
   }, [searchParams]);
 
-  const dates = [
-    { day: "Fri", date: "16 Feb", price: "148" },
-    { day: "Sat", date: "17 Feb", price: "160" },
-    { day: "Sun", date: "18 Feb", price: "170" },
-    { day: "Mon", date: "19 Feb", price: "150" },
-    { day: "Tue", date: "20 Feb", price: "146" },
-  ];
+  // Effect to generate dates for the horizontal selector if needed
+  useEffect(() => {
+    if (showDateSelector) {
+      const today = new Date();
+      setDisplayDates(generateDates(today, 5)); // Generate 5 dates from today
+    } else {
+      setDisplayDates([]); // Clear dates if selector is hidden
+    }
+  }, [showDateSelector]);
 
-  const handleTransitChange = (value: string) => {
-    setTransitFilter((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
+  // --- Filtering Logic ---
+  const filteredAndSortedRoutes = useMemo(() => {
+    console.log(
+      "Filtering routes. Applied filters:",
+      appliedFilters,
+      "From:",
+      fromCity,
+      "To:",
+      toCity
+    );
+    let routes = allBusRoutes.filter((route) => {
+      // Match origin and destination (case-insensitive)
+      const originMatch =
+        !fromCity || route.originCity.toLowerCase() === fromCity.toLowerCase();
+      const destinationMatch =
+        !toCity || route.destinationCity.toLowerCase() === toCity.toLowerCase();
+
+      // Match Price Range
+      const priceMatch =
+        route.price >= appliedFilters.price[0] &&
+        route.price <= appliedFilters.price[1];
+
+      // Match Stops (if filter applied)
+      // If appliedFilters.stops is empty, it means no stop filter is active, so all routes pass
+      const stopsMatch =
+        appliedFilters.stops.length === 0 ||
+        appliedFilters.stops.includes(route.stops);
+
+      return originMatch && destinationMatch && priceMatch && stopsMatch;
+    });
+
+    // Apply Sorting
+    if (appliedFilters.sortBy === "lowest") {
+      routes.sort((a, b) => a.price - b.price);
+    } else if (appliedFilters.sortBy === "highest") {
+      routes.sort((a, b) => b.price - a.price);
+    }
+    // else no sort or default sort (by ID or original order)
+
+    console.log("Filtered routes count:", routes.length);
+    setIsLoading(false); // Filtering done, set loading to false
+    return routes;
+  }, [fromCity, toCity, appliedFilters]); // Re-run when cities or applied filters change
+
+  // --- Event Handlers ---
+  const handleStopsChange = (stopValue: number) => {
+    setSelectedStopsFilter((prev) =>
+      prev.includes(stopValue)
+        ? prev.filter((item) => item !== stopValue)
+        : [...prev, stopValue]
     );
   };
 
-  const handleTransitPointChange = (value: string) => {
-    setTransitPointFilter((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
+  const handleSortChange = (sortType: "lowest" | "highest") => {
+    // Allow only one sort option to be selected
+    setSelectedSort((prev) => (prev === sortType ? null : sortType));
   };
+
+  const handleApplyFilters = useCallback(() => {
+    console.log("Applying filters...");
+    setAppliedFilters({
+      price: selectedPriceRange,
+      stops: selectedStopsFilter,
+      sortBy: selectedSort,
+    });
+    setIsLoading(true); // Set loading true while filtering happens
+    // The useMemo hook [filteredAndSortedRoutes] will re-run automatically
+    // because its dependency 'appliedFilters' changes.
+    // No need to call setIsLoading(false) here, useMemo handles it.
+
+    // Close filter sidebar on mobile after applying
+    if (window.innerWidth < 768) {
+      // md breakpoint
+      setShowFilters(false);
+    }
+  }, [selectedPriceRange, selectedStopsFilter, selectedSort]);
+
+  const handleResetFilters = useCallback(() => {
+    console.log("Resetting filters...");
+    // Reset temporary selections
+    setSelectedPriceRange([0, 60000]);
+    setSelectedStopsFilter([]);
+    setSelectedSort(null);
+    // Reset applied filters to defaults
+    setAppliedFilters({
+      price: [0, 60000],
+      stops: [],
+      sortBy: null,
+    });
+    setIsLoading(true); // Set loading true while filtering resets
+  }, []);
 
   const handleRouteSelect = (routeId: number) => {
+    // Construct the date string for the URL if available
+    // Use the date from the URL param first, then fallback to the selected date in the horizontal scroller
+    let dateQueryParam = "";
+    const selectedDate =
+      searchDate ?? displayDates[selectedDateIndex]?.fullDate;
+
+    if (selectedDate) {
+      // Format date as YYYY-MM-DD for consistency in URL params
+      dateQueryParam = `&date=${format(selectedDate, "yyyy-MM-dd")}`;
+    }
+
     router.push(
-      `/booking/steps/seat-selection?journey=${routeId}&passengers=${passengers}`
+      `/booking/steps/seat-selection?journey=${routeId}&passengers=${passengers}${dateQueryParam}&from=${fromCity}&to=${toCity}`
     );
   };
 
+  // --- Render ---
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 bg-muted/30">
-        <div className="container py-6">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1 bg-background rounded-lg p-4 shadow-sm">
-              <SimplifiedSearch />
-            </div>
+    <main className="flex-1 bg-gray-100 dark:bg-gray-950">
+      {" "}
+      {/* Use neutral background */}
+      <div className="container mx-auto px-4 py-6">
+        {/* Simplified Search Bar Area */}
+        <div className="mb-6">
+          <div className="bg-background dark:bg-gray-900 rounded-lg p-4 shadow-md">
+            <SimplifiedSearch /> {/* Pass initial values if needed */}
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6">
-            <div className="space-y-6">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
+          {" "}
+          {/* Slightly wider filter bar */}
+          {/* Filters Section */}
+          <aside className="space-y-6">
+            {/* Mobile Filter Toggle */}
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-between md:hidden mb-4 dark:text-white dark:border-gray-700"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <span>Show Filters</span>
+              <Filter className="h-4 w-4" />
+            </Button>
+
+            {/* Filter Controls (conditionally rendered) */}
+            <div
+              className={cn(
+                "space-y-6 transition-all duration-300 ease-in-out",
+                showFilters
+                  ? "block max-h-[2000px] opacity-100"
+                  : "hidden max-h-0 opacity-0 md:block md:max-h-none md:opacity-100", // Smooth transition
+                "md:block" // Always block on medium screens and up
+              )}
+            >
+              {/* Apply Filters Button */}
               <Button
-                variant="outline"
-                className="w-full flex items-center justify-between md:hidden mb-4"
-                onClick={() => setShowFilters(!showFilters)}
+                onClick={handleApplyFilters}
+                className="w-full bg-primary hover:bg-primary/90 text-white"
               >
-                <span>Filters</span>
-                <Filter className="h-4 w-4" />
+                Apply Filters
               </Button>
 
-              <div
-                className={cn(
-                  "space-y-6",
-                  showFilters ? "block" : "hidden md:block"
-                )}
-              >
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-medium">Sort by</h3>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs">
-                        Reset
-                      </Button>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm">Lowest price</label>
-                        <Checkbox />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm">Highest price</label>
-                        <Checkbox />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-medium">Price</h3>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs">
-                        Reset
-                      </Button>
-                    </div>
-                    <div className="py-4">
-                      <Slider
-                        defaultValue={[0, 60000]}
-                        max={60000}
-                        step={1000}
-                        value={priceRange}
-                        onValueChange={setPriceRange}
+              {/* Sort By */}
+              <Card className="dark:bg-gray-800 dark:border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-semibold dark:text-white">
+                      Sort by
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
+                      onClick={handleResetFilters}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="sort-lowest"
+                        className="text-sm dark:text-gray-300 cursor-pointer"
+                      >
+                        Lowest price
+                      </label>
+                      <Checkbox
+                        id="sort-lowest"
+                        checked={selectedSort === "lowest"}
+                        onCheckedChange={() => handleSortChange("lowest")}
                       />
-                      <div className="flex justify-between mt-2">
-                        <span className="text-xs">
-                          ₦{priceRange[0].toLocaleString()}
-                        </span>
-                        <span className="text-xs">
-                          ₦{priceRange[1].toLocaleString()}
-                        </span>
-                      </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="sort-highest"
+                        className="text-sm dark:text-gray-300 cursor-pointer"
+                      >
+                        Highest price
+                      </label>
+                      <Checkbox
+                        id="sort-highest"
+                        checked={selectedSort === "highest"}
+                        onCheckedChange={() => handleSortChange("highest")}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-medium">No. of transit</h3>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs">
-                        Reset
-                      </Button>
+              {/* Price Filter */}
+              <Card className="dark:bg-gray-800 dark:border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-semibold dark:text-white">
+                      Price Range
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
+                      onClick={handleResetFilters}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                  <div className="py-2">
+                    <Slider
+                      min={0}
+                      max={60000}
+                      step={1000}
+                      value={selectedPriceRange}
+                      onValueChange={setSelectedPriceRange}
+                      className="[&>span:first-child]:h-1 [&>span:first-child>span]:bg-primary" // Style slider track/thumb
+                    />
+                    <div className="flex justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
+                      <span>₦{selectedPriceRange[0].toLocaleString()}</span>
+                      <span>₦{selectedPriceRange[1].toLocaleString()}</span>
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm">Direct</label>
-                        <Checkbox
-                          checked={transitFilter.includes("direct")}
-                          onCheckedChange={() => handleTransitChange("direct")}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm">1 transit</label>
-                        <Checkbox
-                          checked={transitFilter.includes("1transit")}
-                          onCheckedChange={() =>
-                            handleTransitChange("1transit")
-                          }
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-medium">Transit point</h3>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs">
-                        Reset
-                      </Button>
+              {/* Stops Filter */}
+              <Card className="dark:bg-gray-800 dark:border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-semibold dark:text-white">
+                      Stops
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
+                      onClick={handleResetFilters}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="stops-direct"
+                        className="text-sm dark:text-gray-300 cursor-pointer"
+                      >
+                        Direct
+                      </label>
+                      <Checkbox
+                        id="stops-direct"
+                        checked={selectedStopsFilter.includes(0)}
+                        onCheckedChange={() => handleStopsChange(0)}
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm">Ibadan (IBD)</label>
-                        <Checkbox
-                          checked={transitPointFilter.includes("ibadan")}
-                          onCheckedChange={() =>
-                            handleTransitPointChange("ibadan")
-                          }
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm">Ilorin (ILR)</label>
-                        <Checkbox
-                          checked={transitPointFilter.includes("ilorin")}
-                          onCheckedChange={() =>
-                            handleTransitPointChange("ilorin")
-                          }
-                        />
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="stops-1"
+                        className="text-sm dark:text-gray-300 cursor-pointer"
+                      >
+                        1 Stop
+                      </label>
+                      <Checkbox
+                        id="stops-1"
+                        checked={selectedStopsFilter.includes(1)}
+                        onCheckedChange={() => handleStopsChange(1)}
+                      />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="stops-2"
+                        className="text-sm dark:text-gray-300 cursor-pointer"
+                      >
+                        2+ Stops
+                      </label>
+                      <Checkbox
+                        id="stops-2"
+                        checked={selectedStopsFilter.includes(2)}
+                        onCheckedChange={() => handleStopsChange(2)} // Assuming '2' represents 2 or more stops in data/filter logic
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              {/* Removed Transit Point Filter as data doesn't support it well */}
             </div>
-
-            <div className="space-y-6">
-              <div className="bg-background rounded-lg p-4 shadow-sm overflow-x-auto">
+          </aside>
+          {/* Results Section */}
+          <section className="space-y-6">
+            {/* Horizontal Date Selector (Conditional) */}
+            {showDateSelector && displayDates.length > 0 && (
+              <div className="bg-background dark:bg-gray-900 rounded-lg p-3 shadow-sm overflow-x-auto">
                 <div className="flex space-x-2 min-w-max">
-                  {dates.map((dateItem, index) => (
+                  {displayDates.map((dateItem, index) => (
                     <motion.button
                       key={index}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: index * 0.05, duration: 0.2 }}
                       className={cn(
-                        "flex flex-col items-center p-3 rounded-lg min-w-[100px]",
+                        "flex flex-col items-center p-3 rounded-lg min-w-[90px] transition-colors duration-200 border border-transparent",
                         selectedDateIndex === index
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted hover:bg-muted/80"
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                       )}
                       onClick={() => setSelectedDateIndex(index)}
                     >
                       <div className="text-sm font-medium">
                         {dateItem.day}, {dateItem.date}
                       </div>
-                      <div className="text-xs">{dateItem.price} USD</div>
+                      {/* Removed Price Display */}
                     </motion.button>
                   ))}
                 </div>
               </div>
+            )}
 
+            {/* Results Header */}
+            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <span>
+                Showing journeys{" "}
+                {fromCity && toCity
+                  ? `from ${fromCity} to ${toCity} on ${searchDate}`
+                  : "for selected criteria"}
+              </span>
+              {/* Optional: Add Price History or other info here */}
+            </div>
+
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+                <svg
+                  className="animate-spin h-8 w-8 mb-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4.75v1.5M17.127 6.873l-1.061 1.061M19.25 12h-1.5M17.127 17.127l-1.061-1.061M12 17.75v1.5M6.873 17.127l1.061-1.061M4.75 12h1.5M6.873 6.873l1.061 1.061"
+                  />
+                </svg>
+                <span>Loading available buses...</span>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!isLoading && filteredAndSortedRoutes.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-64 text-center bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <Bus
+                  size={48}
+                  className="text-gray-400 dark:text-gray-500 mb-4"
+                />
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  No Buses Found
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  We couldn't find any buses matching your current search and
+                  filter criteria.
+                </p>
+                <Button
+                  variant="link"
+                  className="mt-4 text-primary"
+                  onClick={handleResetFilters}
+                >
+                  Reset Filters and Search Again
+                </Button>
+              </div>
+            )}
+
+            {/* Bus Route Results */}
+            {!isLoading && filteredAndSortedRoutes.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <span>
-                    Showing journeys from {fromCity || "Lagos"} to{" "}
-                    {toCity || "Abuja"}
-                  </span>
-                  <Button variant="ghost" size="sm" className="ml-auto">
-                    Price history
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                  </Button>
-                </div>
-
-                {busRoutes.map((route, index) => (
+                {filteredAndSortedRoutes.map((route, index) => (
                   <motion.div
                     key={route.id}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.07, duration: 0.3 }}
+                    layout // Animate layout changes smoothly
                   >
-                    <Card className="overflow-hidden">
+                    <Card className="overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200 border dark:border-gray-700">
                       <CardContent className="p-0">
-                        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] gap-4 p-4 items-center">
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center justify-center w-12 h-12 bg-muted rounded-md">
-                              <span className="font-medium">{route.logo}</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-4 p-4 items-center">
+                          {/* Company Info */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full text-primary font-bold">
+                              {/* Use an actual logo image if available */}
+                              {route.logo}
                             </div>
                             <div>
-                              <div className="text-sm font-medium">
+                              <div className="text-sm font-semibold text-gray-800 dark:text-white">
                                 {route.company}
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                23kg
+                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <Luggage size={12} /> 23kg{" "}
+                                {/* Example baggage */}
                               </div>
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-2 items-center">
-                            <div className="text-center">
-                              <div className="text-lg font-bold">
+                          {/* Journey Details */}
+                          <div className="grid grid-cols-[auto_1fr_auto] gap-2 items-center text-center sm:text-left">
+                            {/* Departure */}
+                            <div className="flex flex-col items-center sm:items-start">
+                              <div className="text-lg font-bold text-gray-900 dark:text-white">
                                 {route.departureTime}
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                {fromCity || "Lagos"}
+                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <MapPin size={12} /> {route.originCity}
                               </div>
                             </div>
-                            <div className="flex flex-col items-center">
-                              <div className="text-xs text-muted-foreground">
-                                {route.duration}
+
+                            {/* Duration & Stops */}
+                            <div className="flex flex-col items-center px-2">
+                              <div className="text-xs font-medium text-primary dark:text-primary-light whitespace-nowrap flex items-center gap-1">
+                                <Clock size={12} /> {route.duration}
                               </div>
-                              <div className="relative w-16 md:w-24">
-                                <div className="absolute inset-0 flex items-center">
-                                  <span className="w-full border-t"></span>
+                              <div className="relative w-full my-1">
+                                <div
+                                  className="absolute inset-0 flex items-center"
+                                  aria-hidden="true"
+                                >
+                                  <div className="w-full border-t border-dashed border-gray-300 dark:border-gray-600"></div>
                                 </div>
                                 <div className="relative flex justify-center">
-                                  <span className="bg-background px-2 text-xs text-muted-foreground">
+                                  <span className="bg-white dark:bg-gray-800 px-1 text-xs text-gray-500 dark:text-gray-400">
                                     {route.stops === 0
                                       ? "Direct"
-                                      : `${route.stops} stop`}
+                                      : `${route.stops} stop${
+                                          route.stops > 1 ? "s" : ""
+                                        }`}
                                   </span>
                                 </div>
                               </div>
                             </div>
-                            <div className="text-center">
-                              <div className="text-lg font-bold">
+
+                            {/* Arrival */}
+                            <div className="flex flex-col items-center sm:items-end">
+                              <div className="text-lg font-bold text-gray-900 dark:text-white">
                                 {route.arrivalTime}
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                {toCity || "Abuja"}
+                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <MapPin size={12} /> {route.destinationCity}
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex flex-col items-end gap-2">
-                            <div className="text-xl font-bold">
-                              ₦{route.price.toLocaleString()}{" "}
-                              <span className="text-xs font-normal text-muted-foreground">
-                                / pax
-                              </span>
+                          {/* Price & Action */}
+                          <div className="flex flex-col items-center sm:items-end gap-1 pt-3 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-4">
+                            <div className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1">
+                              <DollarSign
+                                size={18}
+                                className="text-green-600"
+                              />
+                              ₦{route.price.toLocaleString()}
                             </div>
-                            <div className="text-xs text-muted-foreground mb-2">
-                              {route.available_seats} seats available
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1">
+                              <Users size={12} /> {route.available_seats} seats
+                              left
                             </div>
-                            <Button onClick={() => handleRouteSelect(route.id)}>
-                              Choose
+                            <Button
+                              size="sm"
+                              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white"
+                              onClick={() => handleRouteSelect(route.id)}
+                            >
+                              Choose Seat
                             </Button>
                           </div>
                         </div>
@@ -447,58 +783,53 @@ export default function SearchPage() {
                     </Card>
                   </motion.div>
                 ))}
-
-                <div className="flex justify-center gap-2 py-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-8 h-8 rounded-full bg-primary text-primary-foreground"
-                  >
-                    1
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8 rounded-full"
-                  >
-                    2
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8 rounded-full"
-                  >
-                    3
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8 rounded-full"
-                  >
-                    4
-                  </Button>
-                  <span className="flex items-center px-2">...</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8 rounded-full"
-                  >
-                    10
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8 rounded-full"
-                  >
-                    11
-                  </Button>
-                </div>
               </div>
-            </div>
-          </div>
+            )}
+
+            {/* Pagination (Placeholder/Example) */}
+            {!isLoading && filteredAndSortedRoutes.length > 0 && (
+              <div className="flex justify-center items-center gap-1 py-4 text-sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="dark:text-white dark:border-gray-600"
+                >
+                  Prev
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-8 h-8 bg-primary text-primary-foreground border-primary"
+                >
+                  1
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 dark:text-white"
+                >
+                  2
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 dark:text-white"
+                >
+                  3
+                </Button>
+                <span className="text-gray-500 dark:text-gray-400">...</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="dark:text-white dark:border-gray-600"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </section>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </main>
   );
 }

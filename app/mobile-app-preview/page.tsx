@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { useState } from "react";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Home,
   Search,
@@ -26,21 +32,27 @@ import {
   Phone,
   Mail,
   Download,
-} from "lucide-react"
-import {motion} from "motion/react"
+} from "lucide-react";
+import { motion } from "motion/react";
 
 export default function MobileAppPreviewPage() {
-  const [activeTab, setActiveTab] = useState("home")
+  const [activeTab, setActiveTab] = useState("home");
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             <div className="mb-6">
-              <h1 className="text-2xl font-bold">N-Journey Mobile App</h1>
-              <p className="text-muted-foreground">Preview our upcoming mobile app experience</p>
+              <h1 className="text-2xl font-bold">bookAM Mobile App</h1>
+              <p className="text-muted-foreground">
+                Preview our upcoming mobile app experience
+              </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
@@ -48,7 +60,9 @@ export default function MobileAppPreviewPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Mobile App Preview</CardTitle>
-                    <CardDescription>Experience the N-Journey app before it launches</CardDescription>
+                    <CardDescription>
+                      Experience the bookAM app before it launches
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="flex justify-center p-0">
                     <div className="relative w-[320px] h-[650px] bg-background rounded-[40px] border-8 border-muted overflow-hidden shadow-xl my-6">
@@ -57,13 +71,24 @@ export default function MobileAppPreviewPage() {
 
                       {/* App content */}
                       <div className="h-full overflow-hidden">
-                        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-                          <TabsContent value="home" className="flex-1 overflow-auto m-0 p-0">
+                        <Tabs
+                          value={activeTab}
+                          onValueChange={setActiveTab}
+                          className="h-full flex flex-col"
+                        >
+                          <TabsContent
+                            value="home"
+                            className="flex-1 overflow-auto m-0 p-0"
+                          >
                             <div className="p-4 bg-primary text-primary-foreground">
                               <div className="flex justify-between items-center mb-4">
                                 <div>
-                                  <h2 className="font-bold text-lg">Hello, Chioma</h2>
-                                  <p className="text-xs opacity-90">Where are you going today?</p>
+                                  <h2 className="font-bold text-lg">
+                                    Hello, Chioma
+                                  </h2>
+                                  <p className="text-xs opacity-90">
+                                    Where are you going today?
+                                  </p>
                                 </div>
                                 <div className="relative">
                                   <Bell className="h-6 w-6" />
@@ -97,13 +122,17 @@ export default function MobileAppPreviewPage() {
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 border rounded-md p-2">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-xs">May 16, 2025</span>
+                                        <span className="text-xs">
+                                          May 16, 2025
+                                        </span>
                                       </div>
                                     </div>
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 border rounded-md p-2">
                                         <User className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-xs">1 Passenger</span>
+                                        <span className="text-xs">
+                                          1 Passenger
+                                        </span>
                                       </div>
                                     </div>
                                   </div>
@@ -117,16 +146,24 @@ export default function MobileAppPreviewPage() {
 
                             <div className="p-4 space-y-4">
                               <div>
-                                <h3 className="font-medium text-sm mb-2">Upcoming Journeys</h3>
+                                <h3 className="font-medium text-sm mb-2">
+                                  Upcoming Journeys
+                                </h3>
                                 <Card>
                                   <CardContent className="p-3">
                                     <div className="flex justify-between items-start mb-2">
                                       <div>
-                                        <Badge className="bg-primary text-primary-foreground text-xs">Tomorrow</Badge>
-                                        <h4 className="font-medium mt-1">Lagos to Abuja</h4>
+                                        <Badge className="bg-primary text-primary-foreground text-xs">
+                                          Tomorrow
+                                        </Badge>
+                                        <h4 className="font-medium mt-1">
+                                          Lagos to Abuja
+                                        </h4>
                                       </div>
                                       <div className="text-right">
-                                        <p className="text-xs text-muted-foreground">Journey #CT-6018</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Journey #CT-6018
+                                        </p>
                                         <p className="font-medium">₦14,850</p>
                                       </div>
                                     </div>
@@ -134,11 +171,15 @@ export default function MobileAppPreviewPage() {
                                     <div className="flex items-center justify-between text-sm mt-3">
                                       <div className="space-y-1">
                                         <p className="font-medium">23:15</p>
-                                        <p className="text-xs text-muted-foreground">Lagos</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Lagos
+                                        </p>
                                       </div>
 
                                       <div className="flex-1 mx-2 flex flex-col items-center">
-                                        <div className="text-xs text-muted-foreground">8h 10m</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          8h 10m
+                                        </div>
                                         <div className="relative w-full">
                                           <div className="absolute inset-0 flex items-center">
                                             <span className="w-full border-t border-dashed"></span>
@@ -151,15 +192,24 @@ export default function MobileAppPreviewPage() {
 
                                       <div className="space-y-1 text-right">
                                         <p className="font-medium">07:25</p>
-                                        <p className="text-xs text-muted-foreground">Abuja</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Abuja
+                                        </p>
                                       </div>
                                     </div>
 
                                     <div className="flex gap-2 mt-3">
-                                      <Button size="sm" variant="outline" className="flex-1 text-xs h-8">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="flex-1 text-xs h-8"
+                                      >
                                         View Ticket
                                       </Button>
-                                      <Button size="sm" className="flex-1 text-xs h-8">
+                                      <Button
+                                        size="sm"
+                                        className="flex-1 text-xs h-8"
+                                      >
                                         Track Journey
                                       </Button>
                                     </div>
@@ -168,13 +218,31 @@ export default function MobileAppPreviewPage() {
                               </div>
 
                               <div>
-                                <h3 className="font-medium text-sm mb-2">Popular Routes</h3>
+                                <h3 className="font-medium text-sm mb-2">
+                                  Popular Routes
+                                </h3>
                                 <div className="grid grid-cols-2 gap-2">
                                   {[
-                                    { from: "Lagos", to: "Abuja", price: "₦14,850" },
-                                    { from: "Lagos", to: "Benin", price: "₦8,500" },
-                                    { from: "Abuja", to: "Kaduna", price: "₦5,200" },
-                                    { from: "Port Harcourt", to: "Enugu", price: "₦9,300" },
+                                    {
+                                      from: "Lagos",
+                                      to: "Abuja",
+                                      price: "₦14,850",
+                                    },
+                                    {
+                                      from: "Lagos",
+                                      to: "Benin",
+                                      price: "₦8,500",
+                                    },
+                                    {
+                                      from: "Abuja",
+                                      to: "Kaduna",
+                                      price: "₦5,200",
+                                    },
+                                    {
+                                      from: "Port Harcourt",
+                                      to: "Enugu",
+                                      price: "₦9,300",
+                                    },
                                   ].map((route, index) => (
                                     <Card key={index}>
                                       <CardContent className="p-3">
@@ -184,8 +252,14 @@ export default function MobileAppPreviewPage() {
                                           <span>{route.to}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                          <span className="font-medium">{route.price}</span>
-                                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                                          <span className="font-medium">
+                                            {route.price}
+                                          </span>
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-7 w-7 p-0"
+                                          >
                                             <ChevronRight className="h-4 w-4" />
                                           </Button>
                                         </div>
@@ -196,16 +270,26 @@ export default function MobileAppPreviewPage() {
                               </div>
 
                               <div>
-                                <h3 className="font-medium text-sm mb-2">Special Offers</h3>
+                                <h3 className="font-medium text-sm mb-2">
+                                  Special Offers
+                                </h3>
                                 <div className="bg-primary/10 rounded-lg p-3 flex items-center gap-3">
                                   <div className="bg-primary/20 rounded-full p-2">
                                     <Gift className="h-5 w-5 text-primary" />
                                   </div>
                                   <div className="flex-1">
-                                    <h4 className="font-medium text-sm">Weekend Special</h4>
-                                    <p className="text-xs text-muted-foreground">20% off all weekend journeys</p>
+                                    <h4 className="font-medium text-sm">
+                                      Weekend Special
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground">
+                                      20% off all weekend journeys
+                                    </p>
                                   </div>
-                                  <Button size="sm" variant="outline" className="h-8">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8"
+                                  >
                                     View
                                   </Button>
                                 </div>
@@ -213,9 +297,14 @@ export default function MobileAppPreviewPage() {
                             </div>
                           </TabsContent>
 
-                          <TabsContent value="search" className="flex-1 overflow-auto m-0 p-0">
+                          <TabsContent
+                            value="search"
+                            className="flex-1 overflow-auto m-0 p-0"
+                          >
                             <div className="p-4 bg-muted">
-                              <h2 className="font-bold text-lg mb-3">Search Results</h2>
+                              <h2 className="font-bold text-lg mb-3">
+                                Search Results
+                              </h2>
                               <div className="bg-background rounded-lg p-3 mb-3">
                                 <div className="flex justify-between text-sm mb-2">
                                   <div>
@@ -223,13 +312,23 @@ export default function MobileAppPreviewPage() {
                                     <ArrowRight className="h-3 w-3 inline mx-1" />
                                     <span className="font-medium">Abuja</span>
                                   </div>
-                                  <div className="text-muted-foreground">May 16, 2025</div>
+                                  <div className="text-muted-foreground">
+                                    May 16, 2025
+                                  </div>
                                 </div>
                                 <div className="flex gap-2">
-                                  <Button size="sm" variant="outline" className="text-xs h-7 rounded-full">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7 rounded-full"
+                                  >
                                     Filter
                                   </Button>
-                                  <Button size="sm" variant="outline" className="text-xs h-7 rounded-full">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7 rounded-full"
+                                  >
                                     Sort
                                   </Button>
                                 </div>
@@ -265,28 +364,40 @@ export default function MobileAppPreviewPage() {
                                   <CardContent className="p-3">
                                     <div className="flex justify-between items-start mb-2">
                                       <div>
-                                        <h4 className="font-medium">{journey.company}</h4>
+                                        <h4 className="font-medium">
+                                          {journey.company}
+                                        </h4>
                                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                           <Bus className="h-3 w-3" />
                                           <span>Luxury Coach</span>
                                         </div>
                                       </div>
                                       <div className="text-right">
-                                        <p className="font-medium">{journey.price}</p>
+                                        <p className="font-medium">
+                                          {journey.price}
+                                        </p>
                                         {journey.discount && (
-                                          <Badge className="bg-green-500 text-white text-xs">{journey.discount}</Badge>
+                                          <Badge className="bg-green-500 text-white text-xs">
+                                            {journey.discount}
+                                          </Badge>
                                         )}
                                       </div>
                                     </div>
 
                                     <div className="flex items-center justify-between text-sm mt-3">
                                       <div className="space-y-1">
-                                        <p className="font-medium">{journey.departure}</p>
-                                        <p className="text-xs text-muted-foreground">Lagos</p>
+                                        <p className="font-medium">
+                                          {journey.departure}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Lagos
+                                        </p>
                                       </div>
 
                                       <div className="flex-1 mx-2 flex flex-col items-center">
-                                        <div className="text-xs text-muted-foreground">{journey.duration}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {journey.duration}
+                                        </div>
                                         <div className="relative w-full">
                                           <div className="absolute inset-0 flex items-center">
                                             <span className="w-full border-t border-dashed"></span>
@@ -298,12 +409,19 @@ export default function MobileAppPreviewPage() {
                                       </div>
 
                                       <div className="space-y-1 text-right">
-                                        <p className="font-medium">{journey.arrival}</p>
-                                        <p className="text-xs text-muted-foreground">Abuja</p>
+                                        <p className="font-medium">
+                                          {journey.arrival}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Abuja
+                                        </p>
                                       </div>
                                     </div>
 
-                                    <Button size="sm" className="w-full mt-3 text-xs h-8">
+                                    <Button
+                                      size="sm"
+                                      className="w-full mt-3 text-xs h-8"
+                                    >
                                       Select Journey
                                     </Button>
                                   </CardContent>
@@ -312,32 +430,49 @@ export default function MobileAppPreviewPage() {
                             </div>
                           </TabsContent>
 
-                          <TabsContent value="tickets" className="flex-1 overflow-auto m-0 p-0">
+                          <TabsContent
+                            value="tickets"
+                            className="flex-1 overflow-auto m-0 p-0"
+                          >
                             <div className="p-4 bg-muted">
-                              <h2 className="font-bold text-lg mb-3">My Tickets</h2>
+                              <h2 className="font-bold text-lg mb-3">
+                                My Tickets
+                              </h2>
                             </div>
 
                             <div className="p-4 space-y-4">
                               <div>
-                                <h3 className="font-medium text-sm mb-2">Upcoming Journeys</h3>
+                                <h3 className="font-medium text-sm mb-2">
+                                  Upcoming Journeys
+                                </h3>
                                 <Card className="overflow-hidden">
                                   <div className="bg-primary text-primary-foreground p-3">
                                     <div className="flex justify-between items-start">
                                       <div>
-                                        <h4 className="font-medium">Lagos to Abuja</h4>
-                                        <p className="text-xs opacity-90">Tomorrow, 23:15</p>
+                                        <h4 className="font-medium">
+                                          Lagos to Abuja
+                                        </h4>
+                                        <p className="text-xs opacity-90">
+                                          Tomorrow, 23:15
+                                        </p>
                                       </div>
-                                      <Badge className="bg-white text-primary">CT-6018</Badge>
+                                      <Badge className="bg-white text-primary">
+                                        CT-6018
+                                      </Badge>
                                     </div>
 
                                     <div className="flex items-center justify-between text-sm mt-3">
                                       <div className="space-y-1">
                                         <p className="font-medium">23:15</p>
-                                        <p className="text-xs opacity-90">Lagos</p>
+                                        <p className="text-xs opacity-90">
+                                          Lagos
+                                        </p>
                                       </div>
 
                                       <div className="flex-1 mx-2 flex flex-col items-center">
-                                        <div className="text-xs opacity-90">8h 10m</div>
+                                        <div className="text-xs opacity-90">
+                                          8h 10m
+                                        </div>
                                         <div className="relative w-full">
                                           <div className="absolute inset-0 flex items-center">
                                             <span className="w-full border-t border-dashed border-white/50"></span>
@@ -350,7 +485,9 @@ export default function MobileAppPreviewPage() {
 
                                       <div className="space-y-1 text-right">
                                         <p className="font-medium">07:25</p>
-                                        <p className="text-xs opacity-90">Abuja</p>
+                                        <p className="text-xs opacity-90">
+                                          Abuja
+                                        </p>
                                       </div>
                                     </div>
                                   </div>
@@ -358,21 +495,36 @@ export default function MobileAppPreviewPage() {
                                   <CardContent className="p-3">
                                     <div className="flex justify-between mb-3">
                                       <div>
-                                        <p className="text-xs text-muted-foreground">Passenger</p>
-                                        <p className="text-sm font-medium">Chioma Okafor</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Passenger
+                                        </p>
+                                        <p className="text-sm font-medium">
+                                          Chioma Okafor
+                                        </p>
                                       </div>
                                       <div className="text-right">
-                                        <p className="text-xs text-muted-foreground">Seat</p>
-                                        <p className="text-sm font-medium">12A</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Seat
+                                        </p>
+                                        <p className="text-sm font-medium">
+                                          12A
+                                        </p>
                                       </div>
                                     </div>
 
                                     <div className="flex gap-2">
-                                      <Button size="sm" variant="outline" className="flex-1 text-xs h-8">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="flex-1 text-xs h-8"
+                                      >
                                         <QrCode className="h-3 w-3 mr-1" />
                                         View QR
                                       </Button>
-                                      <Button size="sm" className="flex-1 text-xs h-8">
+                                      <Button
+                                        size="sm"
+                                        className="flex-1 text-xs h-8"
+                                      >
                                         <Clock className="h-3 w-3 mr-1" />
                                         Track
                                       </Button>
@@ -382,12 +534,29 @@ export default function MobileAppPreviewPage() {
                               </div>
 
                               <div>
-                                <h3 className="font-medium text-sm mb-2">Past Journeys</h3>
+                                <h3 className="font-medium text-sm mb-2">
+                                  Past Journeys
+                                </h3>
                                 <div className="space-y-3">
                                   {[
-                                    { from: "Abuja", to: "Lagos", date: "April 10, 2025", id: "CT-5982" },
-                                    { from: "Lagos", to: "Benin", date: "March 22, 2025", id: "CT-5843" },
-                                    { from: "Benin", to: "Lagos", date: "March 25, 2025", id: "CT-5901" },
+                                    {
+                                      from: "Abuja",
+                                      to: "Lagos",
+                                      date: "April 10, 2025",
+                                      id: "CT-5982",
+                                    },
+                                    {
+                                      from: "Lagos",
+                                      to: "Benin",
+                                      date: "March 22, 2025",
+                                      id: "CT-5843",
+                                    },
+                                    {
+                                      from: "Benin",
+                                      to: "Lagos",
+                                      date: "March 25, 2025",
+                                      id: "CT-5901",
+                                    },
                                   ].map((journey, index) => (
                                     <Card key={index}>
                                       <CardContent className="p-3">
@@ -396,11 +565,19 @@ export default function MobileAppPreviewPage() {
                                             <h4 className="font-medium">
                                               {journey.from} to {journey.to}
                                             </h4>
-                                            <p className="text-xs text-muted-foreground">{journey.date}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                              {journey.date}
+                                            </p>
                                           </div>
-                                          <Badge variant="outline">{journey.id}</Badge>
+                                          <Badge variant="outline">
+                                            {journey.id}
+                                          </Badge>
                                         </div>
-                                        <Button size="sm" variant="ghost" className="w-full mt-2 text-xs h-8">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="w-full mt-2 text-xs h-8"
+                                        >
                                           View Details
                                         </Button>
                                       </CardContent>
@@ -411,15 +588,22 @@ export default function MobileAppPreviewPage() {
                             </div>
                           </TabsContent>
 
-                          <TabsContent value="profile" className="flex-1 overflow-auto m-0 p-0">
+                          <TabsContent
+                            value="profile"
+                            className="flex-1 overflow-auto m-0 p-0"
+                          >
                             <div className="p-4 bg-muted">
                               <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                                   <User className="h-6 w-6 text-primary" />
                                 </div>
                                 <div>
-                                  <h2 className="font-bold text-lg">Chioma Okafor</h2>
-                                  <p className="text-xs text-muted-foreground">Gold Member • 4,850 points</p>
+                                  <h2 className="font-bold text-lg">
+                                    Chioma Okafor
+                                  </h2>
+                                  <p className="text-xs text-muted-foreground">
+                                    Gold Member • 4,850 points
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -427,18 +611,28 @@ export default function MobileAppPreviewPage() {
                             <div className="p-4 space-y-4">
                               <Card>
                                 <CardContent className="p-3">
-                                  <h3 className="font-medium text-sm mb-2">Account</h3>
+                                  <h3 className="font-medium text-sm mb-2">
+                                    Account
+                                  </h3>
                                   <div className="space-y-2">
                                     {[
-                                      { icon: User, label: "Personal Information" },
+                                      {
+                                        icon: User,
+                                        label: "Personal Information",
+                                      },
                                       { icon: Ticket, label: "My Bookings" },
                                       { icon: Gift, label: "Rewards & Points" },
                                       { icon: Settings, label: "Settings" },
                                     ].map((item, index) => (
-                                      <div key={index} className="flex items-center justify-between">
+                                      <div
+                                        key={index}
+                                        className="flex items-center justify-between"
+                                      >
                                         <div className="flex items-center gap-2">
                                           <item.icon className="h-4 w-4 text-muted-foreground" />
-                                          <span className="text-sm">{item.label}</span>
+                                          <span className="text-sm">
+                                            {item.label}
+                                          </span>
                                         </div>
                                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                       </div>
@@ -449,16 +643,26 @@ export default function MobileAppPreviewPage() {
 
                               <Card>
                                 <CardContent className="p-3">
-                                  <h3 className="font-medium text-sm mb-2">Support</h3>
+                                  <h3 className="font-medium text-sm mb-2">
+                                    Support
+                                  </h3>
                                   <div className="space-y-2">
                                     {[
                                       { icon: Mail, label: "Contact Us" },
-                                      { icon: Phone, label: "Call Customer Service" },
+                                      {
+                                        icon: Phone,
+                                        label: "Call Customer Service",
+                                      },
                                     ].map((item, index) => (
-                                      <div key={index} className="flex items-center justify-between">
+                                      <div
+                                        key={index}
+                                        className="flex items-center justify-between"
+                                      >
                                         <div className="flex items-center gap-2">
                                           <item.icon className="h-4 w-4 text-muted-foreground" />
-                                          <span className="text-sm">{item.label}</span>
+                                          <span className="text-sm">
+                                            {item.label}
+                                          </span>
                                         </div>
                                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                       </div>
@@ -477,28 +681,44 @@ export default function MobileAppPreviewPage() {
                           <div className="mt-auto border-t">
                             <div className="flex justify-around p-2">
                               <button
-                                className={`flex flex-col items-center p-2 ${activeTab === "home" ? "text-primary" : "text-muted-foreground"}`}
+                                className={`flex flex-col items-center p-2 ${
+                                  activeTab === "home"
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
+                                }`}
                                 onClick={() => setActiveTab("home")}
                               >
                                 <Home className="h-5 w-5" />
                                 <span className="text-xs mt-1">Home</span>
                               </button>
                               <button
-                                className={`flex flex-col items-center p-2 ${activeTab === "search" ? "text-primary" : "text-muted-foreground"}`}
+                                className={`flex flex-col items-center p-2 ${
+                                  activeTab === "search"
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
+                                }`}
                                 onClick={() => setActiveTab("search")}
                               >
                                 <Search className="h-5 w-5" />
                                 <span className="text-xs mt-1">Search</span>
                               </button>
                               <button
-                                className={`flex flex-col items-center p-2 ${activeTab === "tickets" ? "text-primary" : "text-muted-foreground"}`}
+                                className={`flex flex-col items-center p-2 ${
+                                  activeTab === "tickets"
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
+                                }`}
                                 onClick={() => setActiveTab("tickets")}
                               >
                                 <Ticket className="h-5 w-5" />
                                 <span className="text-xs mt-1">Tickets</span>
                               </button>
                               <button
-                                className={`flex flex-col items-center p-2 ${activeTab === "profile" ? "text-primary" : "text-muted-foreground"}`}
+                                className={`flex flex-col items-center p-2 ${
+                                  activeTab === "profile"
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
+                                }`}
                                 onClick={() => setActiveTab("profile")}
                               >
                                 <User className="h-5 w-5" />
@@ -517,11 +737,14 @@ export default function MobileAppPreviewPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Download the App</CardTitle>
-                    <CardDescription>Coming soon to iOS and Android</CardDescription>
+                    <CardDescription>
+                      Coming soon to iOS and Android
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground">
-                      Get early access to our mobile app and enjoy these exclusive features:
+                      Get early access to our mobile app and enjoy these
+                      exclusive features:
                     </p>
 
                     <div className="space-y-3">
@@ -532,7 +755,8 @@ export default function MobileAppPreviewPage() {
                         <div>
                           <h3 className="font-medium">Real-time Tracking</h3>
                           <p className="text-sm text-muted-foreground">
-                            Track your journey in real-time and get updates on arrival times
+                            Track your journey in real-time and get updates on
+                            arrival times
                           </p>
                         </div>
                       </div>
@@ -544,7 +768,8 @@ export default function MobileAppPreviewPage() {
                         <div>
                           <h3 className="font-medium">Mobile Tickets</h3>
                           <p className="text-sm text-muted-foreground">
-                            Access your tickets offline and scan QR codes for boarding
+                            Access your tickets offline and scan QR codes for
+                            boarding
                           </p>
                         </div>
                       </div>
@@ -556,7 +781,8 @@ export default function MobileAppPreviewPage() {
                         <div>
                           <h3 className="font-medium">Push Notifications</h3>
                           <p className="text-sm text-muted-foreground">
-                            Get instant updates about your journey and special offers
+                            Get instant updates about your journey and special
+                            offers
                           </p>
                         </div>
                       </div>
@@ -567,7 +793,9 @@ export default function MobileAppPreviewPage() {
                         </div>
                         <div>
                           <h3 className="font-medium">Exclusive Rewards</h3>
-                          <p className="text-sm text-muted-foreground">Earn and redeem points directly from the app</p>
+                          <p className="text-sm text-muted-foreground">
+                            Earn and redeem points directly from the app
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -625,13 +853,19 @@ export default function MobileAppPreviewPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Offline Maps</span>
-                        <Badge variant="outline" className="text-muted-foreground">
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground"
+                        >
                           Coming Soon
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Journey Sharing</span>
-                        <Badge variant="outline" className="text-muted-foreground">
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground"
+                        >
                           Coming Soon
                         </Badge>
                       </div>
@@ -645,5 +879,5 @@ export default function MobileAppPreviewPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

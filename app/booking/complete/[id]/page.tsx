@@ -26,7 +26,7 @@ import {
   Share2,
   User,
 } from "lucide-react";
-import {motion} from "motion/react";
+import { motion } from "motion/react";
 import { TicketDisplay } from "@/components/tickets/ticket-display";
 import { fetchBookingDetails } from "@/lib/api/bookings";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -133,7 +133,7 @@ export default function BookingCompletePage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "My N-Journey Ticket",
+          title: "My bookAM Ticket",
           text: `My journey from ${booking.journey.from.city} to ${booking.journey.to.city} on ${booking.journey.date}. Booking reference: ${booking.reference}`,
           url: window.location.href,
         });

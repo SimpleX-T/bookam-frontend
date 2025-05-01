@@ -71,7 +71,10 @@ export default function GroupBookingPage() {
     specialRequests: "",
   });
 
-  const handleInputChange = (field: string, value: string | Date | undefined) => {
+  const handleInputChange = (
+    field: string,
+    value: string | Date | undefined
+  ) => {
     setFormData({ ...formData, [field]: value });
   };
 
@@ -287,7 +290,9 @@ export default function GroupBookingPage() {
                               onChange={(e) =>
                                 handleInputChange(
                                   "passengers",
-                                  (Number.parseInt(e.target.value) || 10).toString()
+                                  (
+                                    Number.parseInt(e.target.value) || 10
+                                  ).toString()
                                 )
                               }
                             />
@@ -447,7 +452,9 @@ export default function GroupBookingPage() {
                               onChange={(e) =>
                                 handleInputChange(
                                   "passengers",
-                                  (Number.parseInt(e.target.value) || 10).toString()
+                                  (
+                                    Number.parseInt(e.target.value) || 10
+                                  ).toString()
                                 )
                               }
                             />
@@ -638,7 +645,7 @@ export default function GroupBookingPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">Email:</span>
-                        <span>groups@n-journey.com</span>
+                        <span>groups@bookAM.com</span>
                       </div>
                     </div>
                     <Button variant="outline" className="w-full">

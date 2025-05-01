@@ -1,12 +1,15 @@
 export interface Route {
-  id: number;
+  id: string;
   from: string;
   to: string;
   price: number;
   duration: string;
-  departureTime: string;
-  transportType: string;
-  stops: string[];
-  availableSeats: number;
   image: string;
+  description: string;
+  distance: string;
+  departureTime: string;
+  arrivalTime: string;
+  stops: string[];
+  fromLocation: string;
+  toLocation: string;
 }

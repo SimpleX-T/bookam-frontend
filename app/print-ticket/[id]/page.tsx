@@ -219,7 +219,7 @@ export default function PrintTicketPage() {
           >
             <div className="print:py-10">
               <div className="text-center mb-8 print:mb-6">
-                <h1 className="text-3xl font-bold text-primary">N-Journey</h1>
+                <h1 className="text-3xl font-bold text-primary">bookAM</h1>
                 <p className="text-muted-foreground">
                   E-Ticket / Boarding Pass
                 </p>
@@ -555,7 +555,7 @@ export default function PrintTicketPage() {
                   safe.
                 </p>
                 <p className="mt-1">
-                  © {new Date().getFullYear()} N-Journey. All rights reserved.
+                  © {new Date().getFullYear()} bookAM. All rights reserved.
                 </p>
               </div>
             </div>

@@ -54,7 +54,7 @@ export function TicketDisplay({
           <CardContent className={cn(compact ? "p-0" : "p-0")}>
             <div className="bg-primary text-primary-foreground p-4 text-center rounded-t-lg">
               <h2 className={cn("font-bold", compact ? "text-lg" : "text-xl")}>
-                N-Journey
+                bookAM
               </h2>
               <p
                 className={cn(
