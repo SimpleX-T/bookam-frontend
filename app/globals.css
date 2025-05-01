@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-inter: ${inter.style.fontFamily};
+  --font-bricolage-grotesque: ${bricolage_grotesque.style.fontFamily};
+}
+
+body {
+  font-family: var(--font-bricolage-grotesque), sans-serif;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
