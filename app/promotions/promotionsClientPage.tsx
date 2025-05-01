@@ -54,7 +54,7 @@ export default function PromotionsClientPage() {
           <div className="relative hidden h-[300px] overflow-hidden rounded-xl md:block">
             <Image
               src="/placeholder.svg?height=600&width=800"
-              alt="N-Journey promotions"
+              alt="bookAM promotions"
               fill
               className="object-cover"
               priority
@@ -279,7 +279,7 @@ export default function PromotionsClientPage() {
       {/* Loyalty Program */}
       <section className="mb-12">
         <div className="mb-8 text-center">
-          <h2 className="mb-2 text-3xl font-bold">N-Journey Loyalty Program</h2>
+          <h2 className="mb-2 text-3xl font-bold">bookAM Loyalty Program</h2>
           <p className="mx-auto max-w-2xl text-muted-foreground">
             Earn points with every journey and enjoy exclusive benefits
           </p>
@@ -293,9 +293,9 @@ export default function PromotionsClientPage() {
                   Join Our Loyalty Program
                 </h3>
                 <p className="mb-6">
-                  The N-Journey Loyalty Program rewards our frequent travelers
-                  with points, exclusive benefits, and special offers. The more
-                  you travel with us, the more you earn!
+                  The bookAM Loyalty Program rewards our frequent travelers with
+                  points, exclusive benefits, and special offers. The more you
+                  travel with us, the more you earn!
                 </p>
                 <Button asChild variant="secondary">
                   <Link href="/signup">
@@ -428,8 +428,7 @@ export default function PromotionsClientPage() {
                 <div className="space-y-4">
                   <p>
                     Redeeming your loyalty points is easy and can be done
-                    through our website, mobile app, or at any N-Journey
-                    terminal.
+                    through our website, mobile app, or at any bookAM terminal.
                   </p>
 
                   <div className="rounded-lg bg-muted p-4">
@@ -437,7 +436,7 @@ export default function PromotionsClientPage() {
                       How to Redeem Online:
                     </h4>
                     <ol className="ml-5 list-decimal space-y-2">
-                      <li>Log in to your N-Journey account</li>
+                      <li>Log in to your bookAM account</li>
                       <li>Navigate to "My Rewards" section</li>
                       <li>Select "Redeem Points"</li>
                       <li>Choose your preferred redemption option</li>
@@ -506,7 +505,7 @@ export default function PromotionsClientPage() {
               WELCOME10
             </div>
             <p className="text-sm text-muted-foreground">
-              10% off your first booking with N-Journey. New users only.
+              10% off your first booking with bookAM. New users only.
             </p>
             <Separator className="my-3" />
             <Button
@@ -599,8 +598,8 @@ export default function PromotionsClientPage() {
               to seat allocation.
             </li>
             <li>
-              N-Journey reserves the right to modify or discontinue any
-              promotion without prior notice.
+              bookAM reserves the right to modify or discontinue any promotion
+              without prior notice.
             </li>
             <li>
               Promo codes are valid for one-time use only unless otherwise

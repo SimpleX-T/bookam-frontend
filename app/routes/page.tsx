@@ -1,14 +1,57 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
-import React from "react";
-// import { motion } from "motion/react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { routes } from "@/lib/constants";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { JourneyPlanner } from "@/components/route-planner/route-planner";
+import { useRouter } from "next/navigation";
+import { Route } from "@/types";
+
+type RouteOption = {
+  operator: string;
+  price: number;
+  duration: string;
+  stops: string[];
+};
+const routeOptions: {
+  [key: string]: RouteOption[];
+} = {
+  "abakpa-gariki": [
+    {
+      operator: "Peace Mass",
+      price: 800,
+      duration: "8h 10m",
+      stops: ["Stop A", "Stop B"],
+    },
+  ],
+  "enugu-nsukka": [
+    {
+      operator: "Royal Express",
+      price: 2500,
+      duration: "2h 30m",
+      stops: ["Stop A", "Stop B"],
+    },
+  ],
+};
+export type TransportOption = {
+  operator: string; // e.g. "Peace Mass"
+  price: number; // e.g. 2500
+  duration: string; // e.g. "2h 30m"
+  departureTime?: string; // optional: "08:30 AM"
+  mapUrl?: string; // optional: link to the route on a map service
+};
 
 export default function Routes() {
+  const router = useRouter();
+  function handleContinue(route: Route) {
+    router.push(
+      `/search?from=${route.from.toLowerCase()}&to=${route.to.toLowerCase()}`
+    );
+  }
   return (
     <main className="min-h-screen bg-muted/30">
       <section className="py-16">
@@ -16,50 +59,7 @@ export default function Routes() {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Available Routes</h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {routes.map((route, index) => (
-              <div
-                key={route.id}
-                // initial={{ opacity: 0, y: 20 }}
-                // animate={{ opacity: 1, y: 0 }}
-                // transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <Card className="overflow-hidden h-full">
-                  <div className="relative h-40">
-                    <Image
-                      src={route.image || "/placeholder.svg"}
-                      alt={`${route.from} to ${route.to}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <CardContent className="p-5">
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="font-bold text-lg">
-                        {route.from} <ArrowRight className="inline h-4 w-4" />{" "}
-                        {route.to}
-                      </div>
-                      <Badge variant="outline" className="text-primary">
-                        ₦{route.price.toLocaleString()}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground mb-4">
-                      <Clock className="mr-1 h-4 w-4" />
-                      {route.duration}
-                    </div>
-                    <Button className="w-full" asChild>
-                      <Link
-                        href={`/search?from=${route.from.toLowerCase()}&to=${route.to.toLowerCase()}`}
-                      >
-                        Book Now
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
-          </div>
+          <JourneyPlanner onContinue={handleContinue} />
         </div>
       </section>
     </main>

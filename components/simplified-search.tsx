@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -23,8 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
-import { CalendarIcon, ArrowRight, Search } from "lucide-react";
-import * as motion from "motion/react";
+import { CalendarIcon, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Popular destinations in Nigeria
@@ -45,14 +44,29 @@ const searchSchema = z.object({
   from: z.string({ required_error: "Please select departure city" }),
   to: z.string({ required_error: "Please select destination city" }),
   date: z.date({ required_error: "Please select a date" }),
-  passengers: z.string({ required_error: "Please select number of passengers" }),
+  passengers: z.string({
+    required_error: "Please select number of passengers",
+  }),
 });
 
 type SearchFormValues = z.infer<typeof searchSchema>;
 
 export default function SimplifiedSearch() {
   const router = useRouter();
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const searchParams = useSearchParams();
+
+  const initialFrom = searchParams.get("from") || "";
+  const initialTo = searchParams.get("to") || "";
+  const initialPassengers = searchParams.get("passengers") || "1";
+
+  let initialDate: Date = new Date();
+  const dateParam = searchParams.get("date");
+  if (dateParam) {
+    const parsed = new Date(dateParam);
+    if (!isNaN(parsed.getTime())) initialDate = parsed;
+  }
+
+  const [date, setDate] = useState<Date | undefined>(initialDate);
 
   const {
     register,
@@ -62,14 +76,19 @@ export default function SimplifiedSearch() {
   } = useForm<SearchFormValues>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      passengers: "1",
-      date: new Date(),
+      from: initialFrom,
+      to: initialTo,
+      date: initialDate,
+      passengers: initialPassengers,
     },
   });
 
+  // Ensure React Hook Form's internal state reflects our controlled `date`
+  useEffect(() => {
+    setValue("date", date ?? new Date());
+  }, [date, setValue]);
+
   const onSubmit = (data: SearchFormValues) => {
-    console.log("Search data:", data);
-    // Convert the data to query parameters
     const params = new URLSearchParams({
       from: data.from,
       to: data.to,
@@ -85,9 +104,13 @@ export default function SimplifiedSearch() {
       <CardContent className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* From City */}
             <div className="space-y-2">
               <Label htmlFor="from">From</Label>
-              <Select onValueChange={(value) => setValue("from", value)}>
+              <Select
+                defaultValue={initialFrom}
+                onValueChange={(value) => setValue("from", value)}
+              >
                 <SelectTrigger
                   id="from"
                   className={cn(errors.from && "border-destructive")}
@@ -109,9 +132,13 @@ export default function SimplifiedSearch() {
               )}
             </div>
 
+            {/* To City */}
             <div className="space-y-2">
               <Label htmlFor="to">To</Label>
-              <Select onValueChange={(value) => setValue("to", value)}>
+              <Select
+                defaultValue={initialTo}
+                onValueChange={(value) => setValue("to", value)}
+              >
                 <SelectTrigger
                   id="to"
                   className={cn(errors.to && "border-destructive")}
@@ -133,6 +160,7 @@ export default function SimplifiedSearch() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Departure Date */}
             <div className="space-y-2">
               <Label htmlFor="date">Departure Date</Label>
               <Popover>
@@ -153,13 +181,13 @@ export default function SimplifiedSearch() {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={(date) => {
-                      setDate(date);
-                      if (date) setValue("date", date);
+                    onSelect={(d) => {
+                      setDate(d);
+                      if (d) setValue("date", d);
                     }}
                     initialFocus
-                    disabled={(date) =>
-                      date < new Date(new Date().setHours(0, 0, 0, 0))
+                    disabled={(d) =>
+                      d < new Date(new Date().setHours(0, 0, 0, 0))
                     }
                   />
                 </PopoverContent>
@@ -171,10 +199,11 @@ export default function SimplifiedSearch() {
               )}
             </div>
 
+            {/* Passengers */}
             <div className="space-y-2">
               <Label htmlFor="passengers">Passengers</Label>
               <Select
-                defaultValue="1"
+                defaultValue={initialPassengers}
                 onValueChange={(value) => setValue("passengers", value)}
               >
                 <SelectTrigger id="passengers">

@@ -293,7 +293,7 @@ export default function MultiCityPage() {
               <CardHeader>
                 <CardTitle>Multi-City Journey Benefits</CardTitle>
                 <CardDescription>
-                  Why book a multi-city journey with N-Journey
+                  Why book a multi-city journey with bookAM
                 </CardDescription>
               </CardHeader>
               <CardContent>

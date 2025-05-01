@@ -16,9 +16,9 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "About Us | N-Journey",
+  title: "About Us | bookAM",
   description:
-    "Learn about N-Journey, Nigeria's premier bus transportation service",
+    "Learn about bookAM, Nigeria's premier bus transportation service",
 };
 
 export default function AboutPage() {
@@ -31,7 +31,7 @@ export default function AboutPage() {
           <div className="grid gap-8 md:grid-cols-2 md:gap-12">
             <div className="flex flex-col justify-center">
               <h1 className="mb-4 text-4xl font-bold md:text-5xl">
-                About N-Journey
+                About bookAM
               </h1>
               <p className="mb-6 text-lg">
                 Nigeria's premier bus transportation service, connecting people
@@ -49,7 +49,7 @@ export default function AboutPage() {
             <div className="relative hidden h-[300px] overflow-hidden rounded-xl md:block">
               <Image
                 src="/placeholder.svg?height=600&width=800"
-                alt="N-Journey team"
+                alt="bookAM team"
                 fill
                 className="object-cover"
                 priority
@@ -76,10 +76,10 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p>
-                  N-Journey started with just 5 buses connecting Lagos and
-                  Abuja. Our founder, Dr. Adebayo Ogunlesi, envisioned a
-                  transportation system that would prioritize safety and comfort
-                  above all else.
+                  bookAM started with just 5 buses connecting Lagos and Abuja.
+                  Our founder, Dr. Adebayo Ogunlesi, envisioned a transportation
+                  system that would prioritize safety and comfort above all
+                  else.
                 </p>
               </CardContent>
             </Card>
@@ -105,7 +105,7 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p>
-                  Today, N-Journey operates over 500 buses with cutting-edge
+                  Today, bookAM operates over 500 buses with cutting-edge
                   technology, including real-time tracking, digital ticketing,
                   and enhanced safety features. We continue to innovate and
                   improve our services.
@@ -120,7 +120,7 @@ export default function AboutPage() {
           <div className="mb-8 text-center">
             <h2 className="mb-2 text-3xl font-bold">Our Values</h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              The principles that guide everything we do at N-Journey
+              The principles that guide everything we do at bookAM
             </p>
           </div>
 
@@ -176,7 +176,7 @@ export default function AboutPage() {
           <div className="mb-8 text-center">
             <h2 className="mb-2 text-3xl font-bold">Our Leadership Team</h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              Meet the dedicated professionals guiding N-Journey's vision and
+              Meet the dedicated professionals guiding bookAM's vision and
               operations
             </p>
           </div>
@@ -199,8 +199,8 @@ export default function AboutPage() {
               <CardContent className="text-center">
                 <p className="text-muted-foreground">
                   With over 25 years in transportation and logistics, Dr.
-                  Ogunlesi founded N-Journey with a vision to transform bus
-                  travel in Nigeria.
+                  Ogunlesi founded bookAM with a vision to transform bus travel
+                  in Nigeria.
                 </p>
               </CardContent>
             </Card>
@@ -221,7 +221,7 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-muted-foreground">
-                  Mrs. Adeyemi oversees all operational aspects of N-Journey,
+                  Mrs. Adeyemi oversees all operational aspects of bookAM,
                   ensuring smooth and efficient service delivery across our
                   network.
                 </p>
@@ -367,7 +367,7 @@ export default function AboutPage() {
                 Join Us on Our Journey
               </h2>
               <p className="mb-6 text-lg">
-                Experience the N-Journey difference for yourself. Book your next
+                Experience the bookAM difference for yourself. Book your next
                 trip with us and discover why we're Nigeria's most trusted bus
                 transportation service.
               </p>
@@ -384,7 +384,7 @@ export default function AboutPage() {
               <div className="relative h-[200px] w-[300px] overflow-hidden rounded-xl">
                 <Image
                   src="/placeholder.svg?height=400&width=600"
-                  alt="N-Journey bus"
+                  alt="bookAM bus"
                   fill
                   className="object-cover"
                 />
