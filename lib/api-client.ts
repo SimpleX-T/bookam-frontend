@@ -63,31 +63,22 @@ export interface ApiResponse<T> {
 const handleResponse = async <T>(
   response: Response
 ): Promise<ApiResponse<T>> => {
-  const data = await response.json().catch(async () => {
-    return response;
-  });
+  const data = await response.json();
 
-  if (!response.ok) {
-    const errorMessage =
-      typeof data === "string"
-        ? data
-        : data?.error?.message || "An error occurred";
-
-    const errorCode = typeof data === "string" ? undefined : data?.error?.code;
-
+  if (!response.ok || data.success === false) {
     return {
       success: false,
       data: null as any,
       error: {
-        message: errorMessage,
-        code: errorCode,
+        message: data.error?.message || "An error occurred",
+        code: data.error?.code,
       },
     };
   }
 
   return {
     success: true,
-    data: (data as any).data || data,
+    data: data.data || data,
   };
 };
 
@@ -112,7 +103,9 @@ export const apiClient = {
   account: {
     login: async (
       data: LoginRequest
-    ): Promise<ApiResponse<{ token: string; user: any }>> => {
+    ): Promise<
+      ApiResponse<{ token: string; email: string; username: string }>
+    > => {
       const response = await fetch(`${API_BASE_URL}/account/login`, {
         method: "POST",
         headers: createHeaders(),

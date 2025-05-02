@@ -89,23 +89,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       const response = await apiClient.account.login(data);
+      console.log(response);
 
       if (response.success) {
         // Extract token and user data from response
-        const { token: authToken, user: userData } = response.data;
+        const { token: authToken, username, email } = response.data;
 
         // Save to state
         setToken(authToken);
-        setUser(userData);
+        setUser({ username, email });
         setIsAuthenticated(true);
 
         // Save to localStorage
         localStorage.setItem("token", authToken);
-        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("user", JSON.stringify({ username, email }));
 
         // Navigate to dashboard
-        router.push("/dashboard");
-        
+        router.push("/routes");
+
         // Show success toast
         toast.success("Login successful!");
       } else {
@@ -139,8 +140,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
 
         // Navigate to a confirmation page or dashboard
-        router.push("/registration-success");
-        
+        router.push("/routes");
+
         // Show success toast
         toast.success("Registration successful!");
       } else {
@@ -171,7 +172,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Navigate to login page
     router.push("/login");
-    
+
     // Show success toast
     toast.success("Logged out successfully");
   };

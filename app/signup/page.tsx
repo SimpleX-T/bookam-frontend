@@ -48,10 +48,8 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       await signup(data);
-      toast.success("Account created successfully!");
     } catch (error) {
       console.error("Signup failed:", error);
-      toast.error(authError || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -93,10 +91,11 @@ export default function SignupPage() {
               Enter your details to create your account
             </CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Full Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
                   placeholder="John Doe"
@@ -109,6 +108,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -123,6 +123,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -157,6 +158,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
@@ -193,9 +195,12 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="flex items-center space-x-2">
-                <Checkbox
+                <input
+                  type="checkbox"
                   id="terms"
+                  className="accent-nigeria-green"
                   {...register("terms")}
                   disabled={isLoading}
                 />
@@ -241,6 +246,7 @@ export default function SignupPage() {
               )}
             </form>
           </CardContent>
+
           <CardFooter className="flex flex-col">
             <div className="relative my-4 w-full">
               <div className="absolute inset-0 flex items-center">
