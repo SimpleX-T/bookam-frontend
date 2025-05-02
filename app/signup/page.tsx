@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { motion } from "motion/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Card,
   CardContent,
@@ -20,32 +20,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
-
-const signupSchema = z
-  .object({
-    fullName: z
-      .string()
-      .min(2, { message: "Full name must be at least 2 characters" }),
-    email: z.string().email({ message: "Please enter a valid email address" }),
-    password: z
-      .string()
-      .min(8, { message: "Password must be at least 8 characters" }),
-    confirmPassword: z.string(),
-    terms: z.boolean().refine((val) => val === true, {
-      message: "You must agree to the terms and conditions",
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type SignupFormValues = z.infer<typeof signupSchema>;
+import { SignupFormValues, useAuth } from "@/hooks/use-auth";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signupSchema, signup, error: authError } = useAuth();
 
   const {
     register,
@@ -54,7 +36,7 @@ export default function SignupPage() {
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      fullName: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -62,14 +44,15 @@ export default function SignupPage() {
     },
   });
 
-  const onSubmit = (data: SignupFormValues) => {
-    console.log(data);
-    // Store user in localStorage for demo purposes
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ email: data.email, name: data.fullName })
-    );
-    router.push("/");
+  const onSubmit = async (data: SignupFormValues) => {
+    setIsLoading(true);
+    try {
+      await signup(data);
+    } catch (error) {
+      console.error("Signup failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -108,27 +91,31 @@ export default function SignupPage() {
               Enter your details to create your account
             </CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="fullName"
+                  id="username"
                   placeholder="John Doe"
-                  {...register("fullName")}
+                  {...register("username")}
+                  disabled={isLoading}
                 />
-                {errors.fullName && (
+                {errors.username && (
                   <p className="text-sm text-destructive">
-                    {errors.fullName.message}
+                    {errors.username.message}
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   placeholder="name@example.com"
                   {...register("email")}
+                  disabled={isLoading}
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">
@@ -136,6 +123,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -144,6 +132,7 @@ export default function SignupPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     {...register("password")}
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -151,6 +140,7 @@ export default function SignupPage() {
                     size="icon"
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -168,6 +158,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
@@ -176,6 +167,7 @@ export default function SignupPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
                     {...register("confirmPassword")}
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -183,6 +175,7 @@ export default function SignupPage() {
                     size="icon"
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isLoading}
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -190,7 +183,9 @@ export default function SignupPage() {
                       <Eye className="h-4 w-4" />
                     )}
                     <span className="sr-only">
-                      {showConfirmPassword ? "Hide password" : "Show password"}
+                      {showConfirmPassword
+                        ? "Hide confirm password"
+                        : "Show confirm password"}
                     </span>
                   </Button>
                 </div>
@@ -200,12 +195,31 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+
               <div className="flex items-center space-x-2">
-                <Checkbox id="terms" {...register("terms")} />
+                <input
+                  type="checkbox"
+                  id="terms"
+                  className="accent-nigeria-green"
+                  {...register("terms")}
+                  disabled={isLoading}
+                />
                 <Label htmlFor="terms" className="text-sm">
                   I agree to the{" "}
-                  <Link href="/terms" className="text-primary hover:underline">
-                    terms and conditions
+                  <Link
+                    href="/terms"
+                    className="text-primary hover:underline"
+                    target="_blank"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline"
+                    target="_blank"
+                  >
+                    Privacy Policy
                   </Link>
                 </Label>
               </div>
@@ -214,11 +228,25 @@ export default function SignupPage() {
                   {errors.terms.message}
                 </p>
               )}
-              <Button type="submit" className="w-full">
-                Create account
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Spinner className="mr-2" size="sm" /> Creating account...
+                  </>
+                ) : (
+                  "Create account"
+                )}
               </Button>
+
+              {authError && (
+                <p className="text-sm text-destructive text-center">
+                  {authError}
+                </p>
+              )}
             </form>
           </CardContent>
+
           <CardFooter className="flex flex-col">
             <div className="relative my-4 w-full">
               <div className="absolute inset-0 flex items-center">
@@ -231,8 +259,12 @@ export default function SignupPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full">
-              <Button variant="outline">Google</Button>
-              <Button variant="outline">Facebook</Button>
+              <Button variant="outline" disabled={isLoading}>
+                Google
+              </Button>
+              <Button variant="outline" disabled={isLoading}>
+                Facebook
+              </Button>
             </div>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Already have an account?{" "}

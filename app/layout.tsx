@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { Providers } from "@/components/providers";
+import { ToastProvider } from "@/components/toast-provider";
 
 // const inter = Inter({ subsets: ["latin"] });
 const bricolage_grotesque = Bricolage_Grotesque({
@@ -35,10 +37,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              {children} <Footer />
-            </div>
+            <Providers>
+              <ToastProvider />
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                {children}
+                <Footer />
+              </div>
+            </Providers>
           </QueryProvider>
         </ThemeProvider>
       </body>
