@@ -1,18 +1,14 @@
 "use client";
 
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 
 import SimplifiedSearch from "@/components/simplified-search";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight,
   Bus,
   Calendar as CalendarIcon,
-  Clock,
   MapPin,
   Star,
   TrendingUp,
@@ -24,77 +20,21 @@ import Link from "next/link";
 import { JourneyPlanner } from "@/components/route-planner/route-planner";
 import { useRouter } from "next/navigation";
 import { Route } from "@/types";
+import { promotions, sampleRoutes } from "@/lib/constants";
+import { useApp } from "@/contexts/app-context";
 
-const popularRoutes = [
-  {
-    id: 1,
-    from: "Abakpa",
-    to: "Gariki",
-    price: 800,
-    duration: "8h 10m",
-    image:
-      "https://www.shutterstock.com/shutterstock/videos/3458108987/thumb/1.jpg?ip=x480",
-  },
-  {
-    id: 2,
-    from: "Enugu",
-    to: "Nsukka",
-    price: 2500,
-    duration: "2h 30m",
-    image:
-      "https://as2.ftcdn.net/jpg/05/11/87/61/1000_F_511876132_lvR1nkSpnniH26xvN5bX84CZCPDScVFI.jpg",
-  },
-  {
-    id: 3,
-    from: "Abuja",
-    to: "Kaduna",
-    price: 17200,
-    duration: "3h 15m",
-    image:
-      "https://www.shutterstock.com/image-photo/aerial-view-bustling-urban-landscape-600nw-2550888697.jpg",
-  },
-  {
-    id: 4,
-    from: "PH",
-    to: "Owerri",
-    price: 1200,
-    duration: "2h 45m",
-    image:
-      "https://www.nairaland.com/attachments/5928171_2127234810287541038941947456967265889492231n_jpega075271d01fed7cb95498c07e6fe6075",
-  },
-];
-
-// Promotions data
-const promotions = [
-  {
-    id: 1,
-    title: "Weekend Special",
-    description: "20% off on all weekend journeys",
-    code: "WEEKEND20",
-    validUntil: "June 30, 2025",
-  },
-  {
-    id: 2,
-    title: "Family Package",
-    description: "Book for 4 or more and get 15% discount",
-    code: "FAMILY15",
-    validUntil: "July 15, 2025",
-  },
-  {
-    id: 3,
-    title: "Early Bird",
-    description: "Book 7 days in advance and save 10%",
-    code: "EARLY10",
-    validUntil: "Ongoing",
-  },
-];
+import playStore from "@/public/images/playstore.png";
+import appStore from "@/public/images/appstore.png";
+import mobileApp from "@/public/images/mobile.png";
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("search");
   const router = useRouter();
+  const { routes } = useApp();
+
   function handleContinue(route: Route) {
     router.push(
-      `/search?from=${route.from.toLowerCase()}&to=${route.to.toLowerCase()}`
+      `/search?from=${route.origin.toLowerCase()}&to=${route.destination.toLowerCase()}`
     );
   }
   return (
@@ -166,6 +106,7 @@ export default function HomePage() {
           </div>
         </section>
       </section>
+
       <div className="bg-background rounded-xl shadow-lg p-6 max-w-5xl mx-auto my-4">
         <Tabs
           defaultValue="search"
@@ -202,6 +143,7 @@ export default function HomePage() {
           </TabsContent>
         </Tabs>
       </div>
+
       {/* Popular Routes Section */}
       <section className="py-16">
         <div className="container">
@@ -215,7 +157,13 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <JourneyPlanner max={4} onContinue={handleContinue} />
+          <JourneyPlanner
+            max={4}
+            onContinue={handleContinue}
+            routes={
+              routes.length ? routes.slice(0, 3) : sampleRoutes.slice(0, 4)
+            }
+          />
         </div>
       </section>
 
@@ -295,7 +243,7 @@ export default function HomePage() {
       </section>
 
       {/* Current Promotions */}
-      <section className="py-16">
+      {/* <section className="py-16">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Current Promotions</h2>
@@ -336,10 +284,15 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Download App Section */}
-      <section className="py-16 bg-primary text-primary-foreground">
+      <section className="py-16 bg-primary text-primary-foreground relative">
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm w-full h-full cursor-not-allowed z-20 flex items-center justify-center">
+          <h3 className="text-3xl text-white text-center uppercase font-bold w-[24ch]">
+            The bookAM mobile app is coming soon to your app stores!
+          </h3>
+        </div>
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
@@ -350,58 +303,33 @@ export default function HomePage() {
                 Get the best experience with our mobile app. Book tickets, check
                 journey status, and receive updates on the go.
               </p>
-              <div className="flex flex-wrap gap-4">
-                <Button variant="secondary" size="lg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
-                    <path d="M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5.5" />
-                    <path d="M16 3v4" />
-                    <path d="M8 3v4" />
-                    <path d="M3 11h18" />
-                    <path d="M19 16v6" />
-                    <path d="M22 19l-3-3-3 3" />
-                  </svg>
-                  App Store
-                </Button>
-                <Button variant="secondary" size="lg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
-                    <path d="M3 9h.01M21 9h.01M3 15h.01M21 15h.01M12 3v18" />
-                    <path d="M3 3v18h18V3z" />
-                  </svg>
-                  Google Play
-                </Button>
+              <div className="flex flex-wrap gap-4 items-center">
+                <Link href="/">
+                  <Image
+                    src={appStore}
+                    alt="App Store"
+                    width={160}
+                    height={80}
+                  />
+                </Link>
+                <Link href="/">
+                  <Image
+                    src={playStore}
+                    alt="App Store"
+                    width={200}
+                    height={100}
+                  />
+                </Link>
               </div>
             </div>
             <div className="flex justify-center lg:justify-end">
               <div className="relative w-[300px] h-[500px]">
-                <div className="absolute inset-0 bg-background/10 rounded-3xl transform rotate-6"></div>
-                <div className="absolute inset-0 bg-background/20 rounded-3xl"></div>
+                <div className="absolute inset-0 bg-background/10 rounded-3xl transform rotate-6" />
+                <div className="absolute inset-0 bg-background/20 rounded-3xl" />
                 <div className="relative h-full w-full bg-background/5 rounded-3xl border-4 border-background/20 overflow-hidden">
                   <Image
-                    src="/images/mobile.png"
+                    src={mobileApp}
                     alt="bookAM Mobile App"
-                    fill
                     className="object-cover"
                   />
                 </div>

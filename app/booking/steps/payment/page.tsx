@@ -1,21 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { motion } from "motion/react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { motion } from "motion/react";
 
 // Dummy journey data
 const journeyData = {
@@ -58,15 +62,24 @@ const journeyData = {
   regularTotalPrice: 15000,
   save: 150,
   totalPrice: 14850,
-}
+};
 
 const paymentSchema = z.object({
   paymentMethod: z.enum(["card", "paypal"], {
     required_error: "Please select a payment method",
   }),
-  cardName: z.string().min(2, { message: "Please enter the cardholder name" }).optional(),
-  cardNumber: z.string().min(16, { message: "Please enter a valid card number" }).optional(),
-  expiryDate: z.string().min(5, { message: "Please enter a valid expiry date" }).optional(),
+  cardName: z
+    .string()
+    .min(2, { message: "Please enter the cardholder name" })
+    .optional(),
+  cardNumber: z
+    .string()
+    .min(16, { message: "Please enter a valid card number" })
+    .optional(),
+  expiryDate: z
+    .string()
+    .min(5, { message: "Please enter a valid expiry date" })
+    .optional(),
   cvv: z.string().min(3, { message: "Please enter a valid CVV" }).optional(),
   useSameAddress: z.boolean().optional(),
   address: z.string().optional(),
@@ -75,13 +88,13 @@ const paymentSchema = z.object({
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "You must accept the terms and conditions",
   }),
-})
+});
 
-type PaymentFormValues = z.infer<typeof paymentSchema>
+type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 export default function PaymentMethodPage() {
-  const router = useRouter()
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card")
+  const router = useRouter();
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card");
 
   const {
     register,
@@ -96,16 +109,15 @@ export default function PaymentMethodPage() {
       useSameAddress: false,
       termsAccepted: false,
     },
-  })
+  });
 
   const onSubmit = (data: PaymentFormValues) => {
-    console.log("Payment data:", data)
-    router.push("/booking/steps/confirmation")
-  }
+    console.log("Payment data:", data);
+    router.push("/booking/steps/confirmation");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="mb-8">
@@ -128,13 +140,19 @@ export default function PaymentMethodPage() {
                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                   3
                 </div>
-                <span className="text-sm mt-1 text-muted-foreground">Get your E-ticket</span>
+                <span className="text-sm mt-1 text-muted-foreground">
+                  Get your E-ticket
+                </span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
               <Card className="mb-6">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
@@ -161,13 +179,25 @@ export default function PaymentMethodPage() {
                       defaultValue="card"
                       className="grid grid-cols-1 md:grid-cols-2 gap-4"
                       onValueChange={(value) => {
-                        setPaymentMethod(value as "card" | "paypal")
-                        setValue("paymentMethod", value as "card" | "paypal")
+                        setPaymentMethod(value as "card" | "paypal");
+                        setValue("paymentMethod", value as "card" | "paypal");
                       }}
                     >
-                      <div className={`border rounded-lg p-4 ${paymentMethod === "card" ? "border-primary" : ""}`}>
-                        <RadioGroupItem value="card" id="card" className="sr-only" {...register("paymentMethod")} />
-                        <Label htmlFor="card" className="flex items-center gap-4 cursor-pointer">
+                      <div
+                        className={`border rounded-lg p-4 ${
+                          paymentMethod === "card" ? "border-primary" : ""
+                        }`}
+                      >
+                        <RadioGroupItem
+                          value="card"
+                          id="card"
+                          className="sr-only"
+                          {...register("paymentMethod")}
+                        />
+                        <Label
+                          htmlFor="card"
+                          className="flex items-center gap-4 cursor-pointer"
+                        >
                           <div className="flex gap-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -221,9 +251,21 @@ export default function PaymentMethodPage() {
                         </Label>
                       </div>
 
-                      <div className={`border rounded-lg p-4 ${paymentMethod === "paypal" ? "border-primary" : ""}`}>
-                        <RadioGroupItem value="paypal" id="paypal" className="sr-only" {...register("paymentMethod")} />
-                        <Label htmlFor="paypal" className="flex items-center gap-4 cursor-pointer">
+                      <div
+                        className={`border rounded-lg p-4 ${
+                          paymentMethod === "paypal" ? "border-primary" : ""
+                        }`}
+                      >
+                        <RadioGroupItem
+                          value="paypal"
+                          id="paypal"
+                          className="sr-only"
+                          {...register("paymentMethod")}
+                        />
+                        <Label
+                          htmlFor="paypal"
+                          className="flex items-center gap-4 cursor-pointer"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="80"
@@ -246,26 +288,50 @@ export default function PaymentMethodPage() {
                         </Label>
                       </div>
                     </RadioGroup>
-                    {errors.paymentMethod && <p className="text-sm text-destructive">{errors.paymentMethod.message}</p>}
+                    {errors.paymentMethod && (
+                      <p className="text-sm text-destructive">
+                        {errors.paymentMethod.message}
+                      </p>
+                    )}
 
                     {paymentMethod === "card" && (
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="cardName">Name on card</Label>
-                          <Input id="cardName" placeholder="Enter name on card" {...register("cardName")} />
-                          {errors.cardName && <p className="text-sm text-destructive">{errors.cardName.message}</p>}
+                          <Input
+                            id="cardName"
+                            placeholder="Enter name on card"
+                            {...register("cardName")}
+                          />
+                          {errors.cardName && (
+                            <p className="text-sm text-destructive">
+                              {errors.cardName.message}
+                            </p>
+                          )}
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="cardNumber">Card number</Label>
-                          <Input id="cardNumber" placeholder="Enter card number" {...register("cardNumber")} />
-                          {errors.cardNumber && <p className="text-sm text-destructive">{errors.cardNumber.message}</p>}
+                          <Input
+                            id="cardNumber"
+                            placeholder="Enter card number"
+                            {...register("cardNumber")}
+                          />
+                          {errors.cardNumber && (
+                            <p className="text-sm text-destructive">
+                              {errors.cardNumber.message}
+                            </p>
+                          )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="expiryDate">Expiration date</Label>
-                            <Select onValueChange={(value) => setValue("expiryDate", value)}>
+                            <Select
+                              onValueChange={(value) =>
+                                setValue("expiryDate", value)
+                              }
+                            >
                               <SelectTrigger id="expiryDate">
                                 <SelectValue placeholder="MM/YY" />
                               </SelectTrigger>
@@ -278,14 +344,24 @@ export default function PaymentMethodPage() {
                               </SelectContent>
                             </Select>
                             {errors.expiryDate && (
-                              <p className="text-sm text-destructive">{errors.expiryDate.message}</p>
+                              <p className="text-sm text-destructive">
+                                {errors.expiryDate.message}
+                              </p>
                             )}
                           </div>
 
                           <div className="space-y-2">
                             <Label htmlFor="cvv">CVV</Label>
-                            <Input id="cvv" placeholder="Enter CVV" {...register("cvv")} />
-                            {errors.cvv && <p className="text-sm text-destructive">{errors.cvv.message}</p>}
+                            <Input
+                              id="cvv"
+                              placeholder="Enter CVV"
+                              {...register("cvv")}
+                            />
+                            {errors.cvv && (
+                              <p className="text-sm text-destructive">
+                                {errors.cvv.message}
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -294,7 +370,7 @@ export default function PaymentMethodPage() {
                             id="useSameAddress"
                             checked={watch("useSameAddress")}
                             onCheckedChange={(checked) => {
-                              setValue("useSameAddress", checked as boolean)
+                              setValue("useSameAddress", checked as boolean);
                             }}
                           />
                           <Label htmlFor="useSameAddress" className="text-sm">
@@ -304,25 +380,39 @@ export default function PaymentMethodPage() {
 
                         <div className="space-y-2">
                           <Label htmlFor="address">Address</Label>
-                          <Input id="address" placeholder="Add address" {...register("address")} />
+                          <Input
+                            id="address"
+                            placeholder="Add address"
+                            {...register("address")}
+                          />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="zipCode">Zip/Postal code</Label>
-                            <Input id="zipCode" placeholder="Input code" {...register("zipCode")} />
+                            <Input
+                              id="zipCode"
+                              placeholder="Input code"
+                              {...register("zipCode")}
+                            />
                           </div>
 
                           <div className="space-y-2">
                             <Label htmlFor="nationality">Nationality</Label>
-                            <Select onValueChange={(value) => setValue("nationality", value)}>
+                            <Select
+                              onValueChange={(value) =>
+                                setValue("nationality", value)
+                              }
+                            >
                               <SelectTrigger id="nationality">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="nigeria">Nigeria</SelectItem>
                                 <SelectItem value="ghana">Ghana</SelectItem>
-                                <SelectItem value="cameroon">Cameroon</SelectItem>
+                                <SelectItem value="cameroon">
+                                  Cameroon
+                                </SelectItem>
                                 <SelectItem value="benin">Benin</SelectItem>
                                 <SelectItem value="togo">Togo</SelectItem>
                               </SelectContent>
@@ -334,11 +424,17 @@ export default function PaymentMethodPage() {
 
                     <div className="text-sm text-muted-foreground">
                       By selecting the button below, I agree to the{" "}
-                      <Button variant="link" className="p-0 h-auto text-primary">
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto text-primary"
+                      >
                         Property Rules, Terms and Conditions
                       </Button>
                       , and{" "}
-                      <Button variant="link" className="p-0 h-auto text-primary">
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto text-primary"
+                      >
                         Privacy Policy
                       </Button>
                     </div>
@@ -348,14 +444,18 @@ export default function PaymentMethodPage() {
                         id="termsAccepted"
                         checked={watch("termsAccepted")}
                         onCheckedChange={(checked) => {
-                          setValue("termsAccepted", checked as boolean)
+                          setValue("termsAccepted", checked as boolean);
                         }}
                       />
                       <Label htmlFor="termsAccepted" className="text-sm">
                         I agree to the terms and conditions
                       </Label>
                     </div>
-                    {errors.termsAccepted && <p className="text-sm text-destructive">{errors.termsAccepted.message}</p>}
+                    {errors.termsAccepted && (
+                      <p className="text-sm text-destructive">
+                        {errors.termsAccepted.message}
+                      </p>
+                    )}
 
                     <Button type="submit" className="w-full">
                       Submit
@@ -369,7 +469,9 @@ export default function PaymentMethodPage() {
               <Card className="sticky top-6">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-primary">Price details</h3>
+                    <h3 className="text-lg font-medium text-primary">
+                      Price details
+                    </h3>
                   </div>
 
                   <div className="space-y-2 mb-4">
@@ -383,7 +485,9 @@ export default function PaymentMethodPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Regular total price</span>
-                      <span>₦{journeyData.regularTotalPrice.toLocaleString()}</span>
+                      <span>
+                        ₦{journeyData.regularTotalPrice.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between text-primary">
                       <span>Save</span>
@@ -395,7 +499,9 @@ export default function PaymentMethodPage() {
 
                   <div className="flex justify-between font-medium">
                     <span>Total</span>
-                    <span className="text-lg text-primary">₦{journeyData.totalPrice.toLocaleString()}</span>
+                    <span className="text-lg text-primary">
+                      ₦{journeyData.totalPrice.toLocaleString()}
+                    </span>
                   </div>
 
                   <Separator className="my-4" />
@@ -406,11 +512,17 @@ export default function PaymentMethodPage() {
                     <div className="bg-muted/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">{journeyData.logo}</span>
+                          <span className="text-xs font-medium text-primary">
+                            {journeyData.logo}
+                          </span>
                         </div>
-                        <span className="text-sm font-medium">Cloudy Transit</span>
+                        <span className="text-sm font-medium">
+                          Cloudy Transit
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground mb-1">HOU - LAS</div>
+                      <div className="text-sm text-muted-foreground mb-1">
+                        HOU - LAS
+                      </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -470,17 +582,25 @@ export default function PaymentMethodPage() {
                           <span>Direct</span>
                         </span>
                       </div>
-                      <div className="text-xs text-primary">Reschedule Available</div>
+                      <div className="text-xs text-primary">
+                        Reschedule Available
+                      </div>
                     </div>
 
                     <div className="bg-muted/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">{journeyData.logo}</span>
+                          <span className="text-xs font-medium text-primary">
+                            {journeyData.logo}
+                          </span>
                         </div>
-                        <span className="text-sm font-medium">Cloudy Transit</span>
+                        <span className="text-sm font-medium">
+                          Cloudy Transit
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground mb-1">LAS - LAX</div>
+                      <div className="text-sm text-muted-foreground mb-1">
+                        LAS - LAX
+                      </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -540,7 +660,9 @@ export default function PaymentMethodPage() {
                           <span>Direct</span>
                         </span>
                       </div>
-                      <div className="text-xs text-primary">Reschedule Available</div>
+                      <div className="text-xs text-primary">
+                        Reschedule Available
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -549,7 +671,6 @@ export default function PaymentMethodPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
-  )
+  );
 }

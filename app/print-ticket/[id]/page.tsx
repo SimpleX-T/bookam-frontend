@@ -3,13 +3,11 @@
 import { useRef, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Printer } from "lucide-react";
 import { motion } from "motion/react";
-import { Footer } from "@/components/footer";
 import { fetchBookingDetails } from "@/lib/api/bookings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -109,9 +107,7 @@ export default function PrintTicketPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <div className="print:hidden">
-          <Header />
-        </div>
+        <div className="print:hidden"></div>
         <main className="flex-1 bg-muted/30 print:bg-white">
           <div className="container py-6 print:py-0">
             <div className="mb-8 print:hidden">
@@ -150,9 +146,7 @@ export default function PrintTicketPage() {
   if (isError) {
     return (
       <div className="min-h-screen flex flex-col">
-        <div className="print:hidden">
-          <Header />
-        </div>
+        <div className="print:hidden"></div>
         <main className="flex-1 bg-muted/30 print:bg-white">
           <div className="container py-6 print:py-0">
             <div className="mb-8 print:hidden">
@@ -187,9 +181,7 @@ export default function PrintTicketPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="print:hidden">
-        <Header />
-      </div>
+      <div className="print:hidden"></div>
       <main className="flex-1 bg-muted/30 print:bg-white">
         <div className="container py-6 print:py-0">
           <div className="mb-8 print:hidden">

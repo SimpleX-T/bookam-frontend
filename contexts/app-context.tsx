@@ -31,10 +31,10 @@ interface AppContextType {
   busesLoading: boolean;
   busError: string | null;
   fetchBuses: () => Promise<void>;
-  fetchBusById: (id: number) => Promise<void>;
+  fetchBusById: (id: string) => Promise<void>;
   createBus: (bus: CreateBusRequest) => Promise<void>;
-  updateBus: (id: number, bus: UpdateBusRequest) => Promise<void>;
-  deleteBus: (id: number) => Promise<void>;
+  updateBus: (id: string, bus: UpdateBusRequest) => Promise<void>;
+  deleteBus: (id: string) => Promise<void>;
 
   // Route state and operations
   routes: Route[];
@@ -42,11 +42,11 @@ interface AppContextType {
   routesLoading: boolean;
   routeError: string | null;
   fetchRoutes: () => Promise<void>;
-  fetchRouteById: (id: number) => Promise<void>;
+  fetchRouteById: (id: string) => Promise<void>;
   searchRoutes: (params: RouteSearchParams) => Promise<void>;
   createRoute: (route: CreateRouteRequest) => Promise<void>;
-  updateRoute: (id: number, route: UpdateRouteRequest) => Promise<void>;
-  deleteRoute: (id: number) => Promise<void>;
+  updateRoute: (id: string, route: UpdateRouteRequest) => Promise<void>;
+  deleteRoute: (id: string) => Promise<void>;
 
   // Common operations
   clearErrors: () => void;
@@ -77,10 +77,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const busesQuery = useBuses();
   const routesQuery = useRoutes();
   const createBusMutation = useCreateBusMutation();
-  const updateBusMutation = useUpdateBusMutation(selectedBus?.busId || 0);
+  const updateBusMutation = useUpdateBusMutation(
+    selectedBus?.busId ? selectedBus.busId : ""
+  );
   const deleteBusMutation = useDeleteBusMutation();
   const createRouteMutation = useCreateRouteMutation();
-  const updateRouteMutation = useUpdateRouteMutation(selectedRoute?.id || 0);
+  const updateRouteMutation = useUpdateRouteMutation(
+    selectedRoute?.routeId ? selectedRoute.routeId : ""
+  );
   const deleteRouteMutation = useDeleteRouteMutation();
 
   // Clear errors
@@ -101,7 +105,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const fetchBusById = async (id: number): Promise<void> => {
+  const fetchBusById = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -131,7 +135,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const updateBus = async (
-    id: number,
+    id: string,
     bus: UpdateBusRequest
   ): Promise<void> => {
     if (!isAuthenticated) return;
@@ -147,7 +151,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const deleteBus = async (id: number): Promise<void> => {
+  const deleteBus = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -178,7 +182,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const fetchRouteById = async (id: number): Promise<void> => {
+  const fetchRouteById = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -220,7 +224,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const updateRoute = async (
-    id: number,
+    routeid: string,
     route: UpdateRouteRequest
   ): Promise<void> => {
     if (!isAuthenticated) return;
@@ -236,7 +240,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const deleteRoute = async (id: number): Promise<void> => {
+  const deleteRoute = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -245,7 +249,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setRouteError(result.error?.message || "Failed to delete route");
       } else {
         // If the deleted route was selected, clear the selection
-        if (selectedRoute?.id === id) {
+        if (selectedRoute?.routeId === id) {
           setSelectedRoute(null);
         }
       }

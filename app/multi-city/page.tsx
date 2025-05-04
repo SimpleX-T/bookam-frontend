@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -62,7 +60,7 @@ const cities = [
 export default function MultiCityPage() {
   const router = useRouter();
   const [legs, setLegs] = useState<
-    Array<{ id: number; from: string; to: string; date: Date | undefined }>
+    Array<{ id: string; from: string; to: string; date: Date | undefined }>
   >([
     { id: 1, from: "", to: "", date: undefined },
     { id: 2, from: "", to: "", date: undefined },
@@ -76,13 +74,13 @@ export default function MultiCityPage() {
     }
   };
 
-  const removeLeg = (id: number) => {
+  const removeLeg = (id: string) => {
     if (legs.length > 2) {
       setLegs(legs.filter((leg) => leg.id !== id));
     }
   };
 
-  const updateLeg = (id: number, field: string, value: string) => {
+  const updateLeg = (id: string, field: string, value: string) => {
     setLegs(
       legs.map((leg) => (leg.id === id ? { ...leg, [field]: value } : leg))
     );
@@ -103,7 +101,6 @@ export default function MultiCityPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <motion.div
@@ -342,7 +339,6 @@ export default function MultiCityPage() {
           </motion.div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

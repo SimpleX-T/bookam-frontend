@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import {
   Card,
   CardContent,
@@ -25,19 +23,13 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { Info } from "lucide-react";
-import BusLayout from "@/components/seat-selection/bus-layout";
+// import Link from "next/link";
+// import { Info } from "lucide-react";
+// import BusLayout from "@/components/seat-selection/bus-layout";
 import { Badge } from "@/components/ui/badge";
-
-type SeatStatus = "available" | "occupied" | "selected";
-
-interface Seat {
-  id: string;
-  status: SeatStatus;
-  price: number;
-  type: "standard" | "premium" | "business";
-}
+import { Seat } from "@/types";
+import { useApp } from "@/contexts/app-context";
+import { sampleRoutes } from "@/lib/constants";
 
 // Dummy journey data
 const journeyData = {
@@ -85,10 +77,18 @@ const journeyData = {
 export default function SeatSelectionClientPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { routes } = useApp();
+  const journeyDetails = routes.length
+    ? routes.find((route) => route.routeId === searchParams.get("journey"))
+    : sampleRoutes.find(
+        (route) => route.routeId === searchParams.get("journey")
+      );
+  console.log(routes, journeyDetails);
+
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [seats, setSeats] = useState<Record<string, Seat>>({});
   const [passengerCount, setPassengerCount] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(journeyData.price);
+  const [totalPrice, setTotalPrice] = useState(journeyDetails?.price || 0);
 
   // Generate dummy seat data
   useEffect(() => {
@@ -108,14 +108,14 @@ export default function SeatSelectionClientPage() {
 
           // Determine seat type based on position
           let type: "standard" | "premium" | "business" = "standard";
-          let price = journeyData.price;
+          let price = (journeyDetails && journeyDetails.price) || 0;
 
           if (row <= 2) {
             type = "business";
-            price = journeyData.price * 1.5;
+            price = (journeyDetails && journeyDetails.price * 1.5) || 0;
           } else if (row <= 5) {
             type = "premium";
-            price = journeyData.price * 1.2;
+            price = (journeyDetails && journeyDetails.price * 1.2) || 0;
           }
 
           seats[id] = {
@@ -195,7 +195,7 @@ export default function SeatSelectionClientPage() {
 
     // Construct query params with selected seats
     const params = new URLSearchParams({
-      journey: journeyData.id,
+      journey: journeyDetails?.routeId || "",
       seats: selectedSeats.join(","),
       price: totalPrice.toString(),
     });
@@ -219,8 +219,7 @@ export default function SeatSelectionClientPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="flex flex-col">
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="mb-8">
@@ -525,7 +524,6 @@ export default function SeatSelectionClientPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

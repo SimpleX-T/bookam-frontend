@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -150,7 +148,6 @@ export default function MultiPassengerPageClient() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="mb-8">
@@ -387,7 +384,6 @@ export default function MultiPassengerPageClient() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

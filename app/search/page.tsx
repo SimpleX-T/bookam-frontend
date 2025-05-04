@@ -3,218 +3,22 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input"; // Assuming Input is still used in SimplifiedSearch
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import SimplifiedSearch from "@/components/simplified-search"; // Assuming this component handles the main search inputs
-import {
-  ChevronDown,
-  Filter,
-  Clock,
-  MapPin,
-  Luggage,
-  Users,
-  DollarSign,
-  CalendarDays,
-  Bus,
-} from "lucide-react";
+import SimplifiedSearch from "@/components/simplified-search";
+import { Filter, Clock, MapPin, Luggage, Users, Bus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion"; // Use framer-motion for easier animations
-import { format, addDays } from "date-fns";
-
-// --- Interfaces ---
-interface BusRoute {
-  id: number;
-  company: string;
-  logo: string; // Could be URL in real app
-  departureTime: string; // Consider using Date objects if complex time logic needed
-  arrivalTime: string; // Consider using Date objects
-  duration: string;
-  stops: number; // 0 for direct
-  price: number; // Assuming integer price in smallest currency unit (e.g., kobo for NGN)
-  available_seats: number;
-  originCity: string;
-  destinationCity: string;
-  // transitPoints?: string[]; // Add this if you want to filter by specific transit points later
-}
-
-interface DateInfo {
-  day: string;
-  date: string;
-  fullDate: Date; // Store the actual date object
-}
-
-interface AppliedFilters {
-  price: number[];
-  stops: number[]; // Use numbers: 0 for direct, 1 for 1 stop, etc.
-  sortBy: "lowest" | "highest" | null;
-}
-
-// --- Updated Dummy Data ---
-const allBusRoutes: BusRoute[] = [
-  {
-    id: 1,
-    company: "HorizonJet",
-    logo: "HJ",
-    departureTime: "22:25", // Use 24hr format for easier sorting/comparison if needed
-    arrivalTime: "07:06",
-    duration: "8h 41m",
-    stops: 1,
-    price: 27550,
-    available_seats: 23,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 2,
-    company: "Altitude Express",
-    logo: "AE",
-    departureTime: "06:30",
-    arrivalTime: "07:55",
-    duration: "1h 25m",
-    stops: 0, // Direct
-    price: 20600,
-    available_seats: 15,
-    originCity: "Lagos",
-    destinationCity: "Ibadan",
-  },
-  {
-    id: 3,
-    company: "Cloudy Transit",
-    logo: "CT",
-    departureTime: "13:19",
-    arrivalTime: "14:45",
-    duration: "1h 26m",
-    stops: 0, // Direct
-    price: 14850,
-    available_seats: 32,
-    originCity: "Lagos",
-    destinationCity: "Ibadan",
-  },
-  {
-    id: 4,
-    company: "Cloudy Transit",
-    logo: "CT",
-    departureTime: "18:13",
-    arrivalTime: "03:40", // Next day arrival
-    duration: "9h 27m",
-    stops: 1,
-    price: 38015,
-    available_seats: 8,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 5,
-    company: "Altitude Express",
-    logo: "AE",
-    departureTime: "06:20",
-    arrivalTime: "15:46",
-    duration: "9h 26m",
-    stops: 2,
-    price: 26910,
-    available_seats: 19,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 6,
-    company: "HorizonJet",
-    logo: "HJ",
-    departureTime: "19:15",
-    arrivalTime: "04:45", // Next day
-    duration: "9h 30m",
-    stops: 0, // Direct
-    price: 54910,
-    available_seats: 27,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 7,
-    company: "HorizonJet",
-    logo: "HJ",
-    departureTime: "06:01",
-    arrivalTime: "07:28",
-    duration: "1h 27m",
-    stops: 0, // Direct
-    price: 20050,
-    available_seats: 11,
-    originCity: "Lagos",
-    destinationCity: "Ibadan",
-  },
-  {
-    id: 8,
-    company: "FlyScape",
-    logo: "FS",
-    departureTime: "08:40",
-    arrivalTime: "18:00",
-    duration: "9h 20m",
-    stops: 1,
-    price: 54910,
-    available_seats: 5,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 9,
-    company: "Capital Connect",
-    logo: "CC",
-    departureTime: "09:00",
-    arrivalTime: "18:30",
-    duration: "9h 30m",
-    stops: 0,
-    price: 42000,
-    available_seats: 30,
-    originCity: "Abuja",
-    destinationCity: "Lagos",
-  },
-  {
-    id: 10,
-    company: "Capital Connect",
-    logo: "CC",
-    departureTime: "21:00",
-    arrivalTime: "06:30", // Next day
-    duration: "9h 30m",
-    stops: 1,
-    price: 39500,
-    available_seats: 12,
-    originCity: "Abuja",
-    destinationCity: "Lagos",
-  },
-  {
-    // Example for a route that might not be commonly searched
-    id: 11,
-    company: "Northern Star",
-    logo: "NS",
-    departureTime: "07:00",
-    arrivalTime: "15:00",
-    duration: "8h 00m",
-    stops: 1,
-    price: 35000,
-    available_seats: 25,
-    originCity: "Abuja",
-    destinationCity: "Kano",
-  },
-];
-
-// --- Helper Function ---
-const generateDates = (startDate: Date, count: number): DateInfo[] => {
-  const dates: DateInfo[] = [];
-  for (let i = 0; i < count; i++) {
-    const currentDate = addDays(startDate, i);
-    dates.push({
-      day: format(currentDate, "EEE"), // Short day name (e.g., Fri)
-      date: format(currentDate, "d MMM"), // Day and short month (e.g., 16 Feb)
-      fullDate: currentDate,
-    });
-  }
-  return dates;
-};
+import { motion } from "motion/react";
+import { format } from "date-fns";
+import { DateInfo, AppliedFilters } from "@/types";
+import { generateDates } from "@/lib/helpers";
+import { allBusRoutes } from "@/lib/constants";
+import SearchPagination from "@/components/search/pagination";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
+
   const router = useRouter();
 
   // --- State ---
@@ -250,7 +54,6 @@ export default function SearchPage() {
   // --- Effects ---
   // Effect to parse URL search params
   useEffect(() => {
-    console.log("Parsing search params...");
     const from = searchParams.get("from");
     const to = searchParams.get("to");
     const dateParam = searchParams.get("date");
@@ -267,7 +70,6 @@ export default function SearchPage() {
         if (!isNaN(parsedDate.getTime())) {
           setSearchDate(parsedDate);
           setShowDateSelector(false); // Hide date selector if URL has date
-          console.log("Date from URL:", parsedDate);
         } else {
           console.error("Invalid date format in URL:", dateParam);
           setSearchDate(undefined);
@@ -280,8 +82,7 @@ export default function SearchPage() {
       }
     } else {
       setSearchDate(undefined);
-      setShowDateSelector(true); // Show date selector if no date in URL
-      console.log("No date in URL, showing date selector.");
+      setShowDateSelector(true);
     }
   }, [searchParams]);
 
@@ -297,14 +98,6 @@ export default function SearchPage() {
 
   // --- Filtering Logic ---
   const filteredAndSortedRoutes = useMemo(() => {
-    console.log(
-      "Filtering routes. Applied filters:",
-      appliedFilters,
-      "From:",
-      fromCity,
-      "To:",
-      toCity
-    );
     let routes = allBusRoutes.filter((route) => {
       // Match origin and destination (case-insensitive)
       const originMatch =
@@ -334,7 +127,6 @@ export default function SearchPage() {
     }
     // else no sort or default sort (by ID or original order)
 
-    console.log("Filtered routes count:", routes.length);
     setIsLoading(false); // Filtering done, set loading to false
     return routes;
   }, [fromCity, toCity, appliedFilters]); // Re-run when cities or applied filters change
@@ -354,7 +146,6 @@ export default function SearchPage() {
   };
 
   const handleApplyFilters = useCallback(() => {
-    console.log("Applying filters...");
     setAppliedFilters({
       price: selectedPriceRange,
       stops: selectedStopsFilter,
@@ -373,7 +164,6 @@ export default function SearchPage() {
   }, [selectedPriceRange, selectedStopsFilter, selectedSort]);
 
   const handleResetFilters = useCallback(() => {
-    console.log("Resetting filters...");
     // Reset temporary selections
     setSelectedPriceRange([0, 60000]);
     setSelectedStopsFilter([]);
@@ -387,7 +177,7 @@ export default function SearchPage() {
     setIsLoading(true); // Set loading true while filtering resets
   }, []);
 
-  const handleRouteSelect = (routeId: number) => {
+  const handleRouteSelect = (routeId: string) => {
     // Construct the date string for the URL if available
     // Use the date from the URL param first, then fallback to the selected date in the horizontal scroller
     let dateQueryParam = "";
@@ -413,15 +203,12 @@ export default function SearchPage() {
         {/* Simplified Search Bar Area */}
         <div className="mb-6">
           <div className="bg-background dark:bg-gray-900 rounded-lg p-4 shadow-md">
-            <SimplifiedSearch /> {/* Pass initial values if needed */}
+            <SimplifiedSearch />
           </div>
         </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
-          {" "}
-          {/* Slightly wider filter bar */}
-          {/* Filters Section */}
           <aside className="space-y-6">
             {/* Mobile Filter Toggle */}
             <Button
@@ -593,9 +380,8 @@ export default function SearchPage() {
               {/* Removed Transit Point Filter as data doesn't support it well */}
             </div>
           </aside>
-          {/* Results Section */}
+
           <section className="space-y-6">
-            {/* Horizontal Date Selector (Conditional) */}
             {showDateSelector && displayDates.length > 0 && (
               <div className="bg-background dark:bg-gray-900 rounded-lg p-3 shadow-sm overflow-x-auto">
                 <div className="flex space-x-2 min-w-max">
@@ -628,10 +414,7 @@ export default function SearchPage() {
               <span>
                 Showing journeys{" "}
                 {fromCity && toCity
-                  ? `from ${fromCity} to ${toCity} on ${format(
-                      searchDate || "",
-                      "PPP"
-                    )}`
+                  ? `from ${fromCity} to ${toCity}`
                   : "for selected criteria"}
               </span>
               {/* Optional: Add Price History or other info here */}
@@ -763,10 +546,6 @@ export default function SearchPage() {
                           {/* Price & Action */}
                           <div className="flex flex-col items-center sm:items-end gap-1 pt-3 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-4">
                             <div className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                              <DollarSign
-                                size={18}
-                                className="text-green-600"
-                              />
                               ₦{route.price.toLocaleString()}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1">
@@ -791,44 +570,7 @@ export default function SearchPage() {
 
             {/* Pagination (Placeholder/Example) */}
             {!isLoading && filteredAndSortedRoutes.length > 0 && (
-              <div className="flex justify-center items-center gap-1 py-4 text-sm">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="dark:text-white dark:border-gray-600"
-                >
-                  Prev
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-8 h-8 bg-primary text-primary-foreground border-primary"
-                >
-                  1
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 dark:text-white"
-                >
-                  2
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 dark:text-white"
-                >
-                  3
-                </Button>
-                <span className="text-gray-500 dark:text-gray-400">...</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="dark:text-white dark:border-gray-600"
-                >
-                  Next
-                </Button>
-              </div>
+              <SearchPagination />
             )}
           </section>
         </div>

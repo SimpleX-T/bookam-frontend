@@ -1,18 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Bus, Calendar, Download } from "lucide-react"
-import { motion } from "motion/react"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { ArrowRight, Bus, Calendar, Download } from "lucide-react";
+import { motion } from "motion/react";
+import Link from "next/link";
 
 // Dummy bookings data
 const bookingsData = [
@@ -79,47 +77,44 @@ const bookingsData = [
     date: "March 25, 2025",
     price: 7200,
   },
-]
+];
 
 export default function BookingsPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("all")
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
     // Check if user is logged in
-    const userData = localStorage.getItem("user")
+    const userData = localStorage.getItem("user");
     if (!userData) {
-      router.push("/login")
-      return
+      router.push("/login");
+      return;
     }
 
-    setIsLoading(false)
-  }, [router])
+    setIsLoading(false);
+  }, [router]);
 
   const filteredBookings = bookingsData.filter((booking) => {
-    if (activeTab === "all") return true
-    return booking.status === activeTab
-  })
+    if (activeTab === "all") return true;
+    return booking.status === activeTab;
+  });
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-muted-foreground">Loading bookings...</p>
           </div>
         </main>
-        <Footer />
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
@@ -132,14 +127,20 @@ export default function BookingsPage() {
                   </Avatar>
                   <div className="text-center">
                     <h2 className="text-xl font-bold">John Doe</h2>
-                    <p className="text-sm text-muted-foreground">Premium Member</p>
+                    <p className="text-sm text-muted-foreground">
+                      Premium Member
+                    </p>
                   </div>
                 </div>
 
                 <Separator className="my-6" />
 
                 <nav className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +160,11 @@ export default function BookingsPage() {
                       Profile
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start bg-muted" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start bg-muted"
+                    asChild
+                  >
                     <Link href="/profile/bookings">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -183,7 +188,11 @@ export default function BookingsPage() {
                       My Bookings
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile/payments">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +212,11 @@ export default function BookingsPage() {
                       Payment Methods
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
                     <Link href="/profile/preferences">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -231,8 +244,8 @@ export default function BookingsPage() {
                   variant="destructive"
                   className="w-full"
                   onClick={() => {
-                    localStorage.removeItem("user")
-                    router.push("/login")
+                    localStorage.removeItem("user");
+                    router.push("/login");
                   }}
                 >
                   <svg
@@ -264,7 +277,11 @@ export default function BookingsPage() {
                 </Button>
               </div>
 
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
@@ -294,14 +311,24 @@ export default function BookingsPage() {
                             strokeLinejoin="round"
                             className="text-muted-foreground"
                           >
-                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                            <rect
+                              width="18"
+                              height="18"
+                              x="3"
+                              y="3"
+                              rx="2"
+                              ry="2"
+                            />
                             <line x1="9" x2="15" y1="9" y2="15" />
                             <line x1="15" x2="9" y1="9" y2="15" />
                           </svg>
                         </div>
-                        <h3 className="text-lg font-medium mb-2">No bookings found</h3>
+                        <h3 className="text-lg font-medium mb-2">
+                          No bookings found
+                        </h3>
                         <p className="text-muted-foreground mb-6">
-                          You don't have any {activeTab !== "all" ? activeTab : ""} bookings yet.
+                          You don't have any{" "}
+                          {activeTab !== "all" ? activeTab : ""} bookings yet.
                         </p>
                         <Button asChild>
                           <Link href="/">Book a Journey</Link>
@@ -314,11 +341,17 @@ export default function BookingsPage() {
                             <div className="flex items-center justify-between p-4 border-b">
                               <div className="flex items-center gap-3">
                                 <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
-                                  <span className="font-medium text-primary">{booking.logo}</span>
+                                  <span className="font-medium text-primary">
+                                    {booking.logo}
+                                  </span>
                                 </div>
                                 <div>
-                                  <div className="font-medium">{booking.company}</div>
-                                  <div className="text-xs text-muted-foreground">Ref: {booking.reference}</div>
+                                  <div className="font-medium">
+                                    {booking.company}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Ref: {booking.reference}
+                                  </div>
                                 </div>
                               </div>
                               <Badge
@@ -326,24 +359,33 @@ export default function BookingsPage() {
                                   booking.status === "upcoming"
                                     ? "default"
                                     : booking.status === "completed"
-                                      ? "outline"
-                                      : "destructive"
+                                    ? "outline"
+                                    : "destructive"
                                 }
                               >
-                                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                {booking.status.charAt(0).toUpperCase() +
+                                  booking.status.slice(1)}
                               </Badge>
                             </div>
 
                             <div className="p-4">
                               <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 mb-4">
                                 <div className="space-y-1">
-                                  <div className="text-lg font-bold">{booking.from.time}</div>
-                                  <div className="font-medium">{booking.from.city}</div>
-                                  <div className="text-xs text-muted-foreground">{booking.from.terminal}</div>
+                                  <div className="text-lg font-bold">
+                                    {booking.from.time}
+                                  </div>
+                                  <div className="font-medium">
+                                    {booking.from.city}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {booking.from.terminal}
+                                  </div>
                                 </div>
 
                                 <div className="flex flex-col items-center justify-center">
-                                  <div className="text-xs text-muted-foreground mb-1">{booking.duration}</div>
+                                  <div className="text-xs text-muted-foreground mb-1">
+                                    {booking.duration}
+                                  </div>
                                   <div className="relative w-16 md:w-24">
                                     <div className="absolute inset-0 flex items-center">
                                       <span className="w-full border-t border-dashed"></span>
@@ -355,9 +397,15 @@ export default function BookingsPage() {
                                 </div>
 
                                 <div className="space-y-1">
-                                  <div className="text-lg font-bold">{booking.to.time}</div>
-                                  <div className="font-medium">{booking.to.city}</div>
-                                  <div className="text-xs text-muted-foreground">{booking.to.terminal}</div>
+                                  <div className="text-lg font-bold">
+                                    {booking.to.time}
+                                  </div>
+                                  <div className="font-medium">
+                                    {booking.to.city}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {booking.to.terminal}
+                                  </div>
                                 </div>
                               </div>
 
@@ -370,14 +418,20 @@ export default function BookingsPage() {
                                   <Bus className="h-4 w-4 text-muted-foreground" />
                                   <span>{booking.journeyNumber}</span>
                                 </div>
-                                <div className="ml-auto font-medium">₦{booking.price.toLocaleString()}</div>
+                                <div className="ml-auto font-medium">
+                                  ₦{booking.price.toLocaleString()}
+                                </div>
                               </div>
 
                               <div className="flex flex-wrap gap-2">
                                 {booking.status === "upcoming" && (
                                   <>
                                     <Button size="sm" asChild>
-                                      <Link href={`/booking/confirmation/${booking.id}`}>View Details</Link>
+                                      <Link
+                                        href={`/booking/confirmation/${booking.id}`}
+                                      >
+                                        View Details
+                                      </Link>
                                     </Button>
                                     <Button size="sm" variant="outline">
                                       <Download className="mr-2 h-4 w-4" />
@@ -386,7 +440,11 @@ export default function BookingsPage() {
                                     <Button size="sm" variant="outline">
                                       Reschedule
                                     </Button>
-                                    <Button size="sm" variant="outline" className="text-destructive">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-destructive"
+                                    >
                                       Cancel
                                     </Button>
                                   </>
@@ -394,7 +452,11 @@ export default function BookingsPage() {
                                 {booking.status === "completed" && (
                                   <>
                                     <Button size="sm" asChild>
-                                      <Link href={`/booking/confirmation/${booking.id}`}>View Details</Link>
+                                      <Link
+                                        href={`/booking/confirmation/${booking.id}`}
+                                      >
+                                        View Details
+                                      </Link>
                                     </Button>
                                     <Button size="sm" variant="outline">
                                       <Download className="mr-2 h-4 w-4" />
@@ -408,7 +470,11 @@ export default function BookingsPage() {
                                 {booking.status === "canceled" && (
                                   <>
                                     <Button size="sm" asChild>
-                                      <Link href={`/booking/confirmation/${booking.id}`}>View Details</Link>
+                                      <Link
+                                        href={`/booking/confirmation/${booking.id}`}
+                                      >
+                                        View Details
+                                      </Link>
                                     </Button>
                                     <Button size="sm" variant="outline">
                                       Book Again
@@ -428,7 +494,6 @@ export default function BookingsPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
-  )
+  );
 }
