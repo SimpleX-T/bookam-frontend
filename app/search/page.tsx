@@ -297,14 +297,14 @@ export default function SearchPage() {
 
   // --- Filtering Logic ---
   const filteredAndSortedRoutes = useMemo(() => {
-    console.log(
-      "Filtering routes. Applied filters:",
-      appliedFilters,
-      "From:",
-      fromCity,
-      "To:",
-      toCity
-    );
+    // console.log(
+    //   "Filtering routes. Applied filters:",
+    //   appliedFilters,
+    //   "From:",
+    //   fromCity,
+    //   "To:",
+    //   toCity
+    // );
     let routes = allBusRoutes.filter((route) => {
       // Match origin and destination (case-insensitive)
       const originMatch =
@@ -334,7 +334,7 @@ export default function SearchPage() {
     }
     // else no sort or default sort (by ID or original order)
 
-    console.log("Filtered routes count:", routes.length);
+    // console.log("Filtered routes count:", routes.length);
     setIsLoading(false); // Filtering done, set loading to false
     return routes;
   }, [fromCity, toCity, appliedFilters]); // Re-run when cities or applied filters change
@@ -354,7 +354,7 @@ export default function SearchPage() {
   };
 
   const handleApplyFilters = useCallback(() => {
-    console.log("Applying filters...");
+    // console.log("Applying filters...");
     setAppliedFilters({
       price: selectedPriceRange,
       stops: selectedStopsFilter,
@@ -373,7 +373,7 @@ export default function SearchPage() {
   }, [selectedPriceRange, selectedStopsFilter, selectedSort]);
 
   const handleResetFilters = useCallback(() => {
-    console.log("Resetting filters...");
+    // console.log("Resetting filters...");
     // Reset temporary selections
     setSelectedPriceRange([0, 60000]);
     setSelectedStopsFilter([]);
@@ -616,7 +616,6 @@ export default function SearchPage() {
                       <div className="text-sm font-medium">
                         {dateItem.day}, {dateItem.date}
                       </div>
-                      {/* Removed Price Display */}
                     </motion.button>
                   ))}
                 </div>
@@ -628,13 +627,9 @@ export default function SearchPage() {
               <span>
                 Showing journeys{" "}
                 {fromCity && toCity
-                  ? `from ${fromCity} to ${toCity} on ${format(
-                      searchDate || "",
-                      "PPP"
-                    )}`
+                  ? `from ${fromCity} to ${toCity} `
                   : "for selected criteria"}
               </span>
-              {/* Optional: Add Price History or other info here */}
             </div>
 
             {/* Loading State */}
@@ -763,10 +758,6 @@ export default function SearchPage() {
                           {/* Price & Action */}
                           <div className="flex flex-col items-center sm:items-end gap-1 pt-3 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-4">
                             <div className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                              <DollarSign
-                                size={18}
-                                className="text-green-600"
-                              />
                               ₦{route.price.toLocaleString()}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1">
