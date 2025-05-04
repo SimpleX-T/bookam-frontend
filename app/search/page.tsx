@@ -402,7 +402,6 @@ export default function SearchPage() {
                       <div className="text-sm font-medium">
                         {dateItem.day}, {dateItem.date}
                       </div>
-                      {/* Removed Price Display */}
                     </motion.button>
                   ))}
                 </div>
@@ -417,7 +416,6 @@ export default function SearchPage() {
                   ? `from ${fromCity} to ${toCity}`
                   : "for selected criteria"}
               </span>
-              {/* Optional: Add Price History or other info here */}
             </div>
 
             {/* Loading State */}

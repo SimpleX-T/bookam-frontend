@@ -5,7 +5,6 @@ import type React from "react";
 import { useState } from "react";
 import Image from "next/image";
 import { ArrowRight, Clock, MapIcon, X } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapView } from "./map-view";
+import dynamic from "next/dynamic";
+
+const MapView = dynamic(() => import("./map-view"), {
+  ssr: false,
+  loading: () => <p>Loading map...</p>,
+});
 import { Route } from "@/types";
 import { sampleRoutes } from "@/lib/constants";
 
@@ -77,27 +81,28 @@ export function JourneyPlanner({
   };
 
   return (
-    <div className="relative flex flex-col w-full">
-      {/* Main content area */}
-      <div
-        className={`w-full h-full overflow-y-auto ${
-          isSidebarOpen ? "lg:pr-1/2" : ""
-        }`}
-      >
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            {selectedRoute && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={toggleSidebar}
-                className="lg:hidden"
-                aria-label="Toggle map sidebar"
-              >
-                <MapIcon className="h-5 w-5" />
-              </Button>
-            )}
-          </div>
+  
+      <div className="relative flex flex-col w-full min-h-fit">
+        {/* Main content area */}
+        <div
+          className={`w-full h-full overflow-y-auto ${
+            isSidebarOpen ? "lg:pr-1/2" : ""
+          }`}
+        >
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              {selectedRoute && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="lg:hidden"
+                  aria-label="Toggle map sidebar"
+                >
+                  <MapIcon className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
 
           <Select
             value={selectedRoute?.routeId}
@@ -182,29 +187,31 @@ export function JourneyPlanner({
         </div>
       </div>
 
-      {/* Desktop sidebar - only visible when a route is selected */}
-      <div
-        className={`hidden lg:block fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-          isSidebarOpen && selectedRoute
-            ? "opacity-100"
-            : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeSidebar}
-      />
-      <div
-        className={`hidden lg:block fixed right-0 top-0 bottom-0 w-1/2 border-l border-border bg-background dark:bg-background overflow-y-auto transition-transform duration-300 ease-in-out transform z-50 ${
-          isSidebarOpen && selectedRoute ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        {selectedRoute && (
-          <div className="h-full flex flex-col">
-            {/* Sidebar Header with Close Button */}
-            <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/90 backdrop-blur-sm border-b">
-              <h2 className="font-bold text-lg">Journey Details</h2>
-              <Button variant="ghost" size="icon" onClick={closeSidebar}>
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+        {/* Desktop sidebar - only visible when a route is selected */}
+        <div
+          className={`hidden lg:block fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+            isSidebarOpen && selectedRoute
+              ? "opacity-100"
+              : "opacity-0 pointer-events-none"
+          }`}
+          onClick={closeSidebar}
+        />
+        <div
+          className={`hidden lg:block fixed right-0 top-0 bottom-0 w-1/2 border-l border-border bg-background dark:bg-background overflow-y-auto transition-transform duration-300 ease-in-out transform z-50 ${
+            isSidebarOpen && selectedRoute
+              ? "translate-x-0"
+              : "translate-x-full"
+          }`}
+        >
+          {selectedRoute && (
+            <div className="h-full flex flex-col">
+              {/* Sidebar Header with Close Button */}
+              <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/90 backdrop-blur-sm border-b">
+                <h2 className="font-bold text-lg">Journey Details</h2>
+                <Button variant="ghost" size="icon" onClick={closeSidebar}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
 
             {/* Map Area */}
             <div className="relative h-1/2 min-h-[300px]">
@@ -266,12 +273,12 @@ export function JourneyPlanner({
                   </div> */}
                 </div>
 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Description
-                  </p>
-                  <p>{selectedRoute.description}</p>
-                </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Description
+                    </p>
+                    <p>{selectedRoute.description}</p>
+                  </div>
 
                 {/* {selectedRoute.stops.length > 0 && (
                   <div>
@@ -285,35 +292,35 @@ export function JourneyPlanner({
                 )} */}
               </div>
 
-              <div className="mt-8">
-                <Button className="w-full" size="lg" onClick={handleContinue}>
-                  Continue with this Journey
-                </Button>
+                <div className="mt-8">
+                  <Button className="w-full" size="lg" onClick={handleContinue}>
+                    Continue with this Journey
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Mobile sidebar - slides in when toggled */}
-      <div
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${
-          isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeSidebar}
-      />
-
-      <div
-        className={`fixed top-0 bottom-0 right-0 w-full sm:w-3/4 md:w-2/3 z-50 border-l border-border bg-background dark:bg-background overflow-y-auto transition-transform duration-300 ease-in-out transform lg:hidden ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/90 backdrop-blur-sm border-b">
-          <h2 className="font-bold text-lg">Journey Details</h2>
-          <Button variant="ghost" size="icon" onClick={closeSidebar}>
-            <X className="h-5 w-5" />
-          </Button>
+          )}
         </div>
+
+        {/* Mobile sidebar - slides in when toggled */}
+        <div
+          className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${
+            isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={closeSidebar}
+        />
+
+        <div
+          className={`fixed top-0 bottom-0 right-0 w-full sm:w-3/4 md:w-2/3 z-50 border-l border-border bg-background dark:bg-background overflow-y-auto transition-transform duration-300 ease-in-out transform lg:hidden ${
+            isSidebarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/90 backdrop-blur-sm border-b">
+            <h2 className="font-bold text-lg">Journey Details</h2>
+            <Button variant="ghost" size="icon" onClick={closeSidebar}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
 
         {selectedRoute && (
           <div className="flex flex-col">
@@ -377,12 +384,12 @@ export function JourneyPlanner({
                   </div> */}
                 </div>
 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Description
-                  </p>
-                  <p>{selectedRoute.description}</p>
-                </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Description
+                    </p>
+                    <p>{selectedRoute.description}</p>
+                  </div>
 
                 {/* {selectedRoute.stops.length > 0 && (
                   <div>
@@ -396,29 +403,29 @@ export function JourneyPlanner({
                 )} */}
               </div>
 
-              <div className="mt-8 pb-8">
-                <Button className="w-full" size="lg" onClick={handleContinue}>
-                  Continue with this Journey
-                </Button>
+                <div className="mt-8 pb-8">
+                  <Button className="w-full" size="lg" onClick={handleContinue}>
+                    Continue with this Journey
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+        </div>
+
+        {/* Floating button to open sidebar on mobile when closed */}
+        {selectedRoute && (
+          <Button
+            variant="default"
+            size="icon"
+            className={`fixed bottom-4 right-4 rounded-full shadow-lg z-30 lg:hidden ${
+              isSidebarOpen ? "hidden" : "flex"
+            }`}
+            onClick={toggleSidebar}
+          >
+            <MapIcon className="h-5 w-5" />
+          </Button>
         )}
       </div>
-
-      {/* Floating button to open sidebar on mobile when closed */}
-      {selectedRoute && (
-        <Button
-          variant="default"
-          size="icon"
-          className={`fixed bottom-4 right-4 rounded-full shadow-lg z-30 lg:hidden ${
-            isSidebarOpen ? "hidden" : "flex"
-          }`}
-          onClick={toggleSidebar}
-        >
-          <MapIcon className="h-5 w-5" />
-        </Button>
-      )}
-    </div>
   );
 }

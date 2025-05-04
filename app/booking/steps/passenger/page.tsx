@@ -1,15 +1,12 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   ArrowLeft,
   ArrowRight,
@@ -20,7 +17,6 @@ import {
   User,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -29,7 +25,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { motion } from "motion/react";
-
+import BookingTimeline from "@/components/booking/booking-timeline";
+import { useAuth } from "@/contexts/auth-context";
 // Dummy journey data
 const journeyData = {
   id: "1",
@@ -72,122 +69,73 @@ const journeyData = {
   save: 150,
   totalPrice: 14850,
 };
-
 const passengerSchema = z.object({
-  title: z.string().min(1, { message: "Please select a title" }),
-  firstName: z
+  fullName: z
     .string()
-    .min(2, { message: "First name must be at least 2 characters" }),
-  lastName: z
+    .min(2, { message: "Full name must be at least 2 characters" }),
+  email: z
     .string()
-    .min(2, { message: "Last name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
+    .email({ message: "Please enter a valid email address" })
+    .optional(),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   dateOfBirth: z.string().optional(),
   nationality: z.string().optional(),
   emergencyContact: z.string().optional(),
   specialRequirements: z.string().optional(),
-  termsAccepted: z.boolean().optional(),
 });
-
 type PassengerFormValues = z.infer<typeof passengerSchema>;
-
 export default function PassengerDetailsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
-
+  const { user } = useAuth();
   useEffect(() => {
     // Get journey details from URL
     const seats = searchParams.get("seats");
     const price = searchParams.get("price");
-
     if (seats) {
       setSelectedSeats(seats.split(","));
     }
-
     if (price) {
       setTotalPrice(parseInt(price, 10));
     }
   }, [searchParams]);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<PassengerFormValues>({
+  } = useForm({
     resolver: zodResolver(passengerSchema),
     defaultValues: {
-      title: "",
-      firstName: "",
-      lastName: "",
-      email: "",
+      fullName: "",
       phone: "",
-      termsAccepted: false,
     },
   });
-
   const onSubmit = (data: PassengerFormValues) => {
     console.log("Passenger data:", data);
-
     // Construct query params with passenger details
     const params = new URLSearchParams({
       journey: journeyData.id,
       seats: selectedSeats.join(","),
       price: totalPrice.toString(),
-      name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
+      name: data.fullName,
+      email: data.email || user?.email || "",
       phone: data.phone,
     });
-
     router.push(`/booking/steps/payment?${params.toString()}`);
   };
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 bg-muted/30">
-        <div className="container py-6">
-          <div className="mb-8">
-            <Button
-              variant="ghost"
-              className="mb-4"
-              onClick={() => router.back()}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Seat Selection
-            </Button>
-            <h1 className="text-2xl font-bold mb-4">Passenger Details</h1>
-            <div className="relative flex items-center justify-between max-w-md mb-6">
-              <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-muted"></div>
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-primary/50 flex items-center justify-center text-primary-foreground">
-                  1
-                </div>
-                <span className="text-sm mt-1 text-primary/50">
-                  Seat Selection
-                </span>
-              </div>
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                  2
-                </div>
-                <span className="text-sm mt-1 text-primary">
-                  Passenger Details
-                </span>
-              </div>
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                  3
-                </div>
-                <span className="text-sm mt-1 text-muted-foreground">
-                  Payment
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
+    <main>
+      <div>
+        <Button variant="ghost" className="mb-4" onClick={() => router.back()}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Seat Selection
+        </Button>
+        <div className="container mx-auto py-8">
+          <h1 className="text-2xl font-bold mb-6">Passenger Details</h1>
+          <BookingTimeline />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 mt-10">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -203,76 +151,16 @@ export default function PassengerDetailsPage() {
                 <CardContent>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="title">Title</Label>
-                        <RadioGroup
-                          defaultValue=""
-                          className="flex flex-wrap gap-4 mt-2"
-                          {...register("title")}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="mr" id="mr" />
-                            <Label htmlFor="mr">Mr</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="mrs" id="mrs" />
-                            <Label htmlFor="mrs">Mrs</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="miss" id="miss" />
-                            <Label htmlFor="miss">Miss</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="ms" id="ms" />
-                            <Label htmlFor="ms">Ms</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="dr" id="dr" />
-                            <Label htmlFor="dr">Dr</Label>
-                          </div>
-                        </RadioGroup>
-                        {errors.title && (
-                          <p className="text-sm text-destructive mt-1">
-                            {errors.title.message}
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input id="fullName" {...register("fullName")} />
+                        {errors.fullName && (
+                          <p className="text-sm text-destructive">
+                            {errors.fullName.message}
                           </p>
                         )}
                       </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name</Label>
-                          <Input id="firstName" {...register("firstName")} />
-                          {errors.firstName && (
-                            <p className="text-sm text-destructive">
-                              {errors.firstName.message}
-                            </p>
-                          )}
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <Input id="lastName" {...register("lastName")} />
-                          {errors.lastName && (
-                            <p className="text-sm text-destructive">
-                              {errors.lastName.message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            {...register("email")}
-                          />
-                          {errors.email && (
-                            <p className="text-sm text-destructive">
-                              {errors.email.message}
-                            </p>
-                          )}
-                        </div>
                         <div className="space-y-2">
                           <Label htmlFor="phone">Phone Number</Label>
                           <Input id="phone" {...register("phone")} />
@@ -282,8 +170,21 @@ export default function PassengerDetailsPage() {
                             </p>
                           )}
                         </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email (Optional)</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            {...register("email")}
+                            defaultValue={user?.email || ""}
+                          />
+                          {errors.email && (
+                            <p className="text-sm text-destructive">
+                              {errors.email.message}
+                            </p>
+                          )}
+                        </div>
                       </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="dateOfBirth">
@@ -305,7 +206,6 @@ export default function PassengerDetailsPage() {
                           />
                         </div>
                       </div>
-
                       <div className="space-y-2">
                         <Label htmlFor="emergencyContact">
                           Emergency Contact (Optional)
@@ -315,7 +215,6 @@ export default function PassengerDetailsPage() {
                           {...register("emergencyContact")}
                         />
                       </div>
-
                       <div className="space-y-2">
                         <Label htmlFor="specialRequirements">
                           Special Requirements (Optional)
@@ -325,28 +224,7 @@ export default function PassengerDetailsPage() {
                           {...register("specialRequirements")}
                         />
                       </div>
-
-                      <div className="flex items-start space-x-2 pt-2">
-                        <Checkbox
-                          id="termsAccepted"
-                          {...register("termsAccepted")}
-                        />
-                        <div className="grid gap-1.5 leading-none">
-                          <Label
-                            htmlFor="termsAccepted"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            I accept the terms and conditions
-                          </Label>
-                          {errors.termsAccepted && (
-                            <p className="text-sm text-destructive">
-                              {errors.termsAccepted.message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
                     </div>
-
                     <Button type="submit" className="w-full">
                       Continue to Payment
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -355,7 +233,6 @@ export default function PassengerDetailsPage() {
                 </CardContent>
               </Card>
             </motion.div>
-
             <div>
               <Card className="sticky top-6">
                 <CardContent className="p-6 space-y-4">
@@ -372,13 +249,11 @@ export default function PassengerDetailsPage() {
                       </div>
                     </div>
                   </div>
-
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{journeyData.date}</span>
                     </div>
-
                     <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
@@ -392,7 +267,6 @@ export default function PassengerDetailsPage() {
                           {journeyData.from.terminal}
                         </span>
                       </div>
-
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">
@@ -406,12 +280,10 @@ export default function PassengerDetailsPage() {
                         </span>
                       </div>
                     </div>
-
                     <div className="flex items-center gap-2">
                       <Bus className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{journeyData.bus.type}</span>
                     </div>
-
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
@@ -419,9 +291,7 @@ export default function PassengerDetailsPage() {
                       </span>
                     </div>
                   </div>
-
                   <Separator />
-
                   <div className="space-y-2">
                     <h3 className="font-medium">Selected Seats</h3>
                     <div className="space-y-1">
@@ -435,9 +305,7 @@ export default function PassengerDetailsPage() {
                       ))}
                     </div>
                   </div>
-
                   <Separator />
-
                   <div className="flex justify-between font-medium">
                     <span>Total</span>
                     <span className="text-lg">
@@ -449,7 +317,7 @@ export default function PassengerDetailsPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
