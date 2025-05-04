@@ -12,8 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "About Us | bookAM",
@@ -24,7 +22,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <Header />
       <main className="container mx-auto px-4 py-8 md:py-12">
         {/* Hero Section */}
         <section className="mb-12 rounded-xl bg-gradient-to-r from-green-900 to-green-700 p-8 text-white dark:from-green-950 dark:to-green-800">
@@ -393,7 +390,6 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

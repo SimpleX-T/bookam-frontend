@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -63,6 +64,7 @@ const journeyData = {
   save: 150,
   totalPrice: 14850,
 };
+};
 
 const paymentSchema = z.object({
   paymentMethod: z.enum(["online", "cash"], {
@@ -80,9 +82,22 @@ const paymentSchema = z.object({
     .string()
     .min(5, { message: "Please enter a valid expiry date" })
     .optional(),
+  cardName: z
+    .string()
+    .min(2, { message: "Please enter the cardholder name" })
+    .optional(),
+  cardNumber: z
+    .string()
+    .min(16, { message: "Please enter a valid card number" })
+    .optional(),
+  expiryDate: z
+    .string()
+    .min(5, { message: "Please enter a valid expiry date" })
+    .optional(),
   cvv: z.string().min(3, { message: "Please enter a valid CVV" }).optional(),
 });
 
+type PaymentFormValues = z.infer<typeof paymentSchema>;
 type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 export default function PaymentMethodPage() {
@@ -127,6 +142,9 @@ export default function PaymentMethodPage() {
     console.log("Payment data:", data);
     router.push("/booking/steps/confirmation");
   };
+    console.log("Payment data:", data);
+    router.push("/booking/steps/confirmation");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -143,6 +161,11 @@ export default function PaymentMethodPage() {
           <h1 className="text-2xl font-bold mb-6">Payment</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -197,10 +220,30 @@ export default function PaymentMethodPage() {
                               {errors.cardName.message}
                             </p>
                           )}
+                          <Input
+                            id="cardName"
+                            placeholder="Enter name on card"
+                            {...register("cardName")}
+                          />
+                          {errors.cardName && (
+                            <p className="text-sm text-destructive">
+                              {errors.cardName.message}
+                            </p>
+                          )}
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="cardNumber">Card number</Label>
+                          <Input
+                            id="cardNumber"
+                            placeholder="Enter card number"
+                            {...register("cardNumber")}
+                          />
+                          {errors.cardNumber && (
+                            <p className="text-sm text-destructive">
+                              {errors.cardNumber.message}
+                            </p>
+                          )}
                           <Input
                             id="cardNumber"
                             placeholder="Enter card number"
@@ -221,6 +264,11 @@ export default function PaymentMethodPage() {
                                 setValue("expiryDate", value)
                               }
                             >
+                            <Select
+                              onValueChange={(value) =>
+                                setValue("expiryDate", value)
+                              }
+                            >
                               <SelectTrigger id="expiryDate">
                                 <SelectValue placeholder="MM/YY" />
                               </SelectTrigger>
@@ -236,6 +284,9 @@ export default function PaymentMethodPage() {
                               </SelectContent>
                             </Select>
                             {errors.expiryDate && (
+                              <p className="text-sm text-destructive">
+                                {errors.expiryDate.message}
+                              </p>
                               <p className="text-sm text-destructive">
                                 {errors.expiryDate.message}
                               </p>
@@ -347,5 +398,6 @@ export default function PaymentMethodPage() {
         </div>
       </main>
     </div>
+  );
   );
 }

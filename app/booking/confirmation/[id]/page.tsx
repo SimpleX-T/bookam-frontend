@@ -1,14 +1,26 @@
-"use client"
+"use client";
 
-import { useParams, useRouter } from "next/navigation"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Bus, Calendar, Download, Share2, User } from "lucide-react"
-import { motion } from "motion/react"
-import Link from "next/link"
+import { useParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  ArrowRight,
+  Bus,
+  Calendar,
+  Download,
+  Share2,
+  User,
+} from "lucide-react";
+import { motion } from "motion/react";
+import Link from "next/link";
 
 // Dummy journey data
 const journeyData = {
@@ -52,15 +64,14 @@ const journeyData = {
     email: "john.doe@example.com",
     phone: "+234 800 123 4567",
   },
-}
+};
 
 export default function ConfirmationPage() {
-  const params = useParams()
-  const router = useRouter()
+  const params = useParams();
+  const router = useRouter();
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <motion.div
@@ -90,30 +101,43 @@ export default function ConfirmationPage() {
                 </div>
                 <CardTitle className="text-2xl">Booking Confirmed!</CardTitle>
                 <CardDescription>
-                  Your journey has been booked successfully. Your booking reference is{" "}
-                  <span className="font-medium">{journeyData.bookingReference}</span>
+                  Your journey has been booked successfully. Your booking
+                  reference is{" "}
+                  <span className="font-medium">
+                    {journeyData.bookingReference}
+                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-3 pb-4 border-b">
                   <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
-                    <span className="font-medium text-primary">{journeyData.logo}</span>
+                    <span className="font-medium text-primary">
+                      {journeyData.logo}
+                    </span>
                   </div>
                   <div>
                     <div className="font-medium">{journeyData.company}</div>
-                    <div className="text-sm text-muted-foreground">{journeyData.journeyNumber}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {journeyData.journeyNumber}
+                    </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6">
                   <div className="space-y-1">
-                    <div className="text-2xl font-bold">{journeyData.from.time}</div>
+                    <div className="text-2xl font-bold">
+                      {journeyData.from.time}
+                    </div>
                     <div className="font-medium">{journeyData.from.city}</div>
-                    <div className="text-sm text-muted-foreground">{journeyData.from.terminal}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {journeyData.from.terminal}
+                    </div>
                   </div>
 
                   <div className="flex flex-col items-center justify-center">
-                    <div className="text-sm text-muted-foreground mb-2">{journeyData.duration}</div>
+                    <div className="text-sm text-muted-foreground mb-2">
+                      {journeyData.duration}
+                    </div>
                     <div className="relative w-24 md:w-32">
                       <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t border-dashed"></span>
@@ -125,9 +149,13 @@ export default function ConfirmationPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <div className="text-2xl font-bold">{journeyData.to.time}</div>
+                    <div className="text-2xl font-bold">
+                      {journeyData.to.time}
+                    </div>
                     <div className="font-medium">{journeyData.to.city}</div>
-                    <div className="text-sm text-muted-foreground">{journeyData.to.terminal}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {journeyData.to.terminal}
+                    </div>
                   </div>
                 </div>
 
@@ -165,7 +193,14 @@ export default function ConfirmationPage() {
                         <path d="M9 10h.01" />
                         <path d="M6 10h.01" />
                         <path d="M12 10h.01" />
-                        <rect x="14" y="18" width="8" height="4" rx="1" ry="1" />
+                        <rect
+                          x="14"
+                          y="18"
+                          width="8"
+                          height="4"
+                          rx="1"
+                          ry="1"
+                        />
                       </svg>
                       <span className="text-sm">{journeyData.luggage}</span>
                     </div>
@@ -174,7 +209,9 @@ export default function ConfirmationPage() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{journeyData.passenger.name}</span>
+                      <span className="text-sm">
+                        {journeyData.passenger.name}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <svg
@@ -192,7 +229,9 @@ export default function ConfirmationPage() {
                         <rect width="20" height="16" x="2" y="4" rx="2" />
                         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                       </svg>
-                      <span className="text-sm">{journeyData.passenger.email}</span>
+                      <span className="text-sm">
+                        {journeyData.passenger.email}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <svg
@@ -209,7 +248,9 @@ export default function ConfirmationPage() {
                       >
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
-                      <span className="text-sm">{journeyData.passenger.phone}</span>
+                      <span className="text-sm">
+                        {journeyData.passenger.phone}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -218,7 +259,9 @@ export default function ConfirmationPage() {
 
                 <div className="flex justify-between font-medium">
                   <span>Total Paid</span>
-                  <span className="text-lg">₦{journeyData.price.toLocaleString()}</span>
+                  <span className="text-lg">
+                    ₦{journeyData.price.toLocaleString()}
+                  </span>
                 </div>
 
                 <div className="bg-muted/50 rounded-lg p-4">
@@ -226,17 +269,23 @@ export default function ConfirmationPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
                       <span className="text-muted-foreground">•</span>
-                      <span>Please arrive at the terminal at least 30 minutes before departure.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-muted-foreground">•</span>
-                      <span>Have your booking reference and ID ready for verification.</span>
+                      <span>
+                        Please arrive at the terminal at least 30 minutes before
+                        departure.
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-muted-foreground">•</span>
                       <span>
-                        For any changes or cancellations, please contact our customer service at least 24 hours before
-                        departure.
+                        Have your booking reference and ID ready for
+                        verification.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-muted-foreground">•</span>
+                      <span>
+                        For any changes or cancellations, please contact our
+                        customer service at least 24 hours before departure.
                       </span>
                     </li>
                   </ul>
@@ -262,7 +311,6 @@ export default function ConfirmationPage() {
           </motion.div>
         </div>
       </main>
-      <Footer />
     </div>
-  )
+  );
 }

@@ -24,6 +24,9 @@ import {
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Seat } from "@/types";
+import { useApp } from "@/contexts/app-context";
+import { sampleRoutes } from "@/lib/constants";
 import BookingTimeline from "@/components/booking/booking-timeline";
 import { toast } from "sonner";
 
@@ -122,6 +125,14 @@ export default function SeatSelectionClientPage(): JSX.Element {
   const pathname = usePathname();
 
   // State with explicit types
+  const { routes } = useApp();
+  const journeyDetails = routes.length
+    ? routes.find((route) => route.routeId === searchParams.get("journey"))
+    : sampleRoutes.find(
+        (route) => route.routeId === searchParams.get("journey")
+      );
+  console.log(routes, journeyDetails);
+
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [seats, setSeats] = useState<Record<string, Seat>>({});
   const [passengerCount, setPassengerCount] = useState<number>(1);
@@ -139,6 +150,10 @@ export default function SeatSelectionClientPage(): JSX.Element {
   }
 
   // Generate seat data
+  const [passengerCount, setPassengerCount] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(journeyDetails?.price || 0);
+
+  // Generate dummy seat data
   useEffect(() => {
     const generateSeats = (): Record<string, Seat> => {
       const newSeats: Record<string, Seat> = {};
@@ -223,7 +238,7 @@ export default function SeatSelectionClientPage(): JSX.Element {
     }
 
     const params = new URLSearchParams({
-      journey: journeyData.id,
+      journey: journeyDetails?.routeId || "",
       seats: selectedSeats.join(","),
       price: totalPrice.toString(),
       passengers: passengerCount.toString(),

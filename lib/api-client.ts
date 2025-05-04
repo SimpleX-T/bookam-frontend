@@ -20,7 +20,7 @@ export interface RegisterRequest {
 export interface CreateBusRequest {
   busNumber: string;
   capacity: number;
-  routeId: number;
+  routeid: string;
   departureTime: string; // ISO datetime string
   arrivalTime: string; // ISO datetime string
 }
@@ -150,7 +150,7 @@ export const apiClient = {
 
   // Bus endpoints
   bus: {
-    getById: async (id: number, token: string): Promise<ApiResponse<any>> => {
+    getById: async (id: string, token: string): Promise<ApiResponse<any>> => {
       const response = await fetch(`${API_BASE_URL}/bus/${id}`, {
         method: "GET",
         headers: createHeaders(token, false),
@@ -182,7 +182,7 @@ export const apiClient = {
     },
 
     update: async (
-      id: number,
+      id: string,
       data: UpdateBusRequest,
       token: string
     ): Promise<ApiResponse<any>> => {
@@ -195,7 +195,7 @@ export const apiClient = {
       return handleResponse(response);
     },
 
-    delete: async (id: number, token: string): Promise<ApiResponse<any>> => {
+    delete: async (id: string, token: string): Promise<ApiResponse<any>> => {
       const response = await fetch(`${API_BASE_URL}/bus/delete/${id}`, {
         method: "DELETE",
         headers: createHeaders(token, false),
@@ -207,7 +207,7 @@ export const apiClient = {
 
   // Route endpoints
   route: {
-    getById: async (id: number, token: string): Promise<ApiResponse<any>> => {
+    getById: async (id: string, token: string): Promise<ApiResponse<any>> => {
       const response = await fetch(`${API_BASE_URL}/route/${id}`, {
         method: "GET",
         headers: createHeaders(token, false),
@@ -239,7 +239,7 @@ export const apiClient = {
     },
 
     update: async (
-      id: number,
+      id: string,
       data: UpdateRouteRequest,
       token: string
     ): Promise<ApiResponse<any>> => {
@@ -252,7 +252,7 @@ export const apiClient = {
       return handleResponse(response);
     },
 
-    delete: async (id: number, token: string): Promise<ApiResponse<any>> => {
+    delete: async (id: string, token: string): Promise<ApiResponse<any>> => {
       const response = await fetch(`${API_BASE_URL}/route/delete/${id}`, {
         method: "DELETE",
         headers: createHeaders(token, false),

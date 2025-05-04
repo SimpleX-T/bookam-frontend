@@ -22,130 +22,9 @@ const MapView = dynamic(() => import("./map-view"), {
   loading: () => <p>Loading map...</p>,
 });
 import { Route } from "@/types";
+import { sampleRoutes } from "@/lib/constants";
 
 // Sample routes data with location names for Google Maps
-const sampleRoutes: Route[] = [
-  {
-    id: "1",
-    from: "Lagos",
-    to: "Abuja",
-    price: 25000,
-    duration: "1h 30m",
-    image: "/placeholder.svg",
-    description: "Direct transit from Lagos to Abuja",
-    distance: "534 km",
-    departureTime: "08:00 AM",
-    arrivalTime: "09:30 AM",
-    stops: [],
-    fromLocation: "Lagos, Nigeria",
-    toLocation: "Abuja, Nigeria",
-  },
-  {
-    id: "2",
-    from: "Lagos",
-    to: "Port Harcourt",
-    price: 22000,
-    duration: "1h 15m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Lagos to Port Harcourt",
-    distance: "617 km",
-    departureTime: "10:00 AM",
-    arrivalTime: "11:15 AM",
-    stops: [],
-    fromLocation: "Lagos, Nigeria",
-    toLocation: "Port Harcourt, Nigeria",
-  },
-  {
-    id: "3",
-    from: "Abuja",
-    to: "Kano",
-    price: 18000,
-    duration: "1h",
-    image: "/placeholder.svg",
-    description: "Direct flight from Abuja to Kano",
-    distance: "376 km",
-    departureTime: "12:00 PM",
-    arrivalTime: "01:00 PM",
-    stops: [],
-    fromLocation: "Abuja, Nigeria",
-    toLocation: "Kano, Nigeria",
-  },
-  {
-    id: "4",
-    from: "Kano",
-    to: "Lagos",
-    price: 27000,
-    duration: "1h 45m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Kano to Lagos",
-    distance: "754 km",
-    departureTime: "03:00 PM",
-    arrivalTime: "04:45 PM",
-    stops: [],
-    fromLocation: "Kano, Nigeria",
-    toLocation: "Lagos, Nigeria",
-  },
-  {
-    id: "5",
-    from: "Port Harcourt",
-    to: "Abuja",
-    price: 20000,
-    duration: "1h 10m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Port Harcourt to Abuja",
-    distance: "498 km",
-    departureTime: "09:30 AM",
-    arrivalTime: "10:40 AM",
-    stops: [],
-    fromLocation: "Port Harcourt, Nigeria",
-    toLocation: "Abuja, Nigeria",
-  },
-  {
-    id: "6",
-    from: "Enugu",
-    to: "Lagos",
-    price: 23000,
-    duration: "1h 20m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Enugu to Lagos",
-    distance: "527 km",
-    departureTime: "11:00 AM",
-    arrivalTime: "12:20 PM",
-    stops: [],
-    fromLocation: "Enugu, Nigeria",
-    toLocation: "Lagos, Nigeria",
-  },
-  {
-    id: "7",
-    from: "Abuja",
-    to: "Enugu",
-    price: 19000,
-    duration: "1h 05m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Abuja to Enugu",
-    distance: "412 km",
-    departureTime: "02:00 PM",
-    arrivalTime: "03:05 PM",
-    stops: [],
-    fromLocation: "Abuja, Nigeria",
-    toLocation: "Enugu, Nigeria",
-  },
-  {
-    id: "8",
-    from: "Lagos",
-    to: "Kano",
-    price: 28000,
-    duration: "1h 50m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Lagos to Kano",
-    distance: "754 km",
-    departureTime: "07:00 AM",
-    arrivalTime: "08:50 AM",
-    stops: [],
-    fromLocation: "Lagos, Nigeria",
-    toLocation: "Kano, Nigeria",
-  },
-];
 
 interface JourneyPlannerProps {
   routes?: Route[];
@@ -170,13 +49,14 @@ export function JourneyPlanner({
   };
 
   const handleContinue = () => {
+    console.log(selectedRoute);
     if (onContinue && selectedRoute) {
       onContinue(selectedRoute);
     }
   };
 
   const handleRouteChange = (routeId: string) => {
-    const route = routes.find((r) => r.id === routeId);
+    const route = routes.find((r) => r.routeId === routeId);
     if (route) {
       handleSelect(route);
       setIsSidebarOpen(true);
@@ -192,6 +72,7 @@ export function JourneyPlanner({
   };
 
   const viewRoute = (route: Route, e?: React.MouseEvent) => {
+    console.log(route, e);
     if (e) {
       e.stopPropagation();
     }
@@ -223,80 +104,88 @@ export function JourneyPlanner({
               )}
             </div>
 
-            <Select value={selectedRoute?.id} onValueChange={handleRouteChange}>
-              <SelectTrigger className="w-full mb-4">
-                <SelectValue placeholder="Select a route" />
-              </SelectTrigger>
-              <SelectContent>
-                {routes.map((route) => (
-                  <SelectItem key={route.id} value={route.id}>
-                    {route.from} to {route.to} - ₦{route.price.toLocaleString()}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {routes.slice(0, max || routes.length).map((route) => (
-                <Card
-                  key={route.id}
-                  className={`overflow-hidden cursor-pointer transition-all shadow-md ${
-                    selectedRoute?.id === route.id
-                      ? "ring-2 ring-primary"
-                      : "hover:shadow-xl"
-                  }`}
-                  onClick={() => handleSelect(route)}
-                >
-                  <div className="relative h-32">
-                    <Image
-                      src={route.image || "/placeholder.svg"}
-                      alt={`${route.from} to ${route.to}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <CardContent className="p-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="font-bold text-sm">
-                        {route.from} <ArrowRight className="inline h-3 w-3" />{" "}
-                        {route.to}
-                      </div>
-                      <Badge variant="outline" className="text-primary text-xs">
-                        ₦{route.price.toLocaleString()}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center text-xs text-muted-foreground mb-3">
-                      <Clock className="mr-1 h-3 w-3" />
-                      {route.duration}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        className="flex-1 text-xs h-8"
-                        variant={
-                          selectedRoute?.id === route.id ? "default" : "outline"
-                        }
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelect(route);
-                        }}
-                      >
-                        {selectedRoute?.id === route.id ? "Selected" : "Select"}
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="h-8 text-xs"
-                        onClick={(e) => viewRoute(route, e)}
-                      >
-                        Route
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+          <Select
+            value={selectedRoute?.routeId}
+            onValueChange={handleRouteChange}
+          >
+            <SelectTrigger className="w-full mb-4">
+              <SelectValue placeholder="Select a route" />
+            </SelectTrigger>
+            <SelectContent>
+              {routes.map((route) => (
+                <SelectItem key={route.routeId} value={route.routeId}>
+                  {route.origin} to {route.destination} - ₦
+                  {route.price.toLocaleString()}
+                </SelectItem>
               ))}
-            </div>
+            </SelectContent>
+          </Select>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {routes.slice(0, max || routes.length).map((route) => (
+              <Card
+                key={route.routeId}
+                className={`overflow-hidden cursor-pointer transition-all shadow-md ${
+                  selectedRoute?.routeId === route.routeId
+                    ? "ring-2 ring-primary"
+                    : "hover:shadow-xl"
+                }`}
+                onClick={() => handleSelect(route)}
+              >
+                <div className="relative h-32">
+                  <Image
+                    src={route.image || "/placeholder.svg"}
+                    alt={`${route.origin} to ${route.destination}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <CardContent className="p-3">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="font-bold text-sm">
+                      {route.origin} <ArrowRight className="inline h-3 w-3" />{" "}
+                      {route.destination}
+                    </div>
+                    <Badge variant="outline" className="text-primary text-xs">
+                      ₦{route.price.toLocaleString()}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center text-xs text-muted-foreground mb-3">
+                    <Clock className="mr-1 h-3 w-3" />
+                    {route.duration}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1 text-xs h-8"
+                      variant={
+                        selectedRoute?.routeId === route.routeId
+                          ? "default"
+                          : "outline"
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelect(route);
+                      }}
+                    >
+                      {selectedRoute?.routeId === route.routeId
+                        ? "Selected"
+                        : "Select"}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={(e) => viewRoute(route, e)}
+                    >
+                      Route
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
+      </div>
 
         {/* Desktop sidebar - only visible when a route is selected */}
         <div
@@ -324,65 +213,65 @@ export function JourneyPlanner({
                 </Button>
               </div>
 
-              {/* Map Area */}
-              <div className="relative h-1/2 min-h-[300px]">
-                {isMapLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                    <div className="text-center">
-                      <div className="h-8 w-8 mx-auto mb-2 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-sm text-muted-foreground">
-                        Loading map...
-                      </p>
-                    </div>
+            {/* Map Area */}
+            <div className="relative h-1/2 min-h-[300px]">
+              {isMapLoading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                  <div className="text-center">
+                    <div className="h-8 w-8 mx-auto mb-2 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-muted-foreground">
+                      Loading map...
+                    </p>
                   </div>
-                ) : (
-                  <MapView
-                    origin={selectedRoute.fromLocation}
-                    destination={selectedRoute.toLocation}
-                    className="h-full"
-                  />
-                )}
-              </div>
+                </div>
+              ) : (
+                <MapView
+                  origin={selectedRoute.origin}
+                  destination={selectedRoute.destination}
+                  className="h-full z-50"
+                />
+              )}
+            </div>
 
-              {/* Journey Details */}
-              <div className="p-6 flex-1">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm text-muted-foreground">From</p>
-                      <p className="font-medium">{selectedRoute.from}</p>
-                      <p className="text-sm">{selectedRoute.departureTime}</p>
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">To</p>
-                      <p className="font-medium">{selectedRoute.to}</p>
-                      <p className="text-sm">{selectedRoute.arrivalTime}</p>
-                    </div>
+            {/* Journey Details */}
+            <div className="p-6 flex-1">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground">From</p>
+                    <p className="font-medium">{selectedRoute.origin}</p>
+                    {/* <p className="text-sm">{selectedRoute.departureTime}</p> */}
                   </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">To</p>
+                    <p className="font-medium">{selectedRoute.destination}</p>
+                    {/* <p className="text-sm">{selectedRoute.arrivalTime}</p> */}
+                  </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Duration</p>
-                      <p className="font-medium">{selectedRoute.duration}</p>
-                    </div>
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Distance</p>
-                      <p className="font-medium">{selectedRoute.distance}</p>
-                    </div>
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Price</p>
-                      <p className="font-medium">
-                        ₦{selectedRoute.price.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Stops</p>
-                      <p className="font-medium">
-                        {selectedRoute.stops.length || "Direct"}
-                      </p>
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Duration</p>
+                    <p className="font-medium">{selectedRoute.duration}</p>
                   </div>
+                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Distance</p>
+                    <p className="font-medium">{selectedRoute.distance}</p>
+                  </div>
+                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Price</p>
+                    <p className="font-medium">
+                      ₦{selectedRoute.price.toLocaleString()}
+                    </p>
+                  </div>
+                  {/* <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Stops</p>
+                    <p className="font-medium">
+                      {selectedRoute.stops.length || "Direct"}
+                    </p>
+                  </div> */}
+                </div>
 
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">
@@ -391,19 +280,17 @@ export function JourneyPlanner({
                     <p>{selectedRoute.description}</p>
                   </div>
 
-                  {selectedRoute.stops.length > 0 && (
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Stops
-                      </p>
-                      <ul className="list-disc pl-5">
-                        {selectedRoute.stops.map((stop, index) => (
-                          <li key={index}>{stop}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                {/* {selectedRoute.stops.length > 0 && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Stops</p>
+                    <ul className="list-disc pl-5">
+                      {selectedRoute.stops.map((stop, index) => (
+                        <li key={index}>{stop}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )} */}
+              </div>
 
                 <div className="mt-8">
                   <Button className="w-full" size="lg" onClick={handleContinue}>
@@ -435,67 +322,67 @@ export function JourneyPlanner({
             </Button>
           </div>
 
-          {selectedRoute && (
-            <div className="flex flex-col">
-              {/* Map Area */}
-              <div className="relative h-[40vh]">
-                {isMapLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                    <div className="text-center">
-                      <div className="h-8 w-8 mx-auto mb-2 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-sm text-muted-foreground">
-                        Loading map...
-                      </p>
-                    </div>
+        {selectedRoute && (
+          <div className="flex flex-col">
+            {/* Map Area */}
+            <div className="relative h-[40vh]">
+              {isMapLoading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                  <div className="text-center">
+                    <div className="h-8 w-8 mx-auto mb-2 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-muted-foreground">
+                      Loading map...
+                    </p>
                   </div>
-                ) : (
-                  <MapView
-                    origin={selectedRoute.fromLocation}
-                    destination={selectedRoute.toLocation}
-                    className="h-full"
-                  />
-                )}
-              </div>
+                </div>
+              ) : (
+                <MapView
+                  origin={selectedRoute.origin}
+                  destination={selectedRoute.destination}
+                  className="h-full"
+                />
+              )}
+            </div>
 
-              {/* Journey Details */}
-              <div className="p-6">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm text-muted-foreground">From</p>
-                      <p className="font-medium">{selectedRoute.from}</p>
-                      <p className="text-sm">{selectedRoute.departureTime}</p>
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">To</p>
-                      <p className="font-medium">{selectedRoute.to}</p>
-                      <p className="text-sm">{selectedRoute.arrivalTime}</p>
-                    </div>
+            {/* Journey Details */}
+            <div className="p-6">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground">From</p>
+                    <p className="font-medium">{selectedRoute.origin}</p>
+                    {/* <p className="text-sm">{selectedRoute.departureTime}</p> */}
                   </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">To</p>
+                    <p className="font-medium">{selectedRoute.destination}</p>
+                    {/* <p className="text-sm">{selectedRoute.arrivalTime}</p> */}
+                  </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Duration</p>
-                      <p className="font-medium">{selectedRoute.duration}</p>
-                    </div>
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Distance</p>
-                      <p className="font-medium">{selectedRoute.distance}</p>
-                    </div>
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Price</p>
-                      <p className="font-medium">
-                        ₦{selectedRoute.price.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="bg-card dark:bg-card p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Stops</p>
-                      <p className="font-medium">
-                        {selectedRoute.stops.length || "Direct"}
-                      </p>
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Duration</p>
+                    <p className="font-medium">{selectedRoute.duration}</p>
                   </div>
+                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Distance</p>
+                    <p className="font-medium">{selectedRoute.distance}</p>
+                  </div>
+                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Price</p>
+                    <p className="font-medium">
+                      ₦{selectedRoute.price.toLocaleString()}
+                    </p>
+                  </div>
+                  {/* <div className="bg-card dark:bg-card p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Stops</p>
+                    <p className="font-medium">
+                      {selectedRoute.stops.length || "Direct"}
+                    </p>
+                  </div> */}
+                </div>
 
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">
@@ -504,19 +391,17 @@ export function JourneyPlanner({
                     <p>{selectedRoute.description}</p>
                   </div>
 
-                  {selectedRoute.stops.length > 0 && (
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Stops
-                      </p>
-                      <ul className="list-disc pl-5">
-                        {selectedRoute.stops.map((stop, index) => (
-                          <li key={index}>{stop}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                {/* {selectedRoute.stops.length > 0 && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Stops</p>
+                    <ul className="list-disc pl-5">
+                      {selectedRoute.stops.map((stop, index) => (
+                        <li key={index}>{stop}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )} */}
+              </div>
 
                 <div className="mt-8 pb-8">
                   <Button className="w-full" size="lg" onClick={handleContinue}>

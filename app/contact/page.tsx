@@ -18,8 +18,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContactForm from "@/components/contact/contact-form";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "Contact Us | bookAM",
@@ -29,7 +27,6 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <>
-      <Header />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <section className="mb-12 rounded-xl bg-gradient-to-r from-green-900 to-green-700 p-8 text-white dark:from-green-950 dark:to-green-800">
           <div className="text-center">
@@ -380,7 +377,6 @@ export default function ContactPage() {
           </Accordion>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

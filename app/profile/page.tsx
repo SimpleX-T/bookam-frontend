@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,10 +104,10 @@ export default function ProfilePage() {
     try {
       // Here you would call the API to update the profile
       console.log("Profile data:", data);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -124,10 +122,10 @@ export default function ProfilePage() {
     try {
       // Here you would call the API to update the password
       console.log("Password data:", data);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       toast.success("Password updated successfully!");
       resetPassword();
     } catch (error) {
@@ -141,21 +139,18 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 flex items-center justify-center">
           <div className="text-center">
             <Spinner size="lg" />
             <p className="mt-4 text-muted-foreground">Loading profile...</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
@@ -169,7 +164,9 @@ export default function ProfilePage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-center">
-                    <h2 className="text-xl font-bold">{user?.username || "User"}</h2>
+                    <h2 className="text-xl font-bold">
+                      {user?.username || "User"}
+                    </h2>
                     <p className="text-sm text-muted-foreground">
                       Premium Member
                     </p>
@@ -221,7 +218,14 @@ export default function ProfilePage() {
                         strokeLinejoin="round"
                         className="mr-2"
                       >
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <rect
+                          x="3"
+                          y="4"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        />
                         <line x1="16" y1="2" x2="16" y2="6" />
                         <line x1="8" y1="2" x2="8" y2="6" />
                         <line x1="3" y1="10" x2="21" y2="10" />
@@ -247,7 +251,14 @@ export default function ProfilePage() {
                         strokeLinejoin="round"
                         className="mr-2"
                       >
-                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                        <rect
+                          x="1"
+                          y="4"
+                          width="22"
+                          height="16"
+                          rx="2"
+                          ry="2"
+                        />
                         <line x1="1" y1="10" x2="23" y2="10" />
                       </svg>
                       Payments
@@ -441,7 +452,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

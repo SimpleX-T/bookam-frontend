@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Download, Mail, Printer, Share2 } from "lucide-react";
@@ -126,7 +124,6 @@ export default function MobileTicketPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 py-12">
           <div className="container">
             <div className="mb-8">
@@ -147,7 +144,6 @@ export default function MobileTicketPage() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -155,7 +151,6 @@ export default function MobileTicketPage() {
   if (isError) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 py-12">
           <div className="container">
             <div className="mb-8">
@@ -180,14 +175,12 @@ export default function MobileTicketPage() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="mb-8">
@@ -437,7 +430,6 @@ export default function MobileTicketPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
