@@ -15,6 +15,7 @@ import { DateInfo, AppliedFilters } from "@/types";
 import { generateDates } from "@/lib/helpers";
 import { allBusRoutes } from "@/lib/constants";
 import SearchPagination from "@/components/search/pagination";
+import { useApp } from "@/contexts/app-context";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -50,6 +51,14 @@ export default function SearchPage() {
   const [showDateSelector, setShowDateSelector] = useState(false);
   const [displayDates, setDisplayDates] = useState<DateInfo[]>([]);
   const [selectedDateIndex, setSelectedDateIndex] = useState(0); // Index for the horizontal date selector
+
+  const { routes } = useApp();
+
+  const currentRoute = routes.find(
+    (route) => route.routeId === searchParams.get("journey")
+  );
+
+  console.log(currentRoute);
 
   // --- Effects ---
   // Effect to parse URL search params
