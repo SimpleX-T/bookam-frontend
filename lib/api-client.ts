@@ -19,8 +19,9 @@ export interface RegisterRequest {
 
 export interface CreateBusRequest {
   busNumber: string;
+  busModel: string;
   capacity: number;
-  routeid: string;
+  routeId: string | number;
   departureTime: string; // ISO datetime string
   arrivalTime: string; // ISO datetime string
 }
@@ -33,16 +34,34 @@ export interface UpdateBusRequest {
   arrivalTime?: string;
 }
 
+export interface BusInRoute {
+  busNumber: string;
+  busModel: string;
+  capacity: number;
+  departureTime: string; // ISO datetime string
+  arrivalTime: string; // ISO datetime string
+}
+
 export interface CreateRouteRequest {
   origin: string;
   destination: string;
-  price: string;
+  price: number;
+  duration: string;
+  image: string;
+  description: string;
+  distance: string;
+  buses: BusInRoute[];
 }
 
 export interface UpdateRouteRequest {
   origin?: string;
   destination?: string;
-  price?: string;
+  price?: number;
+  duration?: string;
+  image?: string;
+  description?: string;
+  distance?: string;
+  buses?: BusInRoute[];
 }
 
 export interface RouteSearchParams {
@@ -287,6 +306,14 @@ export const apiClient = {
     delete: async (token: string): Promise<ApiResponse<any>> => {
       const response = await fetch(`${API_BASE_URL}/user/delete`, {
         method: "DELETE",
+        headers: createHeaders(token, false),
+      });
+
+      return handleResponse(response);
+    },
+    fetchAll: async (token: string): Promise<ApiResponse<any[]>> => {
+      const response = await fetch(`${API_BASE_URL}/user/all`, {
+        method: "GET",
         headers: createHeaders(token, false),
       });
 

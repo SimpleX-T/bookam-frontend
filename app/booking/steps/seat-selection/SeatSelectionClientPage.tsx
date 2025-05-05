@@ -24,7 +24,7 @@ import {
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Seat } from "@/types";
+// import { Seat } from "@/types";
 import { useApp } from "@/contexts/app-context";
 import { sampleRoutes } from "@/lib/constants";
 import BookingTimeline from "@/components/booking/booking-timeline";
@@ -135,8 +135,6 @@ export default function SeatSelectionClientPage(): JSX.Element {
 
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [seats, setSeats] = useState<Record<string, Seat>>({});
-  const [passengerCount, setPassengerCount] = useState<number>(1);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
 
   let currentStep = 0;
 

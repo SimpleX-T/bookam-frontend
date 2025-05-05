@@ -105,7 +105,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem("user", JSON.stringify({ username, email }));
 
         // Navigate to dashboard
-        router.push("/routes");
+        if (username === "bookam-admin" && email === "admin@bookam.com") {
+          router.push("/dashboard");
+        } else {
+          router.push("/routes");
+        }
 
         // Show success toast
         toast.success("Login successful!");

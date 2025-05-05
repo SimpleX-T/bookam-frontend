@@ -179,6 +179,17 @@ export const useDeleteRouteMutation = () => {
 };
 
 // User queries
+export const useUsers = () => {
+  const { token, isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: () => apiClient.user.fetchAll(token as string),
+    enabled: !!token && isAuthenticated,
+    select: (data) => data.data,
+  });
+};
+
 export const useDeleteUserMutation = () => {
   const { token } = useAuth();
   const queryClient = useQueryClient();

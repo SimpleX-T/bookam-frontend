@@ -7,16 +7,33 @@ export interface Route {
   image: string;
   description: string;
   distance: string;
+  buses: Bus[];
 }
 
 // Define types for the data models from API
 export interface Bus {
   busId: string;
-  routeid: string;
+  routeId: string | number;
+  routes: Route[];
   busNumber: string | null;
+  busModel: string;
   capacity: number;
+  seatsRemaining: number;
+  bookedSeats: number[];
+  availableSeats: number[];
   departureTime: string;
   arrivalTime: string;
+}
+
+export interface BookingDetails {
+  bookingId: string;
+  busId: string;
+  routeId: string;
+  userId: string;
+  seatNumber: string;
+  completed: boolean;
+  checkedIn: boolean;
+  createdAt: string;
 }
 
 // Define search parameters for routes

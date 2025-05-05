@@ -128,7 +128,20 @@ The API uses JWT Bearer token authentication.
   {
     "origin": "string",
     "destination": "string",
-    "price": "string"
+    "price": number,
+    "duration": "string",
+    "image": "string",
+    "description": "string",
+    "distance": "string",
+    "buses": [
+      {
+        "busNumber": "string",
+        "busModel": "string",
+        "capacity": number,
+        "departureTime": "datetime",
+        "arrivalTime": "datetime"
+      }
+    ]
   }
   ```
 
@@ -188,12 +201,29 @@ The API uses JWT Bearer token authentication.
 
 ```json
 {
-  "routeId": integer,
+  "routeId": number,
   "origin": "string",
   "destination": "string",
-  "price": "string",
+  "price": number,
+  "duration": "string",
+  "image": "string",
+  "description": "string",
+  "distance": "string",
   "createdAt": "datetime",
   "updatedAt": "datetime",
-  "buses": [Bus]
+  "buses": [
+    {
+      "busId": number,
+      "routeId": number,
+      "busNumber": "string",
+      "busModel": "string",
+      "capacity": number,
+      "seatsRemaining": number,
+      "bookedSeats": array,
+      "availableSeats": array,
+      "departureTime": "datetime",
+      "arrivalTime": "datetime"
+    }
+  ]
 }
 ```

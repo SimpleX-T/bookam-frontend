@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -7,16 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion } from "motion/react";
@@ -64,7 +53,6 @@ const journeyData = {
   save: 150,
   totalPrice: 14850,
 };
-};
 
 const paymentSchema = z.object({
   paymentMethod: z.enum(["online", "cash"], {
@@ -82,22 +70,9 @@ const paymentSchema = z.object({
     .string()
     .min(5, { message: "Please enter a valid expiry date" })
     .optional(),
-  cardName: z
-    .string()
-    .min(2, { message: "Please enter the cardholder name" })
-    .optional(),
-  cardNumber: z
-    .string()
-    .min(16, { message: "Please enter a valid card number" })
-    .optional(),
-  expiryDate: z
-    .string()
-    .min(5, { message: "Please enter a valid expiry date" })
-    .optional(),
   cvv: z.string().min(3, { message: "Please enter a valid CVV" }).optional(),
 });
 
-type PaymentFormValues = z.infer<typeof paymentSchema>;
 type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 export default function PaymentMethodPage() {
@@ -113,9 +88,9 @@ export default function PaymentMethodPage() {
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
-    const name = searchParams.get("name");
-    const email = searchParams.get("email");
-    const phone = searchParams.get("phone");
+    const name = searchParams.get("name") ?? undefined;
+    const email = searchParams.get("email") ?? undefined;
+    const phone = searchParams.get("phone") ?? undefined;
     const seats = searchParams.get("seats")?.split(",");
     const price = parseInt(searchParams.get("price") || "0", 10);
 
@@ -142,9 +117,6 @@ export default function PaymentMethodPage() {
     console.log("Payment data:", data);
     router.push("/booking/steps/confirmation");
   };
-    console.log("Payment data:", data);
-    router.push("/booking/steps/confirmation");
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -161,11 +133,6 @@ export default function PaymentMethodPage() {
           <h1 className="text-2xl font-bold mb-6">Payment</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -206,7 +173,7 @@ export default function PaymentMethodPage() {
                     onSubmit={handleSubmit(onSubmit)}
                     className="space-y-6 mt-4"
                   >
-                    {activeTab === "online" && (
+                    {/* {activeTab === "online" && (
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="cardName">Name on card</Label>
@@ -308,7 +275,7 @@ export default function PaymentMethodPage() {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
 
                     {activeTab === "cash" && (
                       <div className="py-4 text-muted-foreground">
@@ -326,17 +293,7 @@ export default function PaymentMethodPage() {
                       </div>
                     )}
 
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={
-                        activeTab === "online" &&
-                        (errors.cardName ||
-                          errors.cardNumber ||
-                          errors.expiryDate ||
-                          errors.cvv)
-                      }
-                    >
+                    <Button type="submit" className="w-full" disabled={true}>
                       {activeTab === "online" ? (
                         <>
                           Pay Now <CreditCard className="ml-2 h-4 w-4" />
@@ -398,6 +355,5 @@ export default function PaymentMethodPage() {
         </div>
       </main>
     </div>
-  );
   );
 }
