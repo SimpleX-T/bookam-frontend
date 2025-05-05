@@ -29,3 +29,40 @@ export function generateRandomString(length: number) {
   }
   return result;
 }
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+  }).format(amount);
+}
+export function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toString();
+}
+
+export function generateRouteId(
+  origin: string,
+  destination: string,
+  date: string
+): string {
+  const originCode = origin.slice(0, 3).toUpperCase();
+  const destCode = destination.slice(0, 3).toUpperCase();
+  const dateCode = new Date(date).getTime().toString().slice(-4);
+  return `RT-${originCode}-${destCode}-${dateCode}`;
+}
+
+export function generateBusNumber(
+  routeId: string,
+  busModel: string,
+  departureTime: string
+): string {
+  const modelCode = busModel.split(" ")[0].slice(0, 3).toUpperCase();
+  const timeCode = new Date(departureTime).getTime().toString().slice(-4);
+  return `${modelCode}-${timeCode}`;
+}

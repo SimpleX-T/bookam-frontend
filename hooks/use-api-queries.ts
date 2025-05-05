@@ -8,6 +8,8 @@ import {
   RouteSearchParams,
   UpdateBusRequest,
   UpdateRouteRequest,
+  CreateBookingRequest,
+  UpdateBookingRequest,
 } from "@/lib/api-client";
 import { useAuth } from "./use-auth";
 
@@ -179,6 +181,17 @@ export const useDeleteRouteMutation = () => {
 };
 
 // User queries
+export const useUsers = () => {
+  const { token, isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: () => apiClient.user.fetchAll(token as string),
+    enabled: !!token && isAuthenticated,
+    select: (data) => data.data,
+  });
+};
+
 export const useDeleteUserMutation = () => {
   const { token } = useAuth();
   const queryClient = useQueryClient();
@@ -189,5 +202,85 @@ export const useDeleteUserMutation = () => {
       // Clear all queries from cache when user is deleted
       queryClient.clear();
     },
+  });
+};
+
+export const useBookings = () => {
+  const { token, isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: ["bookings"],
+    queryFn: () => apiClient.booking.getAll(token as string),
+    enabled: !!token && isAuthenticated,
+    select: (data) => data.data,
+  });
+};
+
+// Booking queries and mutations
+export const useBookingById = (id: string) => {
+  const { token, isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: ["booking", id],
+    queryFn: () => apiClient.booking.getById(id, token as string),
+    enabled: !!token && isAuthenticated && !!id,
+    select: (data) => data.data,
+  });
+};
+
+export const useCreateBookingMutation = () => {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateBookingRequest) =>
+      apiClient.booking.create(data, token as string),
+    onSuccess: () => {
+      // Invalidate bookings query and user bookings
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["user-bookings"] });
+    },
+  });
+};
+
+export const useUpdateBookingMutation = (id: string) => {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateBookingRequest) =>
+      apiClient.booking.update(id, data, token as string),
+    onSuccess: () => {
+      // Invalidate specific booking and bookings list
+      queryClient.invalidateQueries({ queryKey: ["booking", id] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["user-bookings"] });
+    },
+  });
+};
+
+export const useDeleteBookingMutation = () => {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => apiClient.booking.delete(id, token as string),
+    onSuccess: (_, id) => {
+      // Invalidate specific booking and bookings list
+      queryClient.invalidateQueries({ queryKey: ["booking", id] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["user-bookings"] });
+    },
+  });
+};
+
+export const useUserBookings = () => {
+  const { token, isAuthenticated, user } = useAuth();
+  
+  return useQuery({
+    queryKey: ["user-bookings", user],
+    queryFn: () => apiClient.booking.getUserBookings(user!, token as string),
+    enabled: !!token && isAuthenticated && !!user,
+    select: (data) => data.data,
   });
 };

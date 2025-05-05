@@ -10,11 +10,52 @@ import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 interface TicketDisplayProps {
-  booking: any;
+  booking?: any;
   className?: string;
   compact?: boolean;
 }
+const dummyBooking = {
+  reference: "BKAM123456",
+  checkIn: {
+    date: "2024-07-01",
+    time: "08:00",
+  },
+  journey: {
+    company: "Express Bus Co.",
+    logo: "🚌",
+    journeyNumber: "EX123",
+    date: "2024-07-01",
+    duration: "4h 30m",
+    luggage: "1 bag (20kg)",
+    from: {
+      city: "Lagos",
+      terminal: "Jibowu Terminal",
+      time: "09:00",
+    },
+    to: {
+      city: "Abuja",
+      terminal: "Utako Terminal",
+      time: "13:30",
+    },
+    bus: {
+      type: "Luxury",
+      seating: "2x2",
+    },
+  },
+  passengers: [
+    {
+      title: "Mr.",
+      firstName: "John",
+      lastName: "Doe",
+      seat: "12A",
+      ticketNumber: "TCK123456789",
+    },
+  ],
+};
 
+export default function TicketDisplayDefault() {
+  return <TicketDisplay booking={dummyBooking} />;
+}
 export function TicketDisplay({
   booking,
   className,

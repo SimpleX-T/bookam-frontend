@@ -3,6 +3,8 @@
  * Uses fetch API instead of axios as per user preference
  */
 
+import { User } from "@/contexts/auth-context";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 // Types based on API documentation
@@ -16,11 +18,24 @@ export interface RegisterRequest {
   email: string;
   password: string;
 }
+export interface CreateBookingRequest {
+  userId: string;
+  busId: number;
+  routeId: number;
+  seatNumber: number;
+}
 
+export interface UpdateBookingRequest {
+  userId?: string;
+  busId?: number;
+  routeId?: number;
+  seatNumber?: number;
+}
 export interface CreateBusRequest {
   busNumber: string;
+  busModel: string;
   capacity: number;
-  routeid: string;
+  routeId: string | number;
   departureTime: string; // ISO datetime string
   arrivalTime: string; // ISO datetime string
 }
@@ -33,16 +48,34 @@ export interface UpdateBusRequest {
   arrivalTime?: string;
 }
 
+export interface BusInRoute {
+  busNumber: string;
+  busModel: string;
+  capacity: number;
+  departureTime: string; // ISO datetime string
+  arrivalTime: string; // ISO datetime string
+}
+
 export interface CreateRouteRequest {
   origin: string;
   destination: string;
-  price: string;
+  price: number;
+  duration: string;
+  image: string;
+  description: string;
+  distance: string;
+  buses: BusInRoute[];
 }
 
 export interface UpdateRouteRequest {
   origin?: string;
   destination?: string;
-  price?: string;
+  price?: number;
+  duration?: string;
+  image?: string;
+  description?: string;
+  distance?: string;
+  buses?: BusInRoute[];
 }
 
 export interface RouteSearchParams {
@@ -147,7 +180,88 @@ export const apiClient = {
       return handleResponse(response);
     },
   },
+  //booking endpoints
 
+  booking: {
+    getById: async (id: string, token: string): Promise<ApiResponse<any>> => {
+      const response = await fetch(`${API_BASE_URL}/booking/get/${id}`, {
+        method: "GET",
+        headers: createHeaders(token, false),
+      });
+
+      return handleResponse(response);
+    },
+
+    getAll: async (token: string): Promise<ApiResponse<any[]>> => {
+      const response = await fetch(`${API_BASE_URL}/booking/getall`, {
+        method: "GET",
+        headers: createHeaders(token, false),
+      });
+
+      return handleResponse(response);
+    },
+
+    create: async (
+      data: CreateBookingRequest,
+      token: string
+    ): Promise<ApiResponse<any>> => {
+      const response = await fetch(`${API_BASE_URL}/booking/create`, {
+        method: "POST",
+        headers: createHeaders(token),
+        body: JSON.stringify(data),
+      });
+
+      return handleResponse(response);
+    },
+
+    update: async (
+      id: string,
+      data: UpdateBookingRequest,
+      token: string
+    ): Promise<ApiResponse<any>> => {
+      const response = await fetch(`${API_BASE_URL}/booking/update/${id}`, {
+        method: "PUT",
+        headers: createHeaders(token),
+        body: JSON.stringify(data),
+      });
+
+      return handleResponse(response);
+    },
+
+    // Optional: Add a delete booking function if needed
+    delete: async (id: string, token: string): Promise<ApiResponse<any>> => {
+      const response = await fetch(`${API_BASE_URL}/booking/delete/${id}`, {
+        method: "DELETE",
+        headers: createHeaders(token, false),
+      });
+
+      return handleResponse(response);
+    },
+
+    // Optional: Add a function to get user's bookings
+    getUserBookings: async (
+      user: User,
+      token: string
+    ): Promise<ApiResponse<any[]>> => {
+      // Get all bookings first
+      const response = await fetch(`${API_BASE_URL}/booking/getall`, {
+        method: "GET",
+        headers: createHeaders(token, false),
+      });
+
+      const result = await handleResponse<any[]>(response);
+
+      // If successful, filter bookings by userId
+      if (result.success) {
+        return {
+          success: true,
+          data: result.data.filter((booking) => booking.user === user),
+        };
+      }
+
+      return result;
+    },
+  },
   // Bus endpoints
   bus: {
     getById: async (id: string, token: string): Promise<ApiResponse<any>> => {
@@ -287,6 +401,14 @@ export const apiClient = {
     delete: async (token: string): Promise<ApiResponse<any>> => {
       const response = await fetch(`${API_BASE_URL}/user/delete`, {
         method: "DELETE",
+        headers: createHeaders(token, false),
+      });
+
+      return handleResponse(response);
+    },
+    fetchAll: async (token: string): Promise<ApiResponse<any[]>> => {
+      const response = await fetch(`${API_BASE_URL}/user/all`, {
+        method: "GET",
         headers: createHeaders(token, false),
       });
 

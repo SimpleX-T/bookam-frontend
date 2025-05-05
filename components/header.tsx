@@ -62,7 +62,7 @@ export function Header() {
           >
             Routes
           </Link>
-          <Link
+          {/* <Link
             href="/promotions"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
@@ -72,7 +72,7 @@ export function Header() {
             )}
           >
             Promotions
-          </Link>
+          </Link> */}
           <Link
             href="/about"
             className={cn(
@@ -82,7 +82,7 @@ export function Header() {
           >
             About Us
           </Link>
-          <Link
+          {/* <Link
             href="/contact"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
@@ -90,7 +90,7 @@ export function Header() {
             )}
           >
             Contact
-          </Link>
+          </Link> */}
         </nav>
 
         <div className="flex items-center gap-4">

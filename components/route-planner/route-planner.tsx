@@ -24,8 +24,6 @@ const MapView = dynamic(() => import("./map-view"), {
 import { Route } from "@/types";
 import { sampleRoutes } from "@/lib/constants";
 
-// Sample routes data with location names for Google Maps
-
 interface JourneyPlannerProps {
   routes?: Route[];
   onContinue: (selectedRoute: Route) => void;
