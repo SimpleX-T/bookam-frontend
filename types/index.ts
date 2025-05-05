@@ -9,7 +9,31 @@ export interface Route {
   distance: string;
   buses: Bus[];
 }
-
+export interface Booking {
+  bookingId: number | string;
+  userId: string;
+  user: {
+    userName: string;
+    fullName: string;
+    phone: string;
+  }[];
+  busId: number | string;
+  bus: {
+    busNumber: string;
+    busModel: string;
+  }[];
+  routeId: number | string;
+  routes: {
+    origin: string;
+    destination: string;
+    duration: string;
+    description: string;
+  }[];
+  seatNumber: number | string;
+  completed: boolean;
+  checkedIn: boolean;
+  bookingDate: string;
+}
 // Define types for the data models from API
 export interface Bus {
   busId: string;

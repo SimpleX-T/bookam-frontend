@@ -3,33 +3,27 @@
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "./columns";
 import { BookingDetails } from "@/types";
-
-// Dummy data
-const bookings: BookingDetails[] = [
-  {
-    bookingId: "BK-001-2024",
-    busId: "BUS-001",
-    routeId: "RT-LAG-ABJ-001",
-    userId: "USR-001",
-    seatNumber: "A1",
-    completed: true,
-    checkedIn: true,
-    createdAt: "2024-04-01T10:00:00Z",
-  },
-  {
-    bookingId: "BK-002-2024",
-    busId: "BUS-003",
-    routeId: "RT-LAG-IBD-002",
-    userId: "USR-015",
-    seatNumber: "B3",
-    completed: false,
-    checkedIn: false,
-    createdAt: "2024-04-02T11:30:00Z",
-  },
-  // Add more dummy bookings...
-];
+import { useApp } from "@/contexts/app-context";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BookingsPage() {
+  const { bookings, bookingsLoading } = useApp();
+
+  if (bookingsLoading) {
+    return (
+      <div className="container mx-auto py-10">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-[200px]" />
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between mb-8">
@@ -37,7 +31,12 @@ export default function BookingsPage() {
           Bookings Management
         </h1>
       </div>
-      <DataTable columns={columns} data={bookings} />
+      <DataTable
+        columns={columns}
+        data={bookings}
+        // searchColumn="bookingId"
+        // searchPlaceholder="Search by booking ID..."
+      />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useApp } from "@/contexts/app-context";
+import { useUsers } from "@/hooks/use-api-queries";
+import { useState, useEffect, useMemo } from "react";
 import type { TooltipProps } from "recharts";
 import {
   Area,
@@ -10,48 +12,37 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+type MetricType = "bookings" | "users" | "revenue";
 
-// Chart data
-const chartData = [
-  { date: "2024-04-01", bookings: 22, users: 150, revenue: 55000 },
-  { date: "2024-04-02", bookings: 97, users: 180, revenue: 242500 },
-  { date: "2024-04-03", bookings: 67, users: 120, revenue: 167500 },
-  { date: "2024-04-04", bookings: 142, users: 260, revenue: 355000 },
-  { date: "2024-04-05", bookings: 173, users: 290, revenue: 432500 },
-  { date: "2024-04-06", bookings: 201, users: 340, revenue: 502500 },
-  { date: "2024-04-07", bookings: 110, users: 200, revenue: 275000 },
-  { date: "2024-04-08", bookings: 155, users: 270, revenue: 387500 },
-  { date: "2024-04-09", bookings: 88, users: 160, revenue: 220000 },
-  { date: "2024-04-10", bookings: 190, users: 310, revenue: 475000 },
-  { date: "2024-04-11", bookings: 125, users: 230, revenue: 312500 },
-  { date: "2024-04-12", bookings: 75, users: 140, revenue: 187500 },
-  { date: "2024-04-13", bookings: 165, users: 280, revenue: 412500 },
-  { date: "2024-04-14", bookings: 92, users: 170, revenue: 230000 },
-  { date: "2024-04-15", bookings: 130, users: 240, revenue: 325000 },
-  { date: "2024-04-16", bookings: 105, users: 190, revenue: 262500 },
-  { date: "2024-04-17", bookings: 180, users: 300, revenue: 450000 },
-  { date: "2024-04-18", bookings: 115, users: 210, revenue: 287500 },
-  { date: "2024-04-19", bookings: 80, users: 155, revenue: 200000 },
-  { date: "2024-04-20", bookings: 170, users: 295, revenue: 425000 },
-];
+type ChartConfigValue = {
+  label: string;
+  color: string;
+};
 
-// Chart config
-const chartConfig = {
+type ChartConfig = {
+  [key in MetricType]: ChartConfigValue;
+};
+
+// Add the chart configuration
+const chartConfig: ChartConfig = {
   bookings: {
     label: "Bookings",
-    color: "#3b82f6", // blue-500
+    color: "#0891b2", // cyan-600
   },
   users: {
     label: "Users",
-    color: "#10b981", // emerald-500
+    color: "#2563eb", // blue-600
   },
   revenue: {
     label: "Revenue",
-    color: "#8b5cf6", // violet-500
+    color: "#7c3aed", // violet-600
   },
 };
 
 export function ChartAreaInteractive() {
+  const { bookings } = useApp();
+  const { data: users } = useUsers();
+
   const [timeRange, setTimeRange] = useState("30d");
   const [metricType, setMetricType] = useState("bookings");
   const [isMobile, setIsMobile] = useState(false);
@@ -75,10 +66,42 @@ export function ChartAreaInteractive() {
     }
   }, [isMobile]);
 
+  // Generate real chart data from bookings and users
+  const generateChartData = () => {
+    const last30Days = [...Array(30)]
+      .map((_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split("T")[0];
+      })
+      .reverse();
+
+    return last30Days.map((date) => {
+      const dayBookings = bookings.filter(
+        (b) => b.bookingDate.split("T")[0] === date
+      );
+      const dayUsers = (users || []).filter(
+        () => "2025-05-05T02:05:13.855763Z".split("T")[0] === date
+      );
+      const dayRevenue = dayBookings
+        .filter((b) => b.completed)
+        .reduce((sum, b) => sum + (Number(b.routeId) || 0), 0);
+
+      return {
+        date,
+        bookings: dayBookings.length,
+        users: dayUsers.length,
+        revenue: dayRevenue,
+      };
+    });
+  };
+
+  const chartData = useMemo(() => generateChartData(), [bookings, users]);
+
   // Filter data based on selected time range
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
-    const referenceDate = new Date("2024-04-20"); // Latest date in the data
+    const referenceDate = new Date(); // Latest date in the data
     let daysToSubtract = 90;
 
     if (timeRange === "30d") {
@@ -116,12 +139,15 @@ export function ChartAreaInteractive() {
         formattedValue = data[metricType].toLocaleString();
       }
 
+      // Explicitly type metricType as MetricType for indexing
+      const typedMetricType = metricType as MetricType;
+
       return (
         <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow-md">
           <p className="font-semibold dark:text-gray-100">{formattedDate}</p>
           <p className="text-sm">
-            <span style={{ color: chartConfig[metricType].color }}>
-              {chartConfig[metricType].label}: {formattedValue}
+            <span style={{ color: chartConfig[typedMetricType].color }}>
+              {chartConfig[typedMetricType].label}: {formattedValue}
             </span>
           </p>
         </div>
@@ -135,7 +161,9 @@ export function ChartAreaInteractive() {
       <div className="p-4 border-b border-gray-200 dark:border-gray-800">
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="text-lg font-semibold dark:text-gray-100">Analytics Overview</h3>
+            <h3 className="text-lg font-semibold dark:text-gray-100">
+              Analytics Overview
+            </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {metricType === "bookings"
                 ? "Booking statistics over time"
@@ -148,9 +176,9 @@ export function ChartAreaInteractive() {
           <div className="flex gap-2">
             <select
               value={metricType}
-              onChange={(e) => setMetricType(e.target.value)}
+              onChange={(e) => setMetricType(e.target.value as MetricType)}
               className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-md text-sm
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="bookings">Bookings</option>
               <option value="users">Users</option>
@@ -162,8 +190,8 @@ export function ChartAreaInteractive() {
                 <button
                   onClick={() => setTimeRange("30d")}
                   className={`px-2 py-1 text-sm ${
-                    timeRange === "30d" 
-                      ? "bg-gray-100 dark:bg-gray-700" 
+                    timeRange === "30d"
+                      ? "bg-gray-100 dark:bg-gray-700"
                       : "bg-white dark:bg-gray-800"
                   } text-gray-900 dark:text-gray-100`}
                 >
@@ -172,8 +200,8 @@ export function ChartAreaInteractive() {
                 <button
                   onClick={() => setTimeRange("7d")}
                   className={`px-2 py-1 text-sm ${
-                    timeRange === "7d" 
-                      ? "bg-gray-100 dark:bg-gray-700" 
+                    timeRange === "7d"
+                      ? "bg-gray-100 dark:bg-gray-700"
                       : "bg-white dark:bg-gray-800"
                   } text-gray-900 dark:text-gray-100`}
                 >
@@ -196,19 +224,19 @@ export function ChartAreaInteractive() {
                 <linearGradient id="fillMetric" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor={chartConfig[metricType].color}
+                    stopColor={chartConfig[metricType as MetricType].color}
                     stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
-                    stopColor={chartConfig[metricType].color}
+                    stopColor={chartConfig[metricType as MetricType].color}
                     stopOpacity={0.1}
                   />
                 </linearGradient>
               </defs>
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                vertical={false} 
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
                 stroke="rgba(156, 163, 175, 0.2)"
               />
               <XAxis
@@ -217,7 +245,7 @@ export function ChartAreaInteractive() {
                 axisLine={false}
                 tickMargin={8}
                 minTickGap={32}
-                tick={{ fill: 'currentColor' }}
+                tick={{ fill: "currentColor" }}
                 className="text-gray-600 dark:text-gray-400"
                 tickFormatter={(value) => {
                   const date = new Date(value);
@@ -231,7 +259,7 @@ export function ChartAreaInteractive() {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tick={{ fill: 'currentColor' }}
+                tick={{ fill: "currentColor" }}
                 className="text-gray-600 dark:text-gray-400"
                 tickFormatter={(value) => {
                   if (metricType === "revenue") {
@@ -244,7 +272,7 @@ export function ChartAreaInteractive() {
               <Area
                 type="monotone"
                 dataKey={metricType}
-                stroke={chartConfig[metricType].color}
+                stroke={chartConfig[metricType as MetricType].color}
                 fill="url(#fillMetric)"
                 strokeWidth={2}
               />

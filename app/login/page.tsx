@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -56,11 +56,15 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+useEffect(() => {
   if (isAuthenticated) {
-    if (user?.email === "admin@borrands.com" || user?.username)
-      return router.push("/dashboard");
-    else return router.push("/");
+    if (user?.email === "admin@borrands.com" || user?.username) {
+      router.push("/dashboard");
+    } else {
+      router.push("/");
+    }
   }
+}, [isAuthenticated, user, router]);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
       <motion.div

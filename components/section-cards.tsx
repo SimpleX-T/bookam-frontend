@@ -17,17 +17,86 @@ import {
 } from "@/components/ui/card";
 import { useUsers, useBuses } from "@/hooks/use-api-queries";
 import { formatNumber } from "@/lib/utils";
+import { useEffect, useMemo, useState } from "react";
+import { useApp } from "@/contexts/app-context";
 
 export function SectionCards() {
   const { data: users, isLoading: usersLoading } = useUsers();
-  console.log(users);
   const { data: buses, isLoading: busesLoading } = useBuses();
+  const { bookings, bookingsLoading } = useApp();
 
-  // Calculate month-over-month growth (dummy data for now)
-  const userGrowth = 15;
-  const busGrowth = buses ? ((buses.length - 50) / 50) * 100 : 0;
-  const revenueGrowth = 22;
-  const bookingGrowth = 18;
+  // Calculate total revenue and completed bookings
+  const { totalRevenue, completedBookings } = useMemo(() => {
+    return bookings.reduce(
+      (acc, booking) => {
+        if (booking.completed) {
+          acc.completedBookings.push(booking);
+          acc.totalRevenue += Number(booking.routeId) || 0;
+        }
+        return acc;
+      },
+      { totalRevenue: 0, completedBookings: [] as typeof bookings }
+    );
+  }, [bookings]);
+
+  // Calculate growth percentages
+  const calculateGrowth = (data: any[], days: number = 30) => {
+    const now = new Date();
+    const past = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+    const currentPeriodData = data.filter(
+      (item) => new Date(item.createdAt) > past
+    );
+    const previousPeriodData = data.filter(
+      (item) =>
+        new Date(item.createdAt) <= past &&
+        new Date(item.createdAt) >
+          new Date(past.getTime() - days * 24 * 60 * 60 * 1000)
+    );
+
+    if (previousPeriodData.length === 0) return 0;
+
+    return (
+      ((currentPeriodData.length - previousPeriodData.length) /
+        previousPeriodData.length) *
+      100
+    );
+  };
+
+  const userGrowth = calculateGrowth(users || []);
+  const busGrowth = calculateGrowth(buses || []);
+  const bookingGrowth = calculateGrowth(bookings);
+  const revenueGrowth = calculateGrowth(completedBookings);
+
+  // Generate chart data
+  // const generateChartData = () => {
+  //   const last30Days = [...Array(30)]
+  //     .map((_, i) => {
+  //       const date = new Date();
+  //       date.setDate(date.getDate() - i);
+  //       return date.toISOString().split("T")[0];
+  //     })
+  //     .reverse();
+
+  //   return last30Days.map((date) => {
+  //     const dayBookings = bookings.filter(
+  //       (b) => b.bookingDate.split("T")[0] === date
+  //     );
+  //     const dayUsers = (users || []).filter(
+  //       (u) => u.createdAt.split("T")[0] === date
+  //     );
+  //     const dayRevenue = dayBookings
+  //       .filter((b) => b.completed)
+  //       .reduce((sum, b) => sum + (b.routes[0]?.price || 0), 0);
+
+  //     return {
+  //       date,
+  //       bookings: dayBookings.length,
+  //       users: dayUsers.length,
+  //       revenue: dayRevenue,
+  //     };
+  //   });
+  // };
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -42,14 +111,23 @@ export function SectionCards() {
           </CardTitle>
           <div className="absolute right-4 -top-4">
             <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200">
-              <TrendingUpIcon className="mr-1 h-3 w-3" />
-              {userGrowth}%
+              {userGrowth >= 0 ? (
+                <TrendingUpIcon className="mr-1 h-3 w-3" />
+              ) : (
+                <TrendingDownIcon className="mr-1 h-3 w-3" />
+              )}
+              {Math.abs(userGrowth).toFixed(1)}%
             </Badge>
           </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium text-blue-700 dark:text-blue-300">
-            Growth <TrendingUpIcon className="h-4 w-4" />
+            Growth{" "}
+            {userGrowth >= 0 ? (
+              <TrendingUpIcon className="h-4 w-4" />
+            ) : (
+              <TrendingDownIcon className="h-4 w-4" />
+            )}
           </div>
           <div className="text-blue-600 dark:text-blue-400">vs. last month</div>
         </CardFooter>
@@ -66,20 +144,28 @@ export function SectionCards() {
           </CardTitle>
           <div className="absolute right-4 -top-4">
             <Badge className="bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200">
-              <TrendingUpIcon className="mr-1 h-3 w-3" />
-              {busGrowth}%
+              {busGrowth >= 0 ? (
+                <TrendingUpIcon className="mr-1 h-3 w-3" />
+              ) : (
+                <TrendingDownIcon className="mr-1 h-3 w-3" />
+              )}
+              {Math.abs(busGrowth).toFixed(1)}%
             </Badge>
           </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium text-green-700 dark:text-green-300">
-            Fleet <TrendingUpIcon className="h-4 w-4" />
+            Fleet{" "}
+            {busGrowth >= 0 ? (
+              <TrendingUpIcon className="h-4 w-4" />
+            ) : (
+              <TrendingDownIcon className="h-4 w-4" />
+            )}
           </div>
           <div className="text-green-600 dark:text-green-400">this month</div>
         </CardFooter>
       </Card>
 
-      {/* Keep revenue and bookings cards but simplify text */}
       <Card className="@container/card bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900">
         <CardHeader className="relative mt-5">
           <CardDescription className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
@@ -87,18 +173,27 @@ export function SectionCards() {
             Revenue
           </CardDescription>
           <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-purple-700 dark:text-purple-300">
-            ₦4.5M
+            ₦{formatNumber(totalRevenue)}
           </CardTitle>
           <div className="absolute right-4 -top-4">
             <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200">
-              <TrendingUpIcon className="mr-1 h-3 w-3" />
-              {revenueGrowth}%
+              {revenueGrowth >= 0 ? (
+                <TrendingUpIcon className="mr-1 h-3 w-3" />
+              ) : (
+                <TrendingDownIcon className="mr-1 h-3 w-3" />
+              )}
+              {Math.abs(revenueGrowth).toFixed(1)}%
             </Badge>
           </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium text-purple-700 dark:text-purple-300">
-            Growth <TrendingUpIcon className="h-4 w-4" />
+            Growth{" "}
+            {revenueGrowth >= 0 ? (
+              <TrendingUpIcon className="h-4 w-4" />
+            ) : (
+              <TrendingDownIcon className="h-4 w-4" />
+            )}
           </div>
           <div className="text-purple-600 dark:text-purple-400">this month</div>
         </CardFooter>
@@ -111,18 +206,27 @@ export function SectionCards() {
             Bookings
           </CardDescription>
           <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-amber-700 dark:text-amber-300">
-            3.4K
+            {bookingsLoading ? "..." : formatNumber(bookings.length)}
           </CardTitle>
           <div className="absolute right-4 -top-4">
             <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-200">
-              <TrendingUpIcon className="mr-1 h-3 w-3" />
-              {bookingGrowth}%
+              {bookingGrowth >= 0 ? (
+                <TrendingUpIcon className="mr-1 h-3 w-3" />
+              ) : (
+                <TrendingDownIcon className="mr-1 h-3 w-3" />
+              )}
+              {Math.abs(bookingGrowth).toFixed(1)}%
             </Badge>
           </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium text-amber-700 dark:text-amber-300">
-            Growth <TrendingUpIcon className="h-4 w-4" />
+            Growth{" "}
+            {bookingGrowth >= 0 ? (
+              <TrendingUpIcon className="h-4 w-4" />
+            ) : (
+              <TrendingDownIcon className="h-4 w-4" />
+            )}
           </div>
           <div className="text-amber-600 dark:text-amber-400">this month</div>
         </CardFooter>

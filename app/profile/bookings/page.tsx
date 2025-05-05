@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,104 +13,60 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Bus, Calendar, Download } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-
-// Dummy bookings data
-const bookingsData = [
-  {
-    id: "1",
-    reference: "NJ78945612",
-    status: "upcoming",
-    company: "Cloudy Transit",
-    logo: "CT",
-    from: {
-      city: "Lagos",
-      terminal: "Jibowu Terminal, Lagos",
-      time: "23:15",
-    },
-    to: {
-      city: "Abuja",
-      terminal: "Utako Terminal, Abuja",
-      time: "07:25",
-    },
-    duration: "8h 10m",
-    journeyNumber: "CT-6018",
-    date: "May 16, 2025",
-    price: 14850,
-  },
-  {
-    id: "2",
-    reference: "NJ78945613",
-    status: "completed",
-    company: "HorizonJet",
-    logo: "HJ",
-    from: {
-      city: "Lagos",
-      terminal: "Ojota Terminal, Lagos",
-      time: "08:30",
-    },
-    to: {
-      city: "Ibadan",
-      terminal: "Challenge Terminal, Ibadan",
-      time: "10:45",
-    },
-    duration: "2h 15m",
-    journeyNumber: "HJ-2045",
-    date: "April 10, 2025",
-    price: 5500,
-  },
-  {
-    id: "3",
-    reference: "NJ78945614",
-    status: "canceled",
-    company: "Altitude Express",
-    logo: "AE",
-    from: {
-      city: "Abuja",
-      terminal: "Utako Terminal, Abuja",
-      time: "14:20",
-    },
-    to: {
-      city: "Kaduna",
-      terminal: "Central Terminal, Kaduna",
-      time: "16:50",
-    },
-    duration: "2h 30m",
-    journeyNumber: "AE-3078",
-    date: "March 25, 2025",
-    price: 7200,
-  },
-];
+import { toast } from "sonner";
+import { Booking } from "@/types";
+import { useApp } from "@/contexts/app-context";
 
 export default function BookingsPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { userBookings, userBookingsLoading, userBookingError, deleteBooking } =
+    useApp();
   const [activeTab, setActiveTab] = useState("all");
 
+  // Redirect if not authenticated
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem("user");
-    if (!userData) {
+    if (!authLoading && !isAuthenticated) {
       router.push("/login");
-      return;
     }
+  }, [authLoading, isAuthenticated, router]);
 
-    setIsLoading(false);
-  }, [router]);
+  const handleCancelBooking = async (id: string | number) => {
+    try {
+      await deleteBooking(String(id));
+      toast.success("Booking cancelled successfully");
+    } catch (error) {
+      toast.error("Failed to cancel booking");
+    }
+  };
 
-  const filteredBookings = bookingsData.filter((booking) => {
+  const handleDownloadTicket = (id: string | number) => {
+    // Implement ticket download logic
+    toast.info("Downloading ticket...");
+  };
+
+  const filteredBookings = userBookings?.filter((booking: Booking) => {
     if (activeTab === "all") return true;
-    return booking.status === activeTab;
+    if (activeTab === "paid") return booking.completed;
+    if (activeTab === "checkedin") return booking.checkedIn;
+    return true;
   });
 
-  if (isLoading) {
+  if (authLoading || userBookingsLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <main className="flex-1 bg-muted/30 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading bookings...</p>
-          </div>
-        </main>
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (userBookingError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h3 className="text-lg font-medium mb-2">Error loading bookings</h3>
+          <p className="text-muted-foreground">{userBookingError}</p>
+        </div>
       </div>
     );
   }
@@ -122,14 +80,18 @@ export default function BookingsPage() {
               <CardContent className="p-6">
                 <div className="flex flex-col items-center space-y-4">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src="/placeholder-user.jpg" alt="User" />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarImage
+                      src={"/placeholder-user.jpg"}
+                      alt={user?.username || "User"}
+                    />
+                    <AvatarFallback>
+                      {user?.username?.substring(0, 2)?.toUpperCase() || "U"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="text-center">
-                    <h2 className="text-xl font-bold">John Doe</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Premium Member
-                    </p>
+                    <h2 className="text-xl font-bold">
+                      {user?.username || "User"}
+                    </h2>
                   </div>
                 </div>
 
@@ -188,54 +150,6 @@ export default function BookingsPage() {
                       My Bookings
                     </Link>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link href="/profile/payments">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <rect width="20" height="14" x="2" y="5" rx="2" />
-                        <line x1="2" x2="22" y1="10" y2="10" />
-                      </svg>
-                      Payment Methods
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link href="/profile/preferences">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                      Preferences
-                    </Link>
-                  </Button>
                 </nav>
 
                 <Separator className="my-6" />
@@ -244,7 +158,7 @@ export default function BookingsPage() {
                   variant="destructive"
                   className="w-full"
                   onClick={() => {
-                    localStorage.removeItem("user");
+                    logout();
                     router.push("/login");
                   }}
                 >
@@ -282,11 +196,10 @@ export default function BookingsPage() {
                 onValueChange={setActiveTab}
                 className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                  <TabsTrigger value="completed">Completed</TabsTrigger>
-                  <TabsTrigger value="canceled">Canceled</TabsTrigger>
+                  <TabsTrigger value="paid">Paid</TabsTrigger>
+                  <TabsTrigger value="checkedin">Checked-In</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={activeTab} className="pt-6">
@@ -296,7 +209,7 @@ export default function BookingsPage() {
                     transition={{ duration: 0.3 }}
                     className="space-y-4"
                   >
-                    {filteredBookings.length === 0 ? (
+                    {!filteredBookings?.length ? (
                       <div className="text-center py-12">
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                           <svg
@@ -335,156 +248,17 @@ export default function BookingsPage() {
                         </Button>
                       </div>
                     ) : (
-                      filteredBookings.map((booking) => (
-                        <Card key={booking.id} className="overflow-hidden">
-                          <CardContent className="p-0">
-                            <div className="flex items-center justify-between p-4 border-b">
-                              <div className="flex items-center gap-3">
-                                <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
-                                  <span className="font-medium text-primary">
-                                    {booking.logo}
-                                  </span>
-                                </div>
-                                <div>
-                                  <div className="font-medium">
-                                    {booking.company}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    Ref: {booking.reference}
-                                  </div>
-                                </div>
-                              </div>
-                              <Badge
-                                variant={
-                                  booking.status === "upcoming"
-                                    ? "default"
-                                    : booking.status === "completed"
-                                    ? "outline"
-                                    : "destructive"
-                                }
-                              >
-                                {booking.status.charAt(0).toUpperCase() +
-                                  booking.status.slice(1)}
-                              </Badge>
-                            </div>
-
-                            <div className="p-4">
-                              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 mb-4">
-                                <div className="space-y-1">
-                                  <div className="text-lg font-bold">
-                                    {booking.from.time}
-                                  </div>
-                                  <div className="font-medium">
-                                    {booking.from.city}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {booking.from.terminal}
-                                  </div>
-                                </div>
-
-                                <div className="flex flex-col items-center justify-center">
-                                  <div className="text-xs text-muted-foreground mb-1">
-                                    {booking.duration}
-                                  </div>
-                                  <div className="relative w-16 md:w-24">
-                                    <div className="absolute inset-0 flex items-center">
-                                      <span className="w-full border-t border-dashed"></span>
-                                    </div>
-                                    <div className="relative flex justify-center">
-                                      <ArrowRight className="bg-background w-4 h-4" />
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-1">
-                                  <div className="text-lg font-bold">
-                                    {booking.to.time}
-                                  </div>
-                                  <div className="font-medium">
-                                    {booking.to.city}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {booking.to.terminal}
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                                  <span>{booking.date}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Bus className="h-4 w-4 text-muted-foreground" />
-                                  <span>{booking.journeyNumber}</span>
-                                </div>
-                                <div className="ml-auto font-medium">
-                                  ₦{booking.price.toLocaleString()}
-                                </div>
-                              </div>
-
-                              <div className="flex flex-wrap gap-2">
-                                {booking.status === "upcoming" && (
-                                  <>
-                                    <Button size="sm" asChild>
-                                      <Link
-                                        href={`/booking/confirmation/${booking.id}`}
-                                      >
-                                        View Details
-                                      </Link>
-                                    </Button>
-                                    <Button size="sm" variant="outline">
-                                      <Download className="mr-2 h-4 w-4" />
-                                      Download Ticket
-                                    </Button>
-                                    <Button size="sm" variant="outline">
-                                      Reschedule
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-destructive"
-                                    >
-                                      Cancel
-                                    </Button>
-                                  </>
-                                )}
-                                {booking.status === "completed" && (
-                                  <>
-                                    <Button size="sm" asChild>
-                                      <Link
-                                        href={`/booking/confirmation/${booking.id}`}
-                                      >
-                                        View Details
-                                      </Link>
-                                    </Button>
-                                    <Button size="sm" variant="outline">
-                                      <Download className="mr-2 h-4 w-4" />
-                                      Download Receipt
-                                    </Button>
-                                    <Button size="sm" variant="outline">
-                                      Book Again
-                                    </Button>
-                                  </>
-                                )}
-                                {booking.status === "canceled" && (
-                                  <>
-                                    <Button size="sm" asChild>
-                                      <Link
-                                        href={`/booking/confirmation/${booking.id}`}
-                                      >
-                                        View Details
-                                      </Link>
-                                    </Button>
-                                    <Button size="sm" variant="outline">
-                                      Book Again
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                      filteredBookings.map((booking: Booking) => (
+                        <BookingCard
+                          key={booking.bookingId}
+                          booking={booking}
+                          onCancel={() =>
+                            handleCancelBooking(booking.bookingId)
+                          }
+                          onDownload={() =>
+                            handleDownloadTicket(booking.bookingId)
+                          }
+                        />
                       ))
                     )}
                   </motion.div>
@@ -495,5 +269,182 @@ export default function BookingsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// Add a separate BookingCard component for better organization
+function BookingCard({
+  booking,
+  onCancel,
+  onDownload,
+}: {
+  booking: Booking;
+  onCancel: () => void;
+  onDownload: () => void;
+}) {
+  // Format the booking date
+  const formattedDate = new Date(booking.bookingDate).toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
+
+  return (
+    <Card key={booking.bookingId} className="overflow-hidden">
+      <CardContent className="p-0">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
+              <Bus className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <div className="font-medium">
+                {booking.bus[0]?.busModel || "Bus"}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Bus Number: {booking.bus[0]?.busNumber}
+              </div>
+            </div>
+          </div>
+          <Badge
+            variant={
+              !booking.completed && !booking.checkedIn
+                ? "default"
+                : booking.completed
+                ? "outline"
+                : "secondary"
+            }
+          >
+            {booking.completed
+              ? "Completed"
+              : booking.checkedIn
+              ? "Checked In"
+              : "Upcoming"}
+          </Badge>
+        </div>
+
+        <div className="p-4">
+          <div className="w-full flex items-center justify-between mb-4">
+            <div className="space-y-1">
+              <div className="text-lg font-bold">
+                {booking.routes[0]?.origin}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Departure Terminal
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-xs text-muted-foreground mb-1">
+                {booking.routes[0]?.duration || "Duration"}
+              </div>
+              <div className="relative w-16 md:w-24">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-dashed"></span>
+                </div>
+                <div className="relative flex justify-center">
+                  <ArrowRight className="bg-background w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <div className="text-lg font-bold">
+                {booking.routes[0]?.destination}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Arrival Terminal
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center gap-2">
+            <div className="flex flex-wrap items-center gap-4 text-sm ">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>{formattedDate}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-muted-foreground"
+                >
+                  <path d="M15 5v14" />
+                  <path d="M5 5h14" />
+                  <path d="M5 14h14" />
+                  <path d="M10 2v4" />
+                  <path d="M7 5v4" />
+                  <path d="M10 18v4" />
+                  <path d="M7 15v4" />
+                </svg>
+                <span>Seat {booking.seatNumber}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-muted-foreground"
+                >
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>{booking.routes[0]?.description}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {!booking.completed && !booking.checkedIn && (
+                <>
+                  <Button size="sm" asChild>
+                    <Link href={`/booking/${booking.bookingId}`}>
+                      View Ticket
+                    </Link>
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-destructive"
+                    onClick={onCancel}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
+              {booking.completed && (
+                <>
+                  <Button size="sm" asChild>
+                    <Link href={`/booking/${booking.bookingId}`}>
+                      View Details
+                    </Link>
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href="/">Book Again</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

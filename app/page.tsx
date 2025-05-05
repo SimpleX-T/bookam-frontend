@@ -28,6 +28,7 @@ import appStore from "@/public/images/appstore.png";
 import mobileApp from "@/public/images/mobile.png";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import MobileTicketPage from "./mobile-ticket/page";
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("search");
@@ -348,6 +349,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+      <MobileTicketPage />
       <Footer />
     </>
   );
