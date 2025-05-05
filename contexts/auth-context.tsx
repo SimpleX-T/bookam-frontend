@@ -32,7 +32,8 @@ export type RegisterFormData = z.infer<typeof signupSchema>;
 export interface User {
   username: string;
   email: string;
-  // Add other user properties as needed
+  userId: string;
+  token?: string;
 }
 
 // Define the auth context state
@@ -93,11 +94,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.success) {
         // Extract token and user data from response
-        const { token: authToken, username, email } = response.data;
+        const { token: authToken, username, email, userId } = response.data;
 
         // Save to state
         setToken(authToken);
-        setUser({ username, email });
+        setUser({ username, email, userId });
         setIsAuthenticated(true);
 
         // Save to localStorage

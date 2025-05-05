@@ -137,7 +137,12 @@ export const apiClient = {
     login: async (
       data: LoginRequest
     ): Promise<
-      ApiResponse<{ token: string; email: string; username: string }>
+      ApiResponse<{
+        token: string;
+        email: string;
+        username: string;
+        userId: string;
+      }>
     > => {
       const response = await fetch(`${API_BASE_URL}/account/login`, {
         method: "POST",

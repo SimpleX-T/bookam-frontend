@@ -20,7 +20,7 @@ import Link from "next/link";
 import { JourneyPlanner } from "@/components/route-planner/route-planner";
 import { useRouter } from "next/navigation";
 import { Route } from "@/types";
-import { promotions, sampleRoutes } from "@/lib/constants";
+import { sampleRoutes } from "@/lib/constants";
 import { useApp } from "@/contexts/app-context";
 
 import playStore from "@/public/images/playstore.png";
@@ -37,7 +37,9 @@ export default function HomePage() {
 
   function handleContinue(route: Route) {
     router.push(
-      `/search?from=${route.origin.toLowerCase()}&to=${route.destination.toLowerCase()}`
+      `/search?rId=${
+        route.routeId
+      }&from=${route.origin.toLowerCase()}&to=${route.destination.toLowerCase()}`
     );
   }
   return (

@@ -50,14 +50,14 @@ export interface Bus {
 }
 
 export interface BookingDetails {
-  bookingId: string;
+  // bookingId: string;
   busId: string;
   routeId: string;
   userId: string;
-  seatNumber: string;
+  seatNumber: number | number[];
   completed: boolean;
   checkedIn: boolean;
-  createdAt: string;
+  // createdAt: string;
 }
 
 // Define search parameters for routes

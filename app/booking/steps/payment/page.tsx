@@ -6,53 +6,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion } from "motion/react";
-import { ArrowLeft, ArrowRight, CreditCard, DollarSign } from "lucide-react";
-
-// Dummy journey data (consider fetching this based on journey ID)
-const journeyData = {
-  id: "1",
-  company: "Cloudy Transit",
-  logo: "CT",
-  from: {
-    city: "Lagos",
-    terminal: "Jibowu Terminal, Lagos",
-    time: "23:15",
-  },
-  to: {
-    city: "Abuja",
-    terminal: "Utako Terminal, Abuja",
-    time: "07:25",
-  },
-  duration: "8h 10m",
-  journeyNumber: "CT-6018",
-  class: "Economy",
-  date: "May 16, 2025",
-  luggage: "2 x 23 kg",
-  handLuggage: "1 x 7 kg",
-  bus: {
-    type: "Luxury Coach",
-    seating: "3-2 seat layout",
-    features: "29 inches Seat pitch (standard)",
-  },
-  stops: [
-    {
-      city: "Ibadan",
-      terminal: "Challenge Terminal, Ibadan",
-      arrivalTime: "01:25",
-      departureTime: "01:45",
-      duration: "20 min",
-    },
-  ],
-  price: 14850,
-  adultBasicFee: 15000,
-  tax: "Included",
-  regularTotalPrice: 15000,
-  save: 150,
-  totalPrice: 14850,
-};
+import { ArrowLeft, CreditCard, DollarSign } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 const paymentSchema = z.object({
   paymentMethod: z.enum(["online", "cash"], {
@@ -87,17 +54,19 @@ export default function PaymentMethodPage() {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  useEffect(() => {
-    const name = searchParams.get("name") ?? undefined;
-    const email = searchParams.get("email") ?? undefined;
-    const phone = searchParams.get("phone") ?? undefined;
-    const seats = searchParams.get("seats")?.split(",");
-    const price = parseInt(searchParams.get("price") || "0", 10);
+  const { user } = useAuth();
 
-    setPassengerDetails({ name, email, phone });
-    if (seats) setSelectedSeats(seats);
-    setTotalPrice(price);
-  }, [searchParams]);
+  // useEffect(() => {
+  //   const name = searchParams.get("name");
+  //   const email = searchParams.get("email");
+  //   const phone = searchParams.get("phone");
+  //   const seats = searchParams.get("seats")?.split(",");
+  //   const price = parseInt(searchParams.get("price") || "0", 10);
+
+  //   setPassengerDetails({ name, email, phone });
+  //   if (seats) setSelectedSeats(seats);
+  //   setTotalPrice(price);
+  // }, [searchParams]);
 
   const {
     register,
@@ -187,30 +156,10 @@ export default function PaymentMethodPage() {
                               {errors.cardName.message}
                             </p>
                           )}
-                          <Input
-                            id="cardName"
-                            placeholder="Enter name on card"
-                            {...register("cardName")}
-                          />
-                          {errors.cardName && (
-                            <p className="text-sm text-destructive">
-                              {errors.cardName.message}
-                            </p>
-                          )}
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="cardNumber">Card number</Label>
-                          <Input
-                            id="cardNumber"
-                            placeholder="Enter card number"
-                            {...register("cardNumber")}
-                          />
-                          {errors.cardNumber && (
-                            <p className="text-sm text-destructive">
-                              {errors.cardNumber.message}
-                            </p>
-                          )}
                           <Input
                             id="cardNumber"
                             placeholder="Enter card number"
@@ -226,12 +175,8 @@ export default function PaymentMethodPage() {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="expiryDate">Expiration date</Label>
-                            <Select
-                              onValueChange={(value) =>
-                                setValue("expiryDate", value)
-                              }
-                            >
-                            <Select
+
+                            {/* <Select
                               onValueChange={(value) =>
                                 setValue("expiryDate", value)
                               }
@@ -249,11 +194,8 @@ export default function PaymentMethodPage() {
                                   >{`${month}/25`}</SelectItem>
                                 ))}
                               </SelectContent>
-                            </Select>
+                            </Select> */}
                             {errors.expiryDate && (
-                              <p className="text-sm text-destructive">
-                                {errors.expiryDate.message}
-                              </p>
                               <p className="text-sm text-destructive">
                                 {errors.expiryDate.message}
                               </p>
@@ -293,7 +235,14 @@ export default function PaymentMethodPage() {
                       </div>
                     )}
 
-                    <Button type="submit" className="w-full" disabled={true}>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={
+                        activeTab === "online" &&
+                        !!(errors.cardName || errors.expiryDate || errors.cvv)
+                      }
+                    >
                       {activeTab === "online" ? (
                         <>
                           Pay Now <CreditCard className="ml-2 h-4 w-4" />

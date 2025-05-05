@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { format, parseISO } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -12,11 +13,26 @@ export function truncateString(str: string, num: number) {
   return str.slice(0, num) + "...";
 }
 
-export function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+function getOrdinalDay(day: number): string {
+  if (day > 3 && day < 21) return `${day}th`;
+  switch (day % 10) {
+    case 1:
+      return `${day}st`;
+    case 2:
+      return `${day}nd`;
+    case 3:
+      return `${day}rd`;
+    default:
+      return `${day}th`;
+  }
+}
+
+export function formatDateString(dateString: string): string {
+  const parsedDate = parseISO(dateString);
+  const dayWithSuffix = getOrdinalDay(parsedDate.getDate());
+  const month = format(parsedDate, "MMMM");
+  const time = format(parsedDate, "hh:mm a");
+  return `${dayWithSuffix} ${month} - ${time}`;
 }
 
 export function generateRandomString(length: number) {
@@ -28,6 +44,28 @@ export function generateRandomString(length: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+export function formatDateToDayHourMinute(isoString: string): string {
+  const date = new Date(isoString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  return date.toLocaleString("en-US", options);
+}
+
+export function capitalizeText(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export function extractNumberFromKey(key: string): number | null {
+  const match = key.match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
 }
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-NG", {

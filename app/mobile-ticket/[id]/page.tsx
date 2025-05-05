@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Download, Mail, Printer, Share2 } from "lucide-react";
 import { motion } from "motion/react";
-import { fetchBookingDetails } from "@/lib/api/bookings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TicketDisplay } from "@/components/tickets/ticket-display";
@@ -19,6 +18,16 @@ export default function MobileTicketPage() {
   const bookingId = params.id as string;
   const [activeTab, setActiveTab] = useState("ticket");
 
+  const fetchBookingDetails = async (id: string) => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/booking/get/${id}`
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    return data;
+  };
   // Fetch booking details
   const {
     data: booking,
@@ -27,98 +36,41 @@ export default function MobileTicketPage() {
   } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: () => fetchBookingDetails(bookingId),
-    // Use dummy data for now
-    initialData: {
-      id: bookingId,
-      reference: "NJ-" + Math.floor(10000000 + Math.random() * 90000000),
-      status: "confirmed",
-      paymentStatus: "paid",
-      paymentMethod: "card",
-      totalAmount: 14850,
-      journey: {
-        id: "j-" + Math.floor(1000 + Math.random() * 9000),
-        company: "Cloudy Transit",
-        logo: "CT",
-        from: {
-          city: "Lagos",
-          terminal: "Jibowu Terminal, Lagos",
-          time: "23:15",
-        },
-        to: {
-          city: "Abuja",
-          terminal: "Utako Terminal, Abuja",
-          time: "07:25",
-        },
-        duration: "8h 10m",
-        journeyNumber: "CT-6018",
-        class: "Economy",
-        date: "May 16, 2025",
-        luggage: "2 x 23 kg",
-        handLuggage: "1 x 7 kg",
-        bus: {
-          type: "Luxury Coach",
-          seating: "3-2 seat layout",
-          features: "29 inches Seat pitch (standard)",
-        },
-        stops: [
-          {
-            city: "Ibadan",
-            terminal: "Challenge Terminal, Ibadan",
-            arrivalTime: "01:25",
-            departureTime: "01:45",
-            duration: "20 min",
-          },
-        ],
-      },
-      passengers: [
-        {
-          id: "p1",
-          title: "Mr",
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@example.com",
-          phone: "+234 800 123 4567",
-          seat: "5A",
-          ticketNumber: "NJ-TKT-" + Math.floor(10000 + Math.random() * 90000),
-        },
-      ],
-      checkIn: {
-        date: "16th May 2025",
-        time: "21:20",
-        status: "available",
-      },
-    },
   });
 
   const handlePrintTicket = () => {
-    window.open(`/print-ticket/${bookingId}?print=true`, "_blank");
+    if (typeof window !== "undefined")
+      window.open(`/print-ticket/${bookingId}?print=true`, "_blank");
   };
 
   const handleEmailTicket = () => {
     // In a real app, this would call an API to email the ticket
-    alert("Ticket has been emailed to " + booking.passengers[0].email);
+    alert("Ticket has been emailed to " + booking.user.username);
   };
 
   const handleDownloadPDF = async () => {
-    if (booking) {
-      await generatePDF(booking);
-    }
+    // if (booking) {
+    //   await generatePDF(booking);
+    // }
+
+    alert("coming soon...");
   };
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "My bookAM Ticket",
-          text: `My journey from ${booking.journey.from.city} to ${booking.journey.to.city} on ${booking.journey.date}. Booking reference: ${booking.reference}`,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
-    } else {
-      alert("Web Share API not supported in your browser");
-    }
+    alert("coming soon...");
+    // if (navigator.share) {
+    //   try {
+    //     await navigator.share({
+    //       title: "My bookAM Ticket",
+    //       text: `My journey from ${booking.journey.from.city} to ${booking.journey.to.city} on ${booking.journey.date}. Booking reference: ${booking.reference}`,
+    //       url: window.location.href,
+    //     });
+    //   } catch (error) {
+    //     console.error("Error sharing:", error);
+    //   }
+    // } else {
+    //   alert("Web Share API not supported in your browser");
+    // }
   };
 
   if (isLoading) {
@@ -187,16 +139,16 @@ export default function MobileTicketPage() {
             <Button
               variant="ghost"
               className="mb-4"
-              onClick={() => router.back()}
+              onClick={() => router.push("/")}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
             <h1 className="text-2xl font-bold">Mobile Ticket</h1>
-            <p className="text-muted-foreground">
+            {/* <p className="text-muted-foreground">
               Your journey from {booking.journey.from.city} to{" "}
               {booking.journey.to.city}
-            </p>
+            </p> */}
           </div>
 
           <div className="flex flex-col items-center">
@@ -267,11 +219,11 @@ export default function MobileTicketPage() {
                             Journey Details
                           </h3>
                           <div className="text-sm font-medium">
-                            Ref: {booking.reference}
+                            Ref: {booking.bookingId}
                           </div>
                         </div>
 
-                        <div className="space-y-4">
+                        {/* <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-2">
                             <div>
                               <div className="text-sm text-muted-foreground">
@@ -389,7 +341,7 @@ export default function MobileTicketPage() {
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 

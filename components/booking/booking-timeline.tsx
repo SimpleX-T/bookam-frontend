@@ -13,7 +13,7 @@ const BookingTimeline: React.FC = () => {
   ) {
     currentStep = 0;
   } else if (
-    currentPathname.includes("/steps/passenger-details") ||
+    currentPathname.includes("/steps/passenger") ||
     currentPathname.includes("/passenger-details")
   ) {
     currentStep = 1;

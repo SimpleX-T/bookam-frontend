@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Share2, Printer, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import QRCode from "react-qr-code";
 
 // Dummy journey data
 const journeyData = {
@@ -61,11 +62,13 @@ const journeyData = {
 
 export default function MobileTicketPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("ticket");
   const ticketRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const handlePrint = () => {
+    if(typeof window !== "undefined")
     window.print();
   };
 
@@ -227,324 +230,8 @@ export default function MobileTicketPage() {
                           </div>
 
                           <div className="flex justify-center">
-                            <div className="h-32 w-full bg-white flex items-center justify-center">
-                              <svg
-                                width="200"
-                                height="100"
-                                viewBox="0 0 200 100"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <rect width="200" height="100" fill="white" />
-                                <rect
-                                  x="10"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="15"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="18"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="22"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="27"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="30"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="35"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="40"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="43"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="48"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="51"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="56"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="60"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="63"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="68"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="72"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="75"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="80"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="85"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="88"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="93"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="98"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="101"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="106"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="109"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="114"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="119"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="122"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="127"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="132"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="135"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="140"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="143"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="148"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="152"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="155"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="160"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="165"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="168"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="173"
-                                  y="10"
-                                  width="3"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="178"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="181"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="186"
-                                  y="10"
-                                  width="1"
-                                  height="80"
-                                  fill="black"
-                                />
-                                <rect
-                                  x="189"
-                                  y="10"
-                                  width="2"
-                                  height="80"
-                                  fill="black"
-                                />
-                              </svg>
+                            <div className="p-2 w-full bg-white flex items-center justify-center">
+                              <QRCode value="hey" />
                             </div>
                           </div>
 

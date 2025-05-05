@@ -3,14 +3,7 @@
 import React, { useState, useEffect, JSX } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
@@ -22,51 +15,13 @@ import {
   User,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateToDayHourMinute } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-// import { Seat } from "@/types";
+import { Bus as BusType, Route, Seat, SeatStatus } from "@/types";
 import { useApp } from "@/contexts/app-context";
-import { sampleRoutes } from "@/lib/constants";
 import BookingTimeline from "@/components/booking/booking-timeline";
 import { toast } from "sonner";
-
-type SeatStatus = "available" | "occupied" | "selected";
-
-type Seat = {
-  id: string;
-  status: SeatStatus;
-  price: number;
-};
-
-type Stop = {
-  city: string;
-  terminal: string;
-  arrivalTime: string;
-  departureTime: string;
-  duration: string;
-};
-
-type JourneyData = {
-  id: string;
-  company: string;
-  logo: string;
-  from: { city: string; terminal: string; time: string };
-  to: { city: string; terminal: string; time: string };
-  duration: string;
-  journeyNumber: string;
-  class: string;
-  date: string;
-  luggage: string;
-  handLuggage: string;
-  bus: { type: string; features: string };
-  stops: Stop[];
-  price: number;
-  adultBasicFee: number;
-  tax: string;
-  regularTotalPrice: number;
-  save: number;
-  totalPrice: number;
-};
+import { useAuth } from "@/contexts/auth-context";
 
 // Simplified bus configuration - 32-seater horizontal layout
 const BUS_CONFIG = {
@@ -75,85 +30,44 @@ const BUS_CONFIG = {
   aisle: true, // We'll have an aisle
 };
 
-// Dummy journey data
-const journeyData: JourneyData = {
-  id: "1",
-  company: "Cloudy Transit",
-  logo: "CT",
-  from: {
-    city: "Lagos",
-    terminal: "Jibowu Terminal, Lagos",
-    time: "23:15",
-  },
-  to: {
-    city: "Abuja",
-    terminal: "Utako Terminal, Abuja",
-    time: "07:25",
-  },
-  duration: "8h 10m",
-  journeyNumber: "CT-6018",
-  class: "Economy",
-  date: "May 16, 2025",
-  luggage: "2 x 23 kg",
-  handLuggage: "1 x 7 kg",
-  bus: {
-    type: "Luxury Coach",
-    features: "Comfortable seating",
-  },
-  stops: [
-    {
-      city: "Ibadan",
-      terminal: "Challenge Terminal, Ibadan",
-      arrivalTime: "01:25",
-      departureTime: "01:45",
-      duration: "20 min",
-    },
-  ],
-  price: 14850,
-  adultBasicFee: 15000,
-  tax: "Included",
-  regularTotalPrice: 15000,
-  save: 150,
-  totalPrice: 14850,
-};
-
 // --- Component ---
 
 export default function SeatSelectionClientPage(): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-
-  // State with explicit types
   const { routes } = useApp();
-  const journeyDetails = routes.length
-    ? routes.find((route) => route.routeId === searchParams.get("journey"))
-    : sampleRoutes.find(
-        (route) => route.routeId === searchParams.get("journey")
-      );
-  console.log(routes, journeyDetails);
+  const { user } = useAuth();
 
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [seats, setSeats] = useState<Record<string, Seat>>({});
+  const [passengerCount, setPassengerCount] = useState<number>(1);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [routeDetails, setRouteDetails] = useState<Route | null>(null);
+  const [busDetails, setBusDetails] = useState<BusType | null>(null);
 
-  let currentStep = 0;
+  useEffect(() => {
+    const busParams = searchParams.get("bId");
+    const routeParams = searchParams.get("rId");
 
-  // Determine current step based on pathname
-  if (pathname === "/booking/steps/seat-selection") {
-    currentStep = 0;
-  } else if (pathname === "/booking/steps/passenger-details") {
-    currentStep = 1;
-  } else if (pathname === "/booking/steps/payment") {
-    currentStep = 2;
-  }
+    const routeDetails = routes.find(
+      (route) => Number(route.routeId) === Number(routeParams)
+    );
+    if (!routeDetails) return setRouteDetails(null);
 
-  // Generate seat data
-  const [passengerCount, setPassengerCount] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(journeyDetails?.price || 0);
+    const busDetails = routeDetails.buses.find(
+      (bus) => Number(bus.busId) === Number(busParams)
+    );
+    if (!busDetails) return setBusDetails(null);
+
+    setRouteDetails(routeDetails);
+    setBusDetails(busDetails);
+  }, [searchParams]);
 
   // Generate dummy seat data
   useEffect(() => {
     const generateSeats = (): Record<string, Seat> => {
+      if (!routeDetails || !busDetails) return {};
       const newSeats: Record<string, Seat> = {};
 
       for (let row = 1; row <= BUS_CONFIG.rows; row++) {
@@ -163,12 +77,14 @@ export default function SeatSelectionClientPage(): JSX.Element {
 
           const randomStatus: SeatStatus =
             Math.random() < 0.3 ? "occupied" : "available";
-          const price = journeyData.price;
+          const price = routeDetails?.price || 0;
+          // const price = 3000;
 
           newSeats[id] = {
             id,
             status: randomStatus,
             price,
+            type: "standard",
           };
         }
       }
@@ -177,15 +93,7 @@ export default function SeatSelectionClientPage(): JSX.Element {
     };
     setSeats(generateSeats());
     setSelectedSeats([]);
-
-    const passengersParam = searchParams.get("passengers");
-    if (passengersParam) {
-      const count = parseInt(passengersParam, 10);
-      if (!isNaN(count) && count > 0) {
-        setPassengerCount(count);
-      }
-    }
-  }, [searchParams]);
+  }, [searchParams, routeDetails]);
 
   // Calculate total price based on selected seats
   useEffect(() => {
@@ -236,7 +144,8 @@ export default function SeatSelectionClientPage(): JSX.Element {
     }
 
     const params = new URLSearchParams({
-      journey: journeyDetails?.routeId || "",
+      rId: routeDetails?.routeId || "",
+      bId: busDetails?.busId || "",
       seats: selectedSeats.join(","),
       price: totalPrice.toString(),
       passengers: passengerCount.toString(),
@@ -251,11 +160,16 @@ export default function SeatSelectionClientPage(): JSX.Element {
     return "text-gray-300";
   };
 
-  const renderSeat = (seatId: string, seat: Seat | undefined): JSX.Element => {
+  const renderSeat = (
+    seatId: string,
+    seat: Seat | undefined,
+    key: number
+  ): JSX.Element => {
     let seatClass = getSeatColor(seat);
 
     return (
       <div
+        key={key}
         className={cn(
           "relative w-16 h-16 flex items-center justify-center transition-all duration-200",
           seatClass,
@@ -392,7 +306,7 @@ export default function SeatSelectionClientPage(): JSX.Element {
                                     );
                                     const seatId = `${colLetter}${rowNum}`;
                                     const seat = seats[seatId];
-                                    return renderSeat(seatId, seat);
+                                    return renderSeat(seatId, seat, colIndex);
                                   })}
                                 </div>
                                 {rowNum === 2 && <div className="h-24" />}
@@ -451,35 +365,22 @@ export default function SeatSelectionClientPage(): JSX.Element {
             {/* Right Side: Journey Summary Card */}
             <div>
               <Card className="sticky top-6">
-                {/* Card Header with Company Info */}
-                <CardHeader className="pb-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-md">
-                      <span className="font-medium text-primary">
-                        {journeyData.logo}
-                      </span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-base">
-                        {journeyData.company}
-                      </CardTitle>
-                      <CardDescription>
-                        {journeyData.journeyNumber}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-6">
                   {/* Quick Info Box */}
                   <div className="p-3 rounded-lg bg-muted/30 space-y-3">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{journeyData.date}</span>
+                      <span className="text-sm">
+                        {formatDateToDayHourMinute(
+                          busDetails?.departureTime || ""
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Bus className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{journeyData.bus.type}</span>
+                      <span className="text-sm">
+                        {busDetails?.busModel || "Standard Bus"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-primary" />
@@ -495,7 +396,7 @@ export default function SeatSelectionClientPage(): JSX.Element {
                     <div
                       className="absolute left-4 top-0 bottom-0 w-0.5 bg-primary/20"
                       aria-hidden="true"
-                    ></div>
+                    />
                     {/* From */}
                     <div className="flex mb-6">
                       <div className="mr-4 relative">
@@ -505,38 +406,20 @@ export default function SeatSelectionClientPage(): JSX.Element {
                       </div>
                       <div>
                         <div className="text-sm font-medium">
-                          {journeyData.from.terminal}
+                          {routeDetails?.origin}
                         </div>
                         <div className="flex items-center gap-1 mt-1">
                           <Clock className="h-3 w-3 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground">
-                            {journeyData.from.time} (Departure)
+                            {formatDateToDayHourMinute(
+                              busDetails?.departureTime || ""
+                            )}{" "}
+                            (Departure)
                           </span>
                         </div>
                       </div>
                     </div>
-                    {/* Stops */}
-                    {journeyData.stops.map((stop, i) => (
-                      <div key={`stop-${i}`} className="flex mb-6">
-                        <div className="mr-4 relative">
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-muted-foreground"></div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">
-                            {stop.terminal}
-                          </div>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Clock className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">
-                              {stop.arrivalTime} - {stop.departureTime} (
-                              {stop.duration} stop)
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+
                     {/* To */}
                     <div className="flex">
                       <div className="mr-4 relative">
@@ -546,12 +429,15 @@ export default function SeatSelectionClientPage(): JSX.Element {
                       </div>
                       <div>
                         <div className="text-sm font-medium">
-                          {journeyData.to.terminal}
+                          {routeDetails?.destination}
                         </div>
                         <div className="flex items-center gap-1 mt-1">
                           <Clock className="h-3 w-3 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground">
-                            {journeyData.to.time} (Est. Arrival)
+                            {formatDateToDayHourMinute(
+                              busDetails?.arrivalTime || ""
+                            )}{" "}
+                            (Est. Arrival)
                           </span>
                         </div>
                       </div>
