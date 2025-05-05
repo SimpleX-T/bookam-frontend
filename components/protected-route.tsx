@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
   "/about",
   "/routes",
   "/login",
+  "/admin/login",
   "/signup",
   "/forgot-password",
 ];
@@ -44,10 +45,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           router.push("/login");
           return;
         }
-        if (
-          user?.username !== "bookam-admin" ||
-          user.email !== "admin@bookam.com"
-        ) {
+        if (user?.username !== "admin1" || user.email !== "admin@bookam.com") {
           router.push("/");
           return;
         }

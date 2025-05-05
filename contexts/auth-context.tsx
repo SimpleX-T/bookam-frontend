@@ -103,14 +103,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         // Save to localStorage
         localStorage.setItem("token", authToken);
-        localStorage.setItem("user", JSON.stringify({ username, email }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ username, email, userId })
+        );
 
-        // Navigate to dashboard
-        if (username === "bookam-admin" && email === "admin@bookam.com") {
-          router.push("/dashboard");
-        } else {
-          router.push("/routes");
-        }
+        router.push("/routes");
 
         // Show success toast
         toast.success("Login successful!");
@@ -144,7 +142,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           password: data.password,
         });
 
-        // Navigate to a confirmation page or dashboard
         router.push("/routes");
 
         // Show success toast
