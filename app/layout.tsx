@@ -8,6 +8,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
 import { ToastProvider } from "@/components/toast-provider";
+import { ProtectedRoute } from "@/components/protected-route";
 
 // const inter = Inter({ subsets: ["latin"] });
 const bricolage_grotesque = Bricolage_Grotesque({
@@ -17,9 +18,8 @@ const bricolage_grotesque = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "bookAM | Nigerian Bus Transport System",
+  title: "bookam | Enugu State Transport Management System",
   description: "Book bus tickets across Nigeria with ease",
-  generator: "v0.dev",
 };
 
 export default function RootLayout({
@@ -29,21 +29,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head />
       <body className={`${bricolage_grotesque.className}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
           <QueryProvider>
             <Providers>
-              <ToastProvider />
-              <div className="min-h-screen flex flex-col">
-                <Header />
-                {children}
-                <Footer />
-              </div>
+              <ProtectedRoute>
+                <ToastProvider />
+                <div className="min-h-screen flex flex-col">
+                  {/* <Header /> */}
+                  {children}
+                  {/* <Footer /> */}
+                </div>
+              </ProtectedRoute>
             </Providers>
           </QueryProvider>
         </ThemeProvider>

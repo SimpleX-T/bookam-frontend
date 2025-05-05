@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +23,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/use-auth";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 
 const profileSchema = z.object({
   username: z
@@ -32,10 +32,7 @@ const profileSchema = z.object({
     .min(2, { message: "Username must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
-  address: z.string().optional(),
   city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -61,7 +58,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
@@ -70,22 +67,30 @@ export default function ProfilePage() {
     router.push("/login");
   }
 
+  // Add initial form values from user data
+  const defaultValues = {
+    username: user?.username || "",
+    email: user?.email || "",
+    phone: "",
+    city: "",
+  };
+
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
     formState: { errors: profileErrors },
+    reset: resetProfile,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      username: user?.username || "",
-      email: user?.email || "",
-      phone: "+234 800 123 4567",
-      address: "123 Main Street",
-      city: "Lagos",
-      state: "Lagos State",
-      zipCode: "100001",
-    },
+    defaultValues,
   });
+
+  // Reset form when user data changes
+  useEffect(() => {
+    if (user) {
+      resetProfile(defaultValues);
+    }
+  }, [user, resetProfile]);
 
   const {
     register: registerPassword,
@@ -104,12 +109,8 @@ export default function ProfilePage() {
   const onSubmitProfile = async (data: ProfileFormValues) => {
     setIsUpdatingProfile(true);
     try {
-      // Here you would call the API to update the profile
-      console.log("Profile data:", data);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Update user data through auth context
+      // await updateUser(data);
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -124,10 +125,10 @@ export default function ProfilePage() {
     try {
       // Here you would call the API to update the password
       console.log("Password data:", data);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       toast.success("Password updated successfully!");
       resetPassword();
     } catch (error) {
@@ -141,21 +142,18 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 flex items-center justify-center">
           <div className="text-center">
             <Spinner size="lg" />
             <p className="mt-4 text-muted-foreground">Loading profile...</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
@@ -169,7 +167,9 @@ export default function ProfilePage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-center">
-                    <h2 className="text-xl font-bold">{user?.username || "User"}</h2>
+                    <h2 className="text-xl font-bold">
+                      {user?.username || "User"}
+                    </h2>
                     <p className="text-sm text-muted-foreground">
                       Premium Member
                     </p>
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                 <nav className="space-y-2">
                   <Button
                     variant="ghost"
-                    className="w-full justify-start"
+                    className="w-full justify-start bg-muted"
                     asChild
                   >
                     <Link href="/profile">
@@ -221,7 +221,14 @@ export default function ProfilePage() {
                         strokeLinejoin="round"
                         className="mr-2"
                       >
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <rect
+                          x="3"
+                          y="4"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        />
                         <line x1="16" y1="2" x2="16" y2="6" />
                         <line x1="8" y1="2" x2="8" y2="6" />
                         <line x1="3" y1="10" x2="21" y2="10" />
@@ -229,31 +236,35 @@ export default function ProfilePage() {
                       Bookings
                     </Link>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link href="/profile/payments">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                        <line x1="1" y1="10" x2="23" y2="10" />
-                      </svg>
-                      Payments
-                    </Link>
-                  </Button>
                 </nav>
+                <Separator className="my-6" />
+
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => {
+                    logout();
+                    router.push("/login");
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-2"
+                  >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" x2="9" y1="12" y2="12" />
+                  </svg>
+                  Log Out
+                </Button>
               </CardContent>
             </Card>
 
@@ -317,34 +328,10 @@ export default function ProfilePage() {
                             )}
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="address">Address</Label>
-                            <Input
-                              id="address"
-                              {...registerProfile("address")}
-                              disabled={isUpdatingProfile}
-                            />
-                          </div>
-                          <div className="space-y-2">
                             <Label htmlFor="city">City</Label>
                             <Input
                               id="city"
                               {...registerProfile("city")}
-                              disabled={isUpdatingProfile}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="state">State</Label>
-                            <Input
-                              id="state"
-                              {...registerProfile("state")}
-                              disabled={isUpdatingProfile}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="zipCode">Zip Code</Label>
-                            <Input
-                              id="zipCode"
-                              {...registerProfile("zipCode")}
                               disabled={isUpdatingProfile}
                             />
                           </div>
@@ -441,7 +428,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

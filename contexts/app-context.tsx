@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useAuth } from "./auth-context";
-import { Bus, Route, RouteSearchParams } from "@/types";
+import { Bus, Route, RouteSearchParams, Booking } from "@/types";
 import {
   useBuses,
   useBusById,
@@ -15,12 +15,20 @@ import {
   useCreateRouteMutation,
   useUpdateRouteMutation,
   useDeleteRouteMutation,
+  useBookings,
+  useBookingById,
+  useCreateBookingMutation,
+  useUpdateBookingMutation,
+  useDeleteBookingMutation,
+  useUserBookings,
 } from "@/hooks/use-api-queries";
 import {
   CreateBusRequest,
   CreateRouteRequest,
   UpdateBusRequest,
   UpdateRouteRequest,
+  CreateBookingRequest,
+  UpdateBookingRequest,
 } from "@/lib/api-client";
 
 // Define the app context state
@@ -31,10 +39,10 @@ interface AppContextType {
   busesLoading: boolean;
   busError: string | null;
   fetchBuses: () => Promise<void>;
-  fetchBusById: (id: number) => Promise<void>;
+  fetchBusById: (id: string) => Promise<void>;
   createBus: (bus: CreateBusRequest) => Promise<void>;
-  updateBus: (id: number, bus: UpdateBusRequest) => Promise<void>;
-  deleteBus: (id: number) => Promise<void>;
+  updateBus: (id: string, bus: UpdateBusRequest) => Promise<void>;
+  deleteBus: (id: string) => Promise<void>;
 
   // Route state and operations
   routes: Route[];
@@ -42,11 +50,28 @@ interface AppContextType {
   routesLoading: boolean;
   routeError: string | null;
   fetchRoutes: () => Promise<void>;
-  fetchRouteById: (id: number) => Promise<void>;
+  fetchRouteById: (id: string) => Promise<void>;
   searchRoutes: (params: RouteSearchParams) => Promise<void>;
   createRoute: (route: CreateRouteRequest) => Promise<void>;
-  updateRoute: (id: number, route: UpdateRouteRequest) => Promise<void>;
-  deleteRoute: (id: number) => Promise<void>;
+  updateRoute: (id: string, route: UpdateRouteRequest) => Promise<void>;
+  deleteRoute: (id: string) => Promise<void>;
+
+  // Booking state and operations
+  bookings: Booking[];
+  selectedBooking: Booking | null;
+  bookingsLoading: boolean;
+  bookingError: string | null;
+  fetchBookings: () => Promise<void>;
+  fetchBookingById: (id: string) => Promise<void>;
+  createBooking: (booking: CreateBookingRequest) => Promise<void>;
+  updateBooking: (id: string, booking: UpdateBookingRequest) => Promise<void>;
+  deleteBooking: (id: string) => Promise<void>;
+
+  // User Bookings
+  userBookings: Booking[];
+  userBookingsLoading: boolean;
+  userBookingError: string | null;
+  fetchUserBookings: () => Promise<void>;
 
   // Common operations
   clearErrors: () => void;
@@ -73,20 +98,36 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
 
+  // Booking state
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
   // React Query hooks
   const busesQuery = useBuses();
   const routesQuery = useRoutes();
+  const bookingsQuery = useBookings();
+  const userBookingsQuery = useUserBookings();
   const createBusMutation = useCreateBusMutation();
-  const updateBusMutation = useUpdateBusMutation(selectedBus?.busId || 0);
+  const updateBusMutation = useUpdateBusMutation(
+    selectedBus?.busId ? selectedBus.busId : ""
+  );
   const deleteBusMutation = useDeleteBusMutation();
   const createRouteMutation = useCreateRouteMutation();
-  const updateRouteMutation = useUpdateRouteMutation(selectedRoute?.id || 0);
+  const updateRouteMutation = useUpdateRouteMutation(
+    selectedRoute?.routeId ? selectedRoute.routeId : ""
+  );
   const deleteRouteMutation = useDeleteRouteMutation();
+  const createBookingMutation = useCreateBookingMutation();
+  const updateBookingMutation = useUpdateBookingMutation(
+    selectedBooking?.bookingId ? String(selectedBooking.bookingId) : ""
+  );
+  const deleteBookingMutation = useDeleteBookingMutation();
 
   // Clear errors
   const clearErrors = (): void => {
     setBusError(null);
     setRouteError(null);
+    setBookingError(null);
   };
 
   // Bus operations
@@ -101,7 +142,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const fetchBusById = async (id: number): Promise<void> => {
+  const fetchBusById = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -131,7 +172,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const updateBus = async (
-    id: number,
+    id: string,
     bus: UpdateBusRequest
   ): Promise<void> => {
     if (!isAuthenticated) return;
@@ -147,7 +188,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const deleteBus = async (id: number): Promise<void> => {
+  const deleteBus = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -178,7 +219,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const fetchRouteById = async (id: number): Promise<void> => {
+  const fetchRouteById = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -220,7 +261,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const updateRoute = async (
-    id: number,
+    routeid: string,
     route: UpdateRouteRequest
   ): Promise<void> => {
     if (!isAuthenticated) return;
@@ -236,7 +277,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const deleteRoute = async (id: number): Promise<void> => {
+  const deleteRoute = async (id: string): Promise<void> => {
     if (!isAuthenticated) return;
 
     try {
@@ -245,13 +286,91 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setRouteError(result.error?.message || "Failed to delete route");
       } else {
         // If the deleted route was selected, clear the selection
-        if (selectedRoute?.id === id) {
+        if (selectedRoute?.routeId === id) {
           setSelectedRoute(null);
         }
       }
     } catch (err: any) {
       setRouteError(err.message || "Failed to delete route");
       console.error("Delete route error:", err);
+    }
+  };
+
+  // Booking operations
+  const fetchBookings = async (): Promise<void> => {
+    if (!isAuthenticated) return;
+
+    try {
+      await bookingsQuery.refetch();
+    } catch (err: any) {
+      setBookingError(err.message || "Failed to fetch bookings");
+      console.error("Fetch bookings error:", err);
+    }
+  };
+
+  const fetchBookingById = async (id: string): Promise<void> => {
+    if (!isAuthenticated) return;
+
+    try {
+      const bookingQuery = useBookingById(id);
+      const result = await bookingQuery.refetch();
+      if (result.data) {
+        setSelectedBooking(result.data);
+      }
+    } catch (err: any) {
+      setBookingError(err.message || "Failed to fetch booking");
+      console.error("Fetch booking by ID error:", err);
+    }
+  };
+
+  const createBooking = async (
+    booking: CreateBookingRequest
+  ): Promise<void> => {
+    if (!isAuthenticated) return;
+
+    try {
+      const result = await createBookingMutation.mutateAsync(booking);
+      if (!result.success) {
+        setBookingError(result.error?.message || "Failed to create booking");
+      }
+    } catch (err: any) {
+      setBookingError(err.message || "Failed to create booking");
+      console.error("Create booking error:", err);
+    }
+  };
+
+  const updateBooking = async (
+    id: string,
+    booking: UpdateBookingRequest
+  ): Promise<void> => {
+    if (!isAuthenticated) return;
+
+    try {
+      const result = await updateBookingMutation.mutateAsync(booking);
+      if (!result.success) {
+        setBookingError(result.error?.message || "Failed to update booking");
+      }
+    } catch (err: any) {
+      setBookingError(err.message || "Failed to update booking");
+      console.error("Update booking error:", err);
+    }
+  };
+
+  const deleteBooking = async (id: string): Promise<void> => {
+    if (!isAuthenticated) return;
+
+    try {
+      const result = await deleteBookingMutation.mutateAsync(id);
+      if (!result.success) {
+        setBookingError(result.error?.message || "Failed to delete booking");
+      } else {
+        if (String(selectedBooking?.bookingId) === id) {
+          setSelectedBooking(null);
+        }
+      }
+    } catch (err: any) {
+      setBookingError(err.message || "Failed to delete booking");
+      console.error("Delete booking error:", err);
     }
   };
 
@@ -278,6 +397,30 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     createRoute,
     updateRoute,
     deleteRoute,
+
+    // Booking state and operations
+    bookings: bookingsQuery.data || [],
+    selectedBooking,
+    bookingsLoading: bookingsQuery.isLoading,
+    bookingError,
+    fetchBookings,
+    fetchBookingById,
+    createBooking,
+    updateBooking,
+    deleteBooking,
+
+    // User Bookings
+    userBookings: userBookingsQuery?.data || [],
+    userBookingsLoading: userBookingsQuery?.isLoading || false,
+    userBookingError: userBookingsQuery?.error?.message || null,
+    fetchUserBookings: async () => {
+      try {
+        await userBookingsQuery?.refetch();
+      } catch (err: any) {
+        setBookingError(err.message || "Failed to fetch user bookings");
+        console.error("Fetch user bookings error:", err);
+      }
+    },
 
     // Common operations
     clearErrors,

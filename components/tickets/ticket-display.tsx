@@ -8,26 +8,70 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import QRCode from "react-qr-code";
+import { usePathname } from "next/navigation";
 
 interface TicketDisplayProps {
-  booking: any;
+  booking?: any;
   className?: string;
   compact?: boolean;
 }
+const dummyBooking = {
+  reference: "BKAM123456",
+  checkIn: {
+    date: "2024-07-01",
+    time: "08:00",
+  },
+  journey: {
+    company: "Express Bus Co.",
+    logo: "🚌",
+    journeyNumber: "EX123",
+    date: "2024-07-01",
+    duration: "4h 30m",
+    luggage: "1 bag (20kg)",
+    from: {
+      city: "Lagos",
+      terminal: "Jibowu Terminal",
+      time: "09:00",
+    },
+    to: {
+      city: "Abuja",
+      terminal: "Utako Terminal",
+      time: "13:30",
+    },
+    bus: {
+      type: "Luxury",
+      seating: "2x2",
+    },
+  },
+  passengers: [
+    {
+      title: "Mr.",
+      firstName: "John",
+      lastName: "Doe",
+      seat: "12A",
+      ticketNumber: "TCK123456789",
+    },
+  ],
+};
 
+export default function TicketDisplayDefault() {
+  return <TicketDisplay booking={dummyBooking} />;
+}
 export function TicketDisplay({
   booking,
   className,
   compact = false,
 }: TicketDisplayProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const pathname = usePathname();
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
   };
 
-  const passenger = booking.passengers[0];
-  const journey = booking.journey;
+  // const passenger = booking.passengers[0];
+  // const journey = booking.journey;
 
   return (
     <div className={cn("perspective-1000", className)}>
@@ -67,7 +111,7 @@ export function TicketDisplay({
             </div>
 
             <div className={cn("space-y-4", compact ? "p-3" : "p-6")}>
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
@@ -104,9 +148,9 @@ export function TicketDisplay({
                 >
                   {passenger.seat}
                 </Badge>
-              </div>
+              </div> */}
 
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <div className="text-center">
                   <div
                     className={cn(
@@ -193,50 +237,19 @@ export function TicketDisplay({
                 >
                   {passenger.title} {passenger.firstName} {passenger.lastName}
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex justify-center">
                 <div
-                  className={cn(
-                    "bg-white flex items-center justify-center",
-                    compact ? "h-24" : "h-32 w-full"
-                  )}
+                  className={cn("bg-white flex items-center justify-center")}
                 >
-                  <div className="relative h-full w-full max-w-[200px] flex items-center justify-center">
-                    <svg
-                      viewBox="0 0 100 100"
-                      className={cn(
-                        "border border-border",
-                        compact ? "h-20 w-20" : "h-24 w-24"
-                      )}
-                    >
-                      <rect x="5" y="5" width="90" height="90" fill="white" />
-                      <rect x="10" y="10" width="2" height="80" fill="black" />
-                      <rect x="15" y="10" width="1" height="80" fill="black" />
-                      <rect x="18" y="10" width="2" height="80" fill="black" />
-                      <rect x="22" y="10" width="3" height="80" fill="black" />
-                      <rect x="27" y="10" width="1" height="80" fill="black" />
-                      <rect x="30" y="10" width="2" height="80" fill="black" />
-                      <rect x="35" y="10" width="3" height="80" fill="black" />
-                      <rect x="40" y="10" width="1" height="80" fill="black" />
-                      <rect x="43" y="10" width="2" height="80" fill="black" />
-                      <rect x="48" y="10" width="1" height="80" fill="black" />
-                      <rect x="51" y="10" width="3" height="80" fill="black" />
-                      <rect x="56" y="10" width="2" height="80" fill="black" />
-                      <rect x="60" y="10" width="1" height="80" fill="black" />
-                      <rect x="63" y="10" width="3" height="80" fill="black" />
-                      <rect x="68" y="10" width="2" height="80" fill="black" />
-                      <rect x="72" y="10" width="1" height="80" fill="black" />
-                      <rect x="75" y="10" width="2" height="80" fill="black" />
-                      <rect x="80" y="10" width="3" height="80" fill="black" />
-                      <rect x="85" y="10" width="1" height="80" fill="black" />
-                      <rect x="88" y="10" width="2" height="80" fill="black" />
-                    </svg>
+                  <div className="relative h-full w-full p-2 flex items-center justify-center">
+                    <QRCode value={pathname} />
                   </div>
                 </div>
               </div>
 
-              <div
+              {/* <div
                 className={cn("text-center", compact ? "text-xs" : "text-sm")}
               >
                 <div className="font-medium">
@@ -245,7 +258,7 @@ export function TicketDisplay({
                 <div className="text-muted-foreground">
                   Ticket: {passenger.ticketNumber}
                 </div>
-              </div>
+              </div> */}
 
               {!compact && (
                 <div className="text-center text-xs text-muted-foreground mt-2">
@@ -281,7 +294,7 @@ export function TicketDisplay({
               </p>
             </div>
 
-            <div className={cn("space-y-3", compact ? "p-3" : "p-6")}>
+            {/* <div className={cn("space-y-3", compact ? "p-3" : "p-6")}>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span
@@ -502,7 +515,7 @@ export function TicketDisplay({
                   Tap to view ticket
                 </div>
               )}
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </motion.div>

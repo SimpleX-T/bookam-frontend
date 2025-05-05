@@ -5,7 +5,6 @@ import type React from "react";
 import { useState } from "react";
 import Image from "next/image";
 import { ArrowRight, Clock, MapIcon, X } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,133 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapView } from "./map-view";
+import dynamic from "next/dynamic";
+
+const MapView = dynamic(() => import("./map-view"), {
+  ssr: false,
+  loading: () => <p>Loading map...</p>,
+});
 import { Route } from "@/types";
-
-
-// Sample routes data with location names for Google Maps
-const sampleRoutes: Route[] = [
-  {
-    id: "1",
-    from: "Lagos",
-    to: "Abuja",
-    price: 25000,
-    duration: "1h 30m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Lagos to Abuja",
-    distance: "534 km",
-    departureTime: "08:00 AM",
-    arrivalTime: "09:30 AM",
-    stops: [],
-    fromLocation: "Lagos, Nigeria",
-    toLocation: "Abuja, Nigeria",
-  },
-  {
-    id: "2",
-    from: "Lagos",
-    to: "Port Harcourt",
-    price: 22000,
-    duration: "1h 15m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Lagos to Port Harcourt",
-    distance: "617 km",
-    departureTime: "10:00 AM",
-    arrivalTime: "11:15 AM",
-    stops: [],
-    fromLocation: "Lagos, Nigeria",
-    toLocation: "Port Harcourt, Nigeria",
-  },
-  {
-    id: "3",
-    from: "Abuja",
-    to: "Kano",
-    price: 18000,
-    duration: "1h",
-    image: "/placeholder.svg",
-    description: "Direct flight from Abuja to Kano",
-    distance: "376 km",
-    departureTime: "12:00 PM",
-    arrivalTime: "01:00 PM",
-    stops: [],
-    fromLocation: "Abuja, Nigeria",
-    toLocation: "Kano, Nigeria",
-  },
-  {
-    id: "4",
-    from: "Kano",
-    to: "Lagos",
-    price: 27000,
-    duration: "1h 45m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Kano to Lagos",
-    distance: "754 km",
-    departureTime: "03:00 PM",
-    arrivalTime: "04:45 PM",
-    stops: [],
-    fromLocation: "Kano, Nigeria",
-    toLocation: "Lagos, Nigeria",
-  },
-  {
-    id: "5",
-    from: "Port Harcourt",
-    to: "Abuja",
-    price: 20000,
-    duration: "1h 10m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Port Harcourt to Abuja",
-    distance: "498 km",
-    departureTime: "09:30 AM",
-    arrivalTime: "10:40 AM",
-    stops: [],
-    fromLocation: "Port Harcourt, Nigeria",
-    toLocation: "Abuja, Nigeria",
-  },
-  {
-    id: "6",
-    from: "Enugu",
-    to: "Lagos",
-    price: 23000,
-    duration: "1h 20m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Enugu to Lagos",
-    distance: "527 km",
-    departureTime: "11:00 AM",
-    arrivalTime: "12:20 PM",
-    stops: [],
-    fromLocation: "Enugu, Nigeria",
-    toLocation: "Lagos, Nigeria",
-  },
-  {
-    id: "7",
-    from: "Abuja",
-    to: "Enugu",
-    price: 19000,
-    duration: "1h 05m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Abuja to Enugu",
-    distance: "412 km",
-    departureTime: "02:00 PM",
-    arrivalTime: "03:05 PM",
-    stops: [],
-    fromLocation: "Abuja, Nigeria",
-    toLocation: "Enugu, Nigeria",
-  },
-  {
-    id: "8",
-    from: "Lagos",
-    to: "Kano",
-    price: 28000,
-    duration: "1h 50m",
-    image: "/placeholder.svg",
-    description: "Direct flight from Lagos to Kano",
-    distance: "754 km",
-    departureTime: "07:00 AM",
-    arrivalTime: "08:50 AM",
-    stops: [],
-    fromLocation: "Lagos, Nigeria",
-    toLocation: "Kano, Nigeria",
-  },
-];
+import { sampleRoutes } from "@/lib/constants";
 
 interface JourneyPlannerProps {
   routes?: Route[];
@@ -173,7 +53,7 @@ export function JourneyPlanner({
   };
 
   const handleRouteChange = (routeId: string) => {
-    const route = routes.find((r) => r.id === routeId);
+    const route = routes.find((r) => r.routeId === routeId);
     if (route) {
       handleSelect(route);
       setIsSidebarOpen(true);
@@ -197,7 +77,7 @@ export function JourneyPlanner({
   };
 
   return (
-    <div className="relative flex flex-col w-full min-h-[calc(100vh-4rem)] ">
+    <div className="relative flex flex-col w-full min-h-fit">
       {/* Main content area */}
       <div
         className={`w-full h-full overflow-y-auto ${
@@ -219,14 +99,18 @@ export function JourneyPlanner({
             )}
           </div>
 
-          <Select value={selectedRoute?.id} onValueChange={handleRouteChange}>
+          <Select
+            value={selectedRoute?.routeId}
+            onValueChange={handleRouteChange}
+          >
             <SelectTrigger className="w-full mb-4">
               <SelectValue placeholder="Select a route" />
             </SelectTrigger>
             <SelectContent>
               {routes.map((route) => (
-                <SelectItem key={route.id} value={route.id}>
-                  {route.from} to {route.to} - ₦{route.price.toLocaleString()}
+                <SelectItem key={route.routeId} value={route.routeId}>
+                  {route.origin} to {route.destination} - ₦
+                  {route.price.toLocaleString()}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -235,9 +119,9 @@ export function JourneyPlanner({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {routes.slice(0, max || routes.length).map((route) => (
               <Card
-                key={route.id}
+                key={route.routeId}
                 className={`overflow-hidden cursor-pointer transition-all shadow-md ${
-                  selectedRoute?.id === route.id
+                  selectedRoute?.routeId === route.routeId
                     ? "ring-2 ring-primary"
                     : "hover:shadow-xl"
                 }`}
@@ -246,7 +130,7 @@ export function JourneyPlanner({
                 <div className="relative h-32">
                   <Image
                     src={route.image || "/placeholder.svg"}
-                    alt={`${route.from} to ${route.to}`}
+                    alt={`${route.origin} to ${route.destination}`}
                     fill
                     className="object-cover"
                   />
@@ -254,8 +138,8 @@ export function JourneyPlanner({
                 <CardContent className="p-3">
                   <div className="flex justify-between items-center mb-2">
                     <div className="font-bold text-sm">
-                      {route.from} <ArrowRight className="inline h-3 w-3" />{" "}
-                      {route.to}
+                      {route.origin} <ArrowRight className="inline h-3 w-3" />{" "}
+                      {route.destination}
                     </div>
                     <Badge variant="outline" className="text-primary text-xs">
                       ₦{route.price.toLocaleString()}
@@ -269,14 +153,18 @@ export function JourneyPlanner({
                     <Button
                       className="flex-1 text-xs h-8"
                       variant={
-                        selectedRoute?.id === route.id ? "default" : "outline"
+                        selectedRoute?.routeId === route.routeId
+                          ? "default"
+                          : "outline"
                       }
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSelect(route);
                       }}
                     >
-                      {selectedRoute?.id === route.id ? "Selected" : "Select"}
+                      {selectedRoute?.routeId === route.routeId
+                        ? "Selected"
+                        : "Select"}
                     </Button>
                     <Button
                       variant="secondary"
@@ -331,9 +219,9 @@ export function JourneyPlanner({
                 </div>
               ) : (
                 <MapView
-                  origin={selectedRoute.fromLocation}
-                  destination={selectedRoute.toLocation}
-                  className="h-full"
+                  origin={selectedRoute.origin}
+                  destination={selectedRoute.destination}
+                  className="h-full z-50"
                 />
               )}
             </div>
@@ -344,14 +232,14 @@ export function JourneyPlanner({
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-muted-foreground">From</p>
-                    <p className="font-medium">{selectedRoute.from}</p>
-                    <p className="text-sm">{selectedRoute.departureTime}</p>
+                    <p className="font-medium">{selectedRoute.origin}</p>
+                    {/* <p className="text-sm">{selectedRoute.departureTime}</p> */}
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground" />
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">To</p>
-                    <p className="font-medium">{selectedRoute.to}</p>
-                    <p className="text-sm">{selectedRoute.arrivalTime}</p>
+                    <p className="font-medium">{selectedRoute.destination}</p>
+                    {/* <p className="text-sm">{selectedRoute.arrivalTime}</p> */}
                   </div>
                 </div>
 
@@ -370,12 +258,12 @@ export function JourneyPlanner({
                       ₦{selectedRoute.price.toLocaleString()}
                     </p>
                   </div>
-                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                  {/* <div className="bg-card dark:bg-card p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground">Stops</p>
                     <p className="font-medium">
                       {selectedRoute.stops.length || "Direct"}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div>
@@ -385,7 +273,7 @@ export function JourneyPlanner({
                   <p>{selectedRoute.description}</p>
                 </div>
 
-                {selectedRoute.stops.length > 0 && (
+                {/* {selectedRoute.stops.length > 0 && (
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">Stops</p>
                     <ul className="list-disc pl-5">
@@ -394,7 +282,7 @@ export function JourneyPlanner({
                       ))}
                     </ul>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="mt-8">
@@ -442,8 +330,8 @@ export function JourneyPlanner({
                 </div>
               ) : (
                 <MapView
-                  origin={selectedRoute.fromLocation}
-                  destination={selectedRoute.toLocation}
+                  origin={selectedRoute.origin}
+                  destination={selectedRoute.destination}
                   className="h-full"
                 />
               )}
@@ -455,14 +343,14 @@ export function JourneyPlanner({
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-muted-foreground">From</p>
-                    <p className="font-medium">{selectedRoute.from}</p>
-                    <p className="text-sm">{selectedRoute.departureTime}</p>
+                    <p className="font-medium">{selectedRoute.origin}</p>
+                    {/* <p className="text-sm">{selectedRoute.departureTime}</p> */}
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground" />
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">To</p>
-                    <p className="font-medium">{selectedRoute.to}</p>
-                    <p className="text-sm">{selectedRoute.arrivalTime}</p>
+                    <p className="font-medium">{selectedRoute.destination}</p>
+                    {/* <p className="text-sm">{selectedRoute.arrivalTime}</p> */}
                   </div>
                 </div>
 
@@ -481,12 +369,12 @@ export function JourneyPlanner({
                       ₦{selectedRoute.price.toLocaleString()}
                     </p>
                   </div>
-                  <div className="bg-card dark:bg-card p-4 rounded-lg">
+                  {/* <div className="bg-card dark:bg-card p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground">Stops</p>
                     <p className="font-medium">
                       {selectedRoute.stops.length || "Direct"}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div>
@@ -496,7 +384,7 @@ export function JourneyPlanner({
                   <p>{selectedRoute.description}</p>
                 </div>
 
-                {selectedRoute.stops.length > 0 && (
+                {/* {selectedRoute.stops.length > 0 && (
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">Stops</p>
                     <ul className="list-disc pl-5">
@@ -505,7 +393,7 @@ export function JourneyPlanner({
                       ))}
                     </ul>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="mt-8 pb-8">

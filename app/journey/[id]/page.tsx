@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -57,7 +55,6 @@ export default function JourneyDetailsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <Card className="mb-6">
@@ -640,7 +637,6 @@ export default function JourneyDetailsPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

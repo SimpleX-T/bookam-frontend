@@ -1,220 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input"; // Assuming Input is still used in SimplifiedSearch
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import SimplifiedSearch from "@/components/simplified-search"; // Assuming this component handles the main search inputs
-import {
-  ChevronDown,
-  Filter,
-  Clock,
-  MapPin,
-  Luggage,
-  Users,
-  DollarSign,
-  CalendarDays,
-  Bus,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion"; // Use framer-motion for easier animations
-import { format, addDays } from "date-fns";
-
-// --- Interfaces ---
-interface BusRoute {
-  id: number;
-  company: string;
-  logo: string; // Could be URL in real app
-  departureTime: string; // Consider using Date objects if complex time logic needed
-  arrivalTime: string; // Consider using Date objects
-  duration: string;
-  stops: number; // 0 for direct
-  price: number; // Assuming integer price in smallest currency unit (e.g., kobo for NGN)
-  available_seats: number;
-  originCity: string;
-  destinationCity: string;
-  // transitPoints?: string[]; // Add this if you want to filter by specific transit points later
-}
-
-interface DateInfo {
-  day: string;
-  date: string;
-  fullDate: Date; // Store the actual date object
-}
-
-interface AppliedFilters {
-  price: number[];
-  stops: number[]; // Use numbers: 0 for direct, 1 for 1 stop, etc.
-  sortBy: "lowest" | "highest" | null;
-}
-
-// --- Updated Dummy Data ---
-const allBusRoutes: BusRoute[] = [
-  {
-    id: 1,
-    company: "HorizonJet",
-    logo: "HJ",
-    departureTime: "22:25", // Use 24hr format for easier sorting/comparison if needed
-    arrivalTime: "07:06",
-    duration: "8h 41m",
-    stops: 1,
-    price: 27550,
-    available_seats: 23,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 2,
-    company: "Altitude Express",
-    logo: "AE",
-    departureTime: "06:30",
-    arrivalTime: "07:55",
-    duration: "1h 25m",
-    stops: 0, // Direct
-    price: 20600,
-    available_seats: 15,
-    originCity: "Lagos",
-    destinationCity: "Ibadan",
-  },
-  {
-    id: 3,
-    company: "Cloudy Transit",
-    logo: "CT",
-    departureTime: "13:19",
-    arrivalTime: "14:45",
-    duration: "1h 26m",
-    stops: 0, // Direct
-    price: 14850,
-    available_seats: 32,
-    originCity: "Lagos",
-    destinationCity: "Ibadan",
-  },
-  {
-    id: 4,
-    company: "Cloudy Transit",
-    logo: "CT",
-    departureTime: "18:13",
-    arrivalTime: "03:40", // Next day arrival
-    duration: "9h 27m",
-    stops: 1,
-    price: 38015,
-    available_seats: 8,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 5,
-    company: "Altitude Express",
-    logo: "AE",
-    departureTime: "06:20",
-    arrivalTime: "15:46",
-    duration: "9h 26m",
-    stops: 2,
-    price: 26910,
-    available_seats: 19,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 6,
-    company: "HorizonJet",
-    logo: "HJ",
-    departureTime: "19:15",
-    arrivalTime: "04:45", // Next day
-    duration: "9h 30m",
-    stops: 0, // Direct
-    price: 54910,
-    available_seats: 27,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 7,
-    company: "HorizonJet",
-    logo: "HJ",
-    departureTime: "06:01",
-    arrivalTime: "07:28",
-    duration: "1h 27m",
-    stops: 0, // Direct
-    price: 20050,
-    available_seats: 11,
-    originCity: "Lagos",
-    destinationCity: "Ibadan",
-  },
-  {
-    id: 8,
-    company: "FlyScape",
-    logo: "FS",
-    departureTime: "08:40",
-    arrivalTime: "18:00",
-    duration: "9h 20m",
-    stops: 1,
-    price: 54910,
-    available_seats: 5,
-    originCity: "Lagos",
-    destinationCity: "Abuja",
-  },
-  {
-    id: 9,
-    company: "Capital Connect",
-    logo: "CC",
-    departureTime: "09:00",
-    arrivalTime: "18:30",
-    duration: "9h 30m",
-    stops: 0,
-    price: 42000,
-    available_seats: 30,
-    originCity: "Abuja",
-    destinationCity: "Lagos",
-  },
-  {
-    id: 10,
-    company: "Capital Connect",
-    logo: "CC",
-    departureTime: "21:00",
-    arrivalTime: "06:30", // Next day
-    duration: "9h 30m",
-    stops: 1,
-    price: 39500,
-    available_seats: 12,
-    originCity: "Abuja",
-    destinationCity: "Lagos",
-  },
-  {
-    // Example for a route that might not be commonly searched
-    id: 11,
-    company: "Northern Star",
-    logo: "NS",
-    departureTime: "07:00",
-    arrivalTime: "15:00",
-    duration: "8h 00m",
-    stops: 1,
-    price: 35000,
-    available_seats: 25,
-    originCity: "Abuja",
-    destinationCity: "Kano",
-  },
-];
-
-// --- Helper Function ---
-const generateDates = (startDate: Date, count: number): DateInfo[] => {
-  const dates: DateInfo[] = [];
-  for (let i = 0; i < count; i++) {
-    const currentDate = addDays(startDate, i);
-    dates.push({
-      day: format(currentDate, "EEE"), // Short day name (e.g., Fri)
-      date: format(currentDate, "d MMM"), // Day and short month (e.g., 16 Feb)
-      fullDate: currentDate,
-    });
-  }
-  return dates;
-};
+import SimplifiedSearch from "@/components/simplified-search";
+import { Filter } from "lucide-react";
+import { capitalizeText, cn } from "@/lib/utils";
+import { motion } from "motion/react";
+import { format } from "date-fns";
+import { DateInfo, AppliedFilters, Route } from "@/types";
+import { generateDates } from "@/lib/helpers";
+import { allBusRoutes } from "@/lib/constants";
+import SearchPagination from "@/components/search/pagination";
+import { useApp } from "@/contexts/app-context";
+import BusCard from "@/components/search/bus-card";
+import EmptyState from "@/components/search/states/empty";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
+
   const router = useRouter();
 
   // --- State ---
@@ -247,10 +55,15 @@ export default function SearchPage() {
   const [displayDates, setDisplayDates] = useState<DateInfo[]>([]);
   const [selectedDateIndex, setSelectedDateIndex] = useState(0); // Index for the horizontal date selector
 
+  const { routes } = useApp();
+
+  const currentRoute: Route | undefined = routes.find(
+    (route) => Number(route.routeId) === Number(searchParams.get("rId"))
+  );
+
   // --- Effects ---
   // Effect to parse URL search params
   useEffect(() => {
-    console.log("Parsing search params...");
     const from = searchParams.get("from");
     const to = searchParams.get("to");
     const dateParam = searchParams.get("date");
@@ -267,7 +80,6 @@ export default function SearchPage() {
         if (!isNaN(parsedDate.getTime())) {
           setSearchDate(parsedDate);
           setShowDateSelector(false); // Hide date selector if URL has date
-          console.log("Date from URL:", parsedDate);
         } else {
           console.error("Invalid date format in URL:", dateParam);
           setSearchDate(undefined);
@@ -280,8 +92,7 @@ export default function SearchPage() {
       }
     } else {
       setSearchDate(undefined);
-      setShowDateSelector(true); // Show date selector if no date in URL
-      console.log("No date in URL, showing date selector.");
+      setShowDateSelector(true);
     }
   }, [searchParams]);
 
@@ -297,14 +108,6 @@ export default function SearchPage() {
 
   // --- Filtering Logic ---
   const filteredAndSortedRoutes = useMemo(() => {
-    console.log(
-      "Filtering routes. Applied filters:",
-      appliedFilters,
-      "From:",
-      fromCity,
-      "To:",
-      toCity
-    );
     let routes = allBusRoutes.filter((route) => {
       // Match origin and destination (case-insensitive)
       const originMatch =
@@ -334,7 +137,6 @@ export default function SearchPage() {
     }
     // else no sort or default sort (by ID or original order)
 
-    console.log("Filtered routes count:", routes.length);
     setIsLoading(false); // Filtering done, set loading to false
     return routes;
   }, [fromCity, toCity, appliedFilters]); // Re-run when cities or applied filters change
@@ -354,7 +156,6 @@ export default function SearchPage() {
   };
 
   const handleApplyFilters = useCallback(() => {
-    console.log("Applying filters...");
     setAppliedFilters({
       price: selectedPriceRange,
       stops: selectedStopsFilter,
@@ -373,7 +174,6 @@ export default function SearchPage() {
   }, [selectedPriceRange, selectedStopsFilter, selectedSort]);
 
   const handleResetFilters = useCallback(() => {
-    console.log("Resetting filters...");
     // Reset temporary selections
     setSelectedPriceRange([0, 60000]);
     setSelectedStopsFilter([]);
@@ -387,7 +187,7 @@ export default function SearchPage() {
     setIsLoading(true); // Set loading true while filtering resets
   }, []);
 
-  const handleRouteSelect = (routeId: number) => {
+  const handleRouteSelect = (routeId: string, busId: string) => {
     // Construct the date string for the URL if available
     // Use the date from the URL param first, then fallback to the selected date in the horizontal scroller
     let dateQueryParam = "";
@@ -400,28 +200,22 @@ export default function SearchPage() {
     }
 
     router.push(
-      `/booking/steps/seat-selection?journey=${routeId}&passengers=${passengers}${dateQueryParam}&from=${fromCity}&to=${toCity}`
+      `/booking/steps/seat-selection?rId=${routeId}&bId=${busId}&passengers=${passengers}${dateQueryParam}&from=${fromCity}&to=${toCity}`
     );
   };
 
   // --- Render ---
   return (
     <main className="flex-1 bg-gray-100 dark:bg-gray-950">
-      {" "}
-      {/* Use neutral background */}
       <div className="container mx-auto px-4 py-6">
-        {/* Simplified Search Bar Area */}
         <div className="mb-6">
           <div className="bg-background dark:bg-gray-900 rounded-lg p-4 shadow-md">
-            <SimplifiedSearch /> {/* Pass initial values if needed */}
+            <SimplifiedSearch />
           </div>
         </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
-          {" "}
-          {/* Slightly wider filter bar */}
-          {/* Filters Section */}
           <aside className="space-y-6">
             {/* Mobile Filter Toggle */}
             <Button
@@ -593,244 +387,81 @@ export default function SearchPage() {
               {/* Removed Transit Point Filter as data doesn't support it well */}
             </div>
           </aside>
-          {/* Results Section */}
-          <section className="space-y-6">
-            {/* Horizontal Date Selector (Conditional) */}
-            {showDateSelector && displayDates.length > 0 && (
-              <div className="bg-background dark:bg-gray-900 rounded-lg p-3 shadow-sm overflow-x-auto">
-                <div className="flex space-x-2 min-w-max">
-                  {displayDates.map((dateItem, index) => (
-                    <motion.button
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05, duration: 0.2 }}
-                      className={cn(
-                        "flex flex-col items-center p-3 rounded-lg min-w-[90px] transition-colors duration-200 border border-transparent",
-                        selectedDateIndex === index
-                          ? "bg-primary text-primary-foreground shadow-md"
-                          : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                      )}
-                      onClick={() => setSelectedDateIndex(index)}
-                    >
-                      <div className="text-sm font-medium">
-                        {dateItem.day}, {dateItem.date}
-                      </div>
-                      {/* Removed Price Display */}
-                    </motion.button>
+
+          <Suspense fallback={<Spinner size="md" />}>
+            <section className="space-y-6">
+              {showDateSelector && displayDates.length > 0 && (
+                <div className="bg-background dark:bg-gray-900 rounded-lg p-3 shadow-sm overflow-x-auto">
+                  <div className="flex space-x-2 min-w-max">
+                    {displayDates.map((dateItem, index) => (
+                      <motion.button
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.2 }}
+                        className={cn(
+                          "flex flex-col items-center p-3 rounded-lg min-w-[90px] transition-colors duration-200 border border-transparent",
+                          selectedDateIndex === index
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                        )}
+                        onClick={() => setSelectedDateIndex(index)}
+                      >
+                        <div className="text-sm font-medium">
+                          {dateItem.day}, {dateItem.date}
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Results Header */}
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                <span>
+                  Showing journeys{" "}
+                  {fromCity && toCity
+                    ? `from ${capitalizeText(fromCity)} to ${capitalizeText(
+                        toCity
+                      )}`
+                    : "for selected criteria"}
+                </span>
+              </div>
+
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+                  <Spinner size="md" className="mb-4" />
+                  <span>Loading available buses...</span>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!isLoading && currentRoute?.buses.length === 0 && (
+                <EmptyState onclick={handleResetFilters} />
+              )}
+
+              {/* Bus Route Results */}
+              {!isLoading && currentRoute && currentRoute?.buses.length > 0 && (
+                <div className="space-y-4">
+                  {currentRoute.buses.map((bus, index) => (
+                    <BusCard
+                      key={bus.busId}
+                      bus={bus}
+                      route={currentRoute}
+                      onclick={handleRouteSelect}
+                      index={index}
+                    />
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Results Header */}
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <span>
-                Showing journeys{" "}
-                {fromCity && toCity
-                  ? `from ${fromCity} to ${toCity} on ${format(
-                      searchDate || "",
-                      "PPP"
-                    )}`
-                  : "for selected criteria"}
-              </span>
-              {/* Optional: Add Price History or other info here */}
-            </div>
-
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
-                <svg
-                  className="animate-spin h-8 w-8 mb-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.75v1.5M17.127 6.873l-1.061 1.061M19.25 12h-1.5M17.127 17.127l-1.061-1.061M12 17.75v1.5M6.873 17.127l1.061-1.061M4.75 12h1.5M6.873 6.873l1.061 1.061"
-                  />
-                </svg>
-                <span>Loading available buses...</span>
-              </div>
-            )}
-
-            {/* Empty State */}
-            {!isLoading && filteredAndSortedRoutes.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-64 text-center bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <Bus
-                  size={48}
-                  className="text-gray-400 dark:text-gray-500 mb-4"
-                />
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  No Buses Found
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  We couldn't find any buses matching your current search and
-                  filter criteria.
-                </p>
-                <Button
-                  variant="link"
-                  className="mt-4 text-primary"
-                  onClick={handleResetFilters}
-                >
-                  Reset Filters and Search Again
-                </Button>
-              </div>
-            )}
-
-            {/* Bus Route Results */}
-            {!isLoading && filteredAndSortedRoutes.length > 0 && (
-              <div className="space-y-4">
-                {filteredAndSortedRoutes.map((route, index) => (
-                  <motion.div
-                    key={route.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.07, duration: 0.3 }}
-                    layout // Animate layout changes smoothly
-                  >
-                    <Card className="overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200 border dark:border-gray-700">
-                      <CardContent className="p-0">
-                        <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-4 p-4 items-center">
-                          {/* Company Info */}
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full text-primary font-bold">
-                              {/* Use an actual logo image if available */}
-                              {route.logo}
-                            </div>
-                            <div>
-                              <div className="text-sm font-semibold text-gray-800 dark:text-white">
-                                {route.company}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                <Luggage size={12} /> 23kg{" "}
-                                {/* Example baggage */}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Journey Details */}
-                          <div className="grid grid-cols-[auto_1fr_auto] gap-2 items-center text-center sm:text-left">
-                            {/* Departure */}
-                            <div className="flex flex-col items-center sm:items-start">
-                              <div className="text-lg font-bold text-gray-900 dark:text-white">
-                                {route.departureTime}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                <MapPin size={12} /> {route.originCity}
-                              </div>
-                            </div>
-
-                            {/* Duration & Stops */}
-                            <div className="flex flex-col items-center px-2">
-                              <div className="text-xs font-medium text-primary dark:text-primary-light whitespace-nowrap flex items-center gap-1">
-                                <Clock size={12} /> {route.duration}
-                              </div>
-                              <div className="relative w-full my-1">
-                                <div
-                                  className="absolute inset-0 flex items-center"
-                                  aria-hidden="true"
-                                >
-                                  <div className="w-full border-t border-dashed border-gray-300 dark:border-gray-600"></div>
-                                </div>
-                                <div className="relative flex justify-center">
-                                  <span className="bg-white dark:bg-gray-800 px-1 text-xs text-gray-500 dark:text-gray-400">
-                                    {route.stops === 0
-                                      ? "Direct"
-                                      : `${route.stops} stop${
-                                          route.stops > 1 ? "s" : ""
-                                        }`}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Arrival */}
-                            <div className="flex flex-col items-center sm:items-end">
-                              <div className="text-lg font-bold text-gray-900 dark:text-white">
-                                {route.arrivalTime}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                <MapPin size={12} /> {route.destinationCity}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Price & Action */}
-                          <div className="flex flex-col items-center sm:items-end gap-1 pt-3 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-4">
-                            <div className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                              <DollarSign
-                                size={18}
-                                className="text-green-600"
-                              />
-                              ₦{route.price.toLocaleString()}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1">
-                              <Users size={12} /> {route.available_seats} seats
-                              left
-                            </div>
-                            <Button
-                              size="sm"
-                              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white"
-                              onClick={() => handleRouteSelect(route.id)}
-                            >
-                              Choose Seat
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-            {/* Pagination (Placeholder/Example) */}
-            {!isLoading && filteredAndSortedRoutes.length > 0 && (
-              <div className="flex justify-center items-center gap-1 py-4 text-sm">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="dark:text-white dark:border-gray-600"
-                >
-                  Prev
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-8 h-8 bg-primary text-primary-foreground border-primary"
-                >
-                  1
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 dark:text-white"
-                >
-                  2
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 dark:text-white"
-                >
-                  3
-                </Button>
-                <span className="text-gray-500 dark:text-gray-400">...</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="dark:text-white dark:border-gray-600"
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </section>
+              {/* Pagination (Placeholder/Example) */}
+              {!isLoading && filteredAndSortedRoutes.length > 0 && (
+                <SearchPagination />
+              )}
+            </section>
+          </Suspense>
         </div>
       </div>
     </main>

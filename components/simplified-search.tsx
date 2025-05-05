@@ -25,20 +25,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Popular destinations in Nigeria
-const popularDestinations = [
-  { value: "lagos", label: "Lagos" },
-  { value: "abuja", label: "Abuja" },
-  { value: "ibadan", label: "Ibadan" },
-  { value: "kano", label: "Kano" },
-  { value: "port-harcourt", label: "Port Harcourt" },
-  { value: "enugu", label: "Enugu" },
-  { value: "benin", label: "Benin City" },
-  { value: "kaduna", label: "Kaduna" },
-  { value: "ilorin", label: "Ilorin" },
-  { value: "jos", label: "Jos" },
-];
+import { extractUniqueLocations, LocationOption } from "@/lib/helpers";
+import { useApp } from "@/contexts/app-context";
+import { sampleRoutes } from "@/lib/constants";
 
 const searchSchema = z.object({
   from: z.string({ required_error: "Please select departure city" }),
@@ -54,6 +43,11 @@ type SearchFormValues = z.infer<typeof searchSchema>;
 export default function SimplifiedSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { routes } = useApp();
+
+  const destinations: LocationOption[] = extractUniqueLocations(
+    routes.length ? routes : sampleRoutes
+  );
 
   const initialFrom = searchParams.get("from") || "";
   const initialTo = searchParams.get("to") || "";
@@ -118,7 +112,7 @@ export default function SimplifiedSearch() {
                   <SelectValue placeholder="Select departure city" />
                 </SelectTrigger>
                 <SelectContent>
-                  {popularDestinations.map((city) => (
+                  {destinations.map((city) => (
                     <SelectItem key={city.value} value={city.value}>
                       {city.label}
                     </SelectItem>
@@ -146,7 +140,7 @@ export default function SimplifiedSearch() {
                   <SelectValue placeholder="Select destination city" />
                 </SelectTrigger>
                 <SelectContent>
-                  {popularDestinations.map((city) => (
+                  {destinations.map((city) => (
                     <SelectItem key={city.value} value={city.value}>
                       {city.label}
                     </SelectItem>

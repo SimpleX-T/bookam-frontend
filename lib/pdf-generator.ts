@@ -21,7 +21,7 @@ export async function generatePDF(booking: any) {
   });
 
   // Add booking reference
-  page.drawText(`Booking Reference: ${booking.reference}`, {
+  page.drawText(`Booking Reference: ${booking.bookingId}`, {
     x: 50,
     y: height - 100,
     size: textFontSize,

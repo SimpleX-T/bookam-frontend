@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -148,7 +146,6 @@ export default function BookingCompletePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 py-12">
           <div className="container">
             <div className="max-w-3xl mx-auto">
@@ -172,7 +169,6 @@ export default function BookingCompletePage() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -180,7 +176,6 @@ export default function BookingCompletePage() {
   if (isError) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 bg-muted/30 py-12">
           <div className="container">
             <div className="max-w-3xl mx-auto">
@@ -195,14 +190,12 @@ export default function BookingCompletePage() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6 md:py-12">
           <motion.div
@@ -550,7 +543,6 @@ export default function BookingCompletePage() {
           </motion.div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

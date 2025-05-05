@@ -53,7 +53,7 @@ export default function PromotionsClientPage() {
           </div>
           <div className="relative hidden h-[300px] overflow-hidden rounded-xl md:block">
             <Image
-              src="/placeholder.svg?height=600&width=800"
+              src="https://img.freepik.com/premium-vector/promotion-sale-goods-green-effect-background_625678-76.jpg"
               alt="bookAM promotions"
               fill
               className="object-cover"

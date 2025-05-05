@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -25,11 +25,12 @@ import { Eye, EyeOff } from "lucide-react";
 import { LoginFormValues, useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { loginSchema, login, error: authError } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
 
   const {
     register,
@@ -55,7 +56,15 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-
+useEffect(() => {
+  if (isAuthenticated) {
+    if (user?.email === "admin@borrands.com" || user?.username) {
+      router.push("/dashboard");
+    } else {
+      router.push("/");
+    }
+  }
+}, [isAuthenticated, user, router]);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
       <motion.div

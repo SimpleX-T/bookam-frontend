@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,6 +38,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { FormSubmitEvent } from "@/types";
 
 // Dummy data for cities
 const cities = [
@@ -78,23 +77,6 @@ export default function GroupBookingPage() {
     setFormData({ ...formData, [field]: value });
   };
 
-  interface BookingFormData {
-    from: string;
-    to: string;
-    date: Date | undefined;
-    returnDate: Date | undefined;
-    passengers: number;
-    name: string;
-    email: string;
-    phone: string;
-    organization: string;
-    specialRequests: string;
-  }
-
-  interface FormSubmitEvent extends React.FormEvent<HTMLFormElement> {
-    preventDefault: () => void;
-  }
-
   const handleSubmit = (e: FormSubmitEvent): void => {
     e.preventDefault();
     // In a real app, we would submit the form data to the server
@@ -106,7 +88,6 @@ export default function GroupBookingPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 bg-muted/30">
         <div className="container py-6">
           <motion.div
@@ -658,7 +639,6 @@ export default function GroupBookingPage() {
           </motion.div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
