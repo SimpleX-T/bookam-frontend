@@ -200,7 +200,6 @@ export default function PaymentMethodPage() {
                                 {errors.expiryDate.message}
                               </p>
                             )}
-                          </div>
 
                           <div className="space-y-2">
                             <Label htmlFor="cvv">CVV</Label>
@@ -215,9 +214,6 @@ export default function PaymentMethodPage() {
                               </p>
                             )}
                           </div>
-                        </div>
-                      </div>
-                    )} */}
 
                     {activeTab === "cash" && (
                       <div className="py-4 text-muted-foreground">
