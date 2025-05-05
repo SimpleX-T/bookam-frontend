@@ -19,20 +19,18 @@ import { useApp } from "@/contexts/app-context";
 import BusCard from "@/components/search/bus-card";
 import EmptyState from "@/components/search/states/empty";
 import { Spinner } from "@/components/ui/spinner";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
 
   const router = useRouter();
-
-  // --- State ---
-  // Search criteria from URL
   const [fromCity, setFromCity] = useState<string>("");
   const [toCity, setToCity] = useState<string>("");
   const [searchDate, setSearchDate] = useState<Date | undefined>(undefined); // Date from URL param
   const [passengers, setPassengers] = useState<string>("1");
 
-  // Filter state (temporary selections)
   const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>([
     0, 60000,
   ]);
@@ -53,14 +51,29 @@ export default function SearchPage() {
   const [isLoading, setIsLoading] = useState(true); // Start loading
   const [showDateSelector, setShowDateSelector] = useState(false);
   const [displayDates, setDisplayDates] = useState<DateInfo[]>([]);
-  const [selectedDateIndex, setSelectedDateIndex] = useState(0); // Index for the horizontal date selector
-
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
+  const [currentRoute, setCurrentRoute] = useState<Route | undefined>(
+    undefined
+  );
   const { routes } = useApp();
 
-  const currentRoute: Route | undefined = routes.find(
-    (route) => Number(route.routeId) === Number(searchParams.get("rId"))
-  );
+  const fromRoute = searchParams.get("from");
+  const toRoute = searchParams.get("to");
+  useEffect(() => {
+    const init = async () => {
+      if (!fromRoute || !toRoute) return setCurrentRoute(undefined);
 
+      const cRoute: Route | undefined = routes.find(
+        (route) =>
+          route.origin.toLowerCase() === fromRoute.toLowerCase() &&
+          route.destination.toLowerCase() === toRoute.toLowerCase()
+      );
+
+      setCurrentRoute(cRoute);
+    };
+
+    init();
+  }, [searchParams]);
   // --- Effects ---
   // Effect to parse URL search params
   useEffect(() => {
@@ -206,264 +219,272 @@ export default function SearchPage() {
 
   // --- Render ---
   return (
-    <main className="flex-1 bg-gray-100 dark:bg-gray-950">
-      <div className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <div className="bg-background dark:bg-gray-900 rounded-lg p-4 shadow-md">
-            <SimplifiedSearch />
+    <>
+      <Header />
+      <main className="flex-1 bg-gray-100 dark:bg-gray-950">
+        <div className="container mx-auto px-4 py-6">
+          <div className="mb-6">
+            <div className="bg-background dark:bg-gray-900 rounded-lg p-4 shadow-md">
+              <SimplifiedSearch />
+            </div>
           </div>
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
-          <aside className="space-y-6">
-            {/* Mobile Filter Toggle */}
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-between md:hidden mb-4 dark:text-white dark:border-gray-700"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <span>Show Filters</span>
-              <Filter className="h-4 w-4" />
-            </Button>
-
-            {/* Filter Controls (conditionally rendered) */}
-            <div
-              className={cn(
-                "space-y-6 transition-all duration-300 ease-in-out",
-                showFilters
-                  ? "block max-h-[2000px] opacity-100"
-                  : "hidden max-h-0 opacity-0 md:block md:max-h-none md:opacity-100", // Smooth transition
-                "md:block" // Always block on medium screens and up
-              )}
-            >
-              {/* Apply Filters Button */}
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
+            <aside className="space-y-6">
+              {/* Mobile Filter Toggle */}
               <Button
-                onClick={handleApplyFilters}
-                className="w-full bg-primary hover:bg-primary/90 text-white"
+                variant="outline"
+                className="w-full flex items-center justify-between md:hidden mb-4 dark:text-white dark:border-gray-700"
+                onClick={() => setShowFilters(!showFilters)}
               >
-                Apply Filters
+                <span>Show Filters</span>
+                <Filter className="h-4 w-4" />
               </Button>
 
-              {/* Sort By */}
-              <Card className="dark:bg-gray-800 dark:border-gray-700">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-semibold dark:text-white">
-                      Sort by
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
-                      onClick={handleResetFilters}
-                    >
-                      Reset
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="sort-lowest"
-                        className="text-sm dark:text-gray-300 cursor-pointer"
-                      >
-                        Lowest price
-                      </label>
-                      <Checkbox
-                        id="sort-lowest"
-                        checked={selectedSort === "lowest"}
-                        onCheckedChange={() => handleSortChange("lowest")}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="sort-highest"
-                        className="text-sm dark:text-gray-300 cursor-pointer"
-                      >
-                        Highest price
-                      </label>
-                      <Checkbox
-                        id="sort-highest"
-                        checked={selectedSort === "highest"}
-                        onCheckedChange={() => handleSortChange("highest")}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Filter Controls (conditionally rendered) */}
+              <div
+                className={cn(
+                  "space-y-6 transition-all duration-300 ease-in-out",
+                  showFilters
+                    ? "block max-h-[2000px] opacity-100"
+                    : "hidden max-h-0 opacity-0 md:block md:max-h-none md:opacity-100", // Smooth transition
+                  "md:block" // Always block on medium screens and up
+                )}
+              >
+                {/* Apply Filters Button */}
+                <Button
+                  onClick={handleApplyFilters}
+                  className="w-full bg-primary hover:bg-primary/90 text-white"
+                >
+                  Apply Filters
+                </Button>
 
-              {/* Price Filter */}
-              <Card className="dark:bg-gray-800 dark:border-gray-700">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-semibold dark:text-white">
-                      Price Range
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
-                      onClick={handleResetFilters}
-                    >
-                      Reset
-                    </Button>
-                  </div>
-                  <div className="py-2">
-                    <Slider
-                      min={0}
-                      max={60000}
-                      step={1000}
-                      value={selectedPriceRange}
-                      onValueChange={setSelectedPriceRange}
-                      className="[&>span:first-child]:h-1 [&>span:first-child>span]:bg-primary" // Style slider track/thumb
-                    />
-                    <div className="flex justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
-                      <span>₦{selectedPriceRange[0].toLocaleString()}</span>
-                      <span>₦{selectedPriceRange[1].toLocaleString()}</span>
+                {/* Sort By */}
+                <Card className="dark:bg-gray-800 dark:border-gray-700">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold dark:text-white">
+                        Sort by
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
+                        onClick={handleResetFilters}
+                      >
+                        Reset
+                      </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="sort-lowest"
+                          className="text-sm dark:text-gray-300 cursor-pointer"
+                        >
+                          Lowest price
+                        </label>
+                        <Checkbox
+                          id="sort-lowest"
+                          checked={selectedSort === "lowest"}
+                          onCheckedChange={() => handleSortChange("lowest")}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="sort-highest"
+                          className="text-sm dark:text-gray-300 cursor-pointer"
+                        >
+                          Highest price
+                        </label>
+                        <Checkbox
+                          id="sort-highest"
+                          checked={selectedSort === "highest"}
+                          onCheckedChange={() => handleSortChange("highest")}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-              {/* Stops Filter */}
-              <Card className="dark:bg-gray-800 dark:border-gray-700">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-semibold dark:text-white">
-                      Stops
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
-                      onClick={handleResetFilters}
-                    >
-                      Reset
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="stops-direct"
-                        className="text-sm dark:text-gray-300 cursor-pointer"
+                {/* Price Filter */}
+                <Card className="dark:bg-gray-800 dark:border-gray-700">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold dark:text-white">
+                        Price Range
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
+                        onClick={handleResetFilters}
                       >
-                        Direct
-                      </label>
-                      <Checkbox
-                        id="stops-direct"
-                        checked={selectedStopsFilter.includes(0)}
-                        onCheckedChange={() => handleStopsChange(0)}
-                      />
+                        Reset
+                      </Button>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="stops-1"
-                        className="text-sm dark:text-gray-300 cursor-pointer"
-                      >
-                        1 Stop
-                      </label>
-                      <Checkbox
-                        id="stops-1"
-                        checked={selectedStopsFilter.includes(1)}
-                        onCheckedChange={() => handleStopsChange(1)}
+                    <div className="py-2">
+                      <Slider
+                        min={0}
+                        max={60000}
+                        step={1000}
+                        value={selectedPriceRange}
+                        onValueChange={setSelectedPriceRange}
+                        className="[&>span:first-child]:h-1 [&>span:first-child>span]:bg-primary" // Style slider track/thumb
                       />
+                      <div className="flex justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
+                        <span>₦{selectedPriceRange[0].toLocaleString()}</span>
+                        <span>₦{selectedPriceRange[1].toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="stops-2"
-                        className="text-sm dark:text-gray-300 cursor-pointer"
-                      >
-                        2+ Stops
-                      </label>
-                      <Checkbox
-                        id="stops-2"
-                        checked={selectedStopsFilter.includes(2)}
-                        onCheckedChange={() => handleStopsChange(2)} // Assuming '2' represents 2 or more stops in data/filter logic
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              {/* Removed Transit Point Filter as data doesn't support it well */}
-            </div>
-          </aside>
+                  </CardContent>
+                </Card>
 
-          <Suspense fallback={<Spinner size="md" />}>
-            <section className="space-y-6">
-              {showDateSelector && displayDates.length > 0 && (
-                <div className="bg-background dark:bg-gray-900 rounded-lg p-3 shadow-sm overflow-x-auto">
-                  <div className="flex space-x-2 min-w-max">
-                    {displayDates.map((dateItem, index) => (
-                      <motion.button
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05, duration: 0.2 }}
-                        className={cn(
-                          "flex flex-col items-center p-3 rounded-lg min-w-[90px] transition-colors duration-200 border border-transparent",
-                          selectedDateIndex === index
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                        )}
-                        onClick={() => setSelectedDateIndex(index)}
+                {/* Stops Filter */}
+                <Card className="dark:bg-gray-800 dark:border-gray-700">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold dark:text-white">
+                        Stops
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs dark:text-gray-400 hover:dark:text-white"
+                        onClick={handleResetFilters}
                       >
-                        <div className="text-sm font-medium">
-                          {dateItem.day}, {dateItem.date}
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Results Header */}
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <span>
-                  Showing journeys{" "}
-                  {fromCity && toCity
-                    ? `from ${capitalizeText(fromCity)} to ${capitalizeText(
-                        toCity
-                      )}`
-                    : "for selected criteria"}
-                </span>
+                        Reset
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="stops-direct"
+                          className="text-sm dark:text-gray-300 cursor-pointer"
+                        >
+                          Direct
+                        </label>
+                        <Checkbox
+                          id="stops-direct"
+                          checked={selectedStopsFilter.includes(0)}
+                          onCheckedChange={() => handleStopsChange(0)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="stops-1"
+                          className="text-sm dark:text-gray-300 cursor-pointer"
+                        >
+                          1 Stop
+                        </label>
+                        <Checkbox
+                          id="stops-1"
+                          checked={selectedStopsFilter.includes(1)}
+                          onCheckedChange={() => handleStopsChange(1)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="stops-2"
+                          className="text-sm dark:text-gray-300 cursor-pointer"
+                        >
+                          2+ Stops
+                        </label>
+                        <Checkbox
+                          id="stops-2"
+                          checked={selectedStopsFilter.includes(2)}
+                          onCheckedChange={() => handleStopsChange(2)} // Assuming '2' represents 2 or more stops in data/filter logic
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                {/* Removed Transit Point Filter as data doesn't support it well */}
               </div>
+            </aside>
 
-              {/* Loading State */}
-              {isLoading && (
-                <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
-                  <Spinner size="md" className="mb-4" />
-                  <span>Loading available buses...</span>
+            <Suspense fallback={<Spinner size="md" />}>
+              <section className="space-y-6">
+                {showDateSelector && displayDates.length > 0 && (
+                  <div className="bg-background dark:bg-gray-900 rounded-lg p-3 shadow-sm overflow-x-auto">
+                    <div className="flex space-x-2 min-w-max">
+                      {displayDates.map((dateItem, index) => (
+                        <motion.button
+                          key={index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05, duration: 0.2 }}
+                          className={cn(
+                            "flex flex-col items-center p-3 rounded-lg min-w-[90px] transition-colors duration-200 border border-transparent",
+                            selectedDateIndex === index
+                              ? "bg-primary text-primary-foreground shadow-md"
+                              : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                          )}
+                          onClick={() => setSelectedDateIndex(index)}
+                        >
+                          <div className="text-sm font-medium">
+                            {dateItem.day}, {dateItem.date}
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Results Header */}
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <span>
+                    Showing journeys{" "}
+                    {fromCity && toCity
+                      ? `from ${capitalizeText(fromCity)} to ${capitalizeText(
+                          toCity
+                        )}`
+                      : "for selected criteria"}
+                  </span>
                 </div>
-              )}
 
-              {/* Empty State */}
-              {!isLoading && currentRoute?.buses.length === 0 && (
-                <EmptyState onclick={handleResetFilters} />
-              )}
+                {/* Loading State */}
+                {isLoading && (
+                  <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+                    <Spinner size="md" className="mb-4" />
+                    <span>Loading available buses...</span>
+                  </div>
+                )}
 
-              {/* Bus Route Results */}
-              {!isLoading && currentRoute && currentRoute?.buses.length > 0 && (
-                <div className="space-y-4">
-                  {currentRoute.buses.map((bus, index) => (
-                    <BusCard
-                      key={bus.busId}
-                      bus={bus}
-                      route={currentRoute}
-                      onclick={handleRouteSelect}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              )}
+                {/* Empty State */}
+                {!isLoading &&
+                  currentRoute &&
+                  currentRoute?.buses.length <= 0 && (
+                    <EmptyState onclick={handleResetFilters} title="buses" />
+                  )}
 
-              {/* Pagination (Placeholder/Example) */}
-              {!isLoading && filteredAndSortedRoutes.length > 0 && (
-                <SearchPagination />
-              )}
-            </section>
-          </Suspense>
+                {/* Bus Route Results */}
+                {!isLoading &&
+                  currentRoute &&
+                  currentRoute?.buses.length > 0 && (
+                    <div className="space-y-4">
+                      {currentRoute.buses.map((bus, index) => (
+                        <BusCard
+                          key={bus.busId}
+                          bus={bus}
+                          route={currentRoute}
+                          onclick={handleRouteSelect}
+                          index={index}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                {/* Pagination (Placeholder/Example) */}
+                {!isLoading && filteredAndSortedRoutes.length > 0 && (
+                  <SearchPagination />
+                )}
+              </section>
+            </Suspense>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }

@@ -335,10 +335,9 @@ export const apiClient = {
       return handleResponse(response);
     },
 
-    getAll: async (token: string): Promise<ApiResponse<any[]>> => {
+    getAll: async (): Promise<ApiResponse<any[]>> => {
       const response = await fetch(`${API_BASE_URL}/route/getall`, {
         method: "GET",
-        headers: createHeaders(token, false),
       });
 
       return handleResponse(response);

@@ -220,7 +220,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const fetchRouteById = async (id: string): Promise<void> => {
-    if (!isAuthenticated) return;
+    // if (!isAuthenticated) return;
 
     try {
       const routeQuery = useRouteById(id);

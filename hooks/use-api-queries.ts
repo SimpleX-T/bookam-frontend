@@ -104,12 +104,12 @@ export const useDeleteBusMutation = () => {
 
 // Route queries
 export const useRoutes = () => {
-  const { token, isAuthenticated } = useAuth();
+  // const { token, isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: ["routes"],
-    queryFn: () => apiClient.route.getAll(token as string),
-    enabled: !!token && isAuthenticated,
+    queryFn: () => apiClient.route.getAll(),
+    // enabled: !!token && isAuthenticated,
     select: (data) => data.data,
   });
 };
@@ -276,7 +276,7 @@ export const useDeleteBookingMutation = () => {
 
 export const useUserBookings = () => {
   const { token, isAuthenticated, user } = useAuth();
-  
+
   return useQuery({
     queryKey: ["user-bookings", user],
     queryFn: () => apiClient.booking.getUserBookings(user!, token as string),
