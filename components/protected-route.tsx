@@ -12,12 +12,14 @@ interface ProtectedRouteProps {
 // Public routes that don't require authentication
 const PUBLIC_ROUTES = [
   "/",
+  "/signup",
+  "/login",
+  "/forgot-password",
+  "/admin/login",
+  "/search",
+  "/seat-selection",
   "/about",
   "/routes",
-  "/login",
-  "/admin/login",
-  "/signup",
-  "/forgot-password",
 ];
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
@@ -36,7 +38,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
       // Check if current path is a public route
       const isPublicRoute = PUBLIC_ROUTES.some(
-        (route) => pathname === route || pathname.startsWith(route + "/")
+        (route) => pathname === route || pathname.startsWith(route)
       );
 
       // Handle dashboard routes

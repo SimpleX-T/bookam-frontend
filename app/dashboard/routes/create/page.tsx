@@ -59,7 +59,7 @@ const locations = [
 ];
 
 const formSchema = z.object({
-  routeId: z.string().min(2),
+  routeId: z.string(),
   origin: z.string().min(2),
   destination: z.string().min(2),
   price: z.number().min(0),

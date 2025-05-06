@@ -20,7 +20,6 @@ import Link from "next/link";
 import { JourneyPlanner } from "@/components/route-planner/route-planner";
 import { useRouter } from "next/navigation";
 import { Route } from "@/types";
-import { sampleRoutes } from "@/lib/constants";
 import { useApp } from "@/contexts/app-context";
 
 import playStore from "@/public/images/playstore.png";
@@ -29,6 +28,7 @@ import mobileApp from "@/public/images/mobile.png";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import MobileTicketPage from "./mobile-ticket/page";
+import EmptyState from "@/components/search/states/empty";
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("search");
@@ -167,13 +167,15 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <JourneyPlanner
-              max={4}
-              onContinue={handleContinue}
-              routes={
-                routes.length ? routes.slice(0, 3) : sampleRoutes.slice(0, 4)
-              }
-            />
+            {routes.length ? (
+              <JourneyPlanner
+                max={4}
+                onContinue={handleContinue}
+                routes={routes.slice(0, 3)}
+              />
+            ) : (
+              <EmptyState title="routes" hasFilters={false} />
+            )}
           </div>
         </section>
 
