@@ -177,7 +177,7 @@ export default function HomePage() {
               <JourneyPlanner
                 max={4}
                 onContinue={handleContinue}
-                routes={routes.slice(0, 4)}
+                routes={routes}
               />
             ) : (
               <EmptyState title="routes" hasFilters={false} />

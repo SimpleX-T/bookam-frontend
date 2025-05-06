@@ -29,7 +29,6 @@ export default function Routes() {
             </div>
             {busRoutes.length ? (
               <JourneyPlanner
-                max={4}
                 onContinue={handleContinue}
                 routes={busRoutes}
               />
