@@ -13,7 +13,6 @@ import { motion } from "motion/react";
 import { format } from "date-fns";
 import { DateInfo, AppliedFilters, Route } from "@/types";
 import { generateDates } from "@/lib/helpers";
-import { allBusRoutes } from "@/lib/constants";
 import SearchPagination from "@/components/search/pagination";
 import { useApp } from "@/contexts/app-context";
 import BusCard from "@/components/search/bus-card";
@@ -34,7 +33,7 @@ export default function SearchPage() {
   const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>([
     0, 60000,
   ]);
-  const [selectedStopsFilter, setSelectedStopsFilter] = useState<number[]>([]); // Store numbers (0, 1, 2...)
+  const [selectedStopsFilter, setSelectedStopsFilter] = useState<number[]>([]);
   const [selectedSort, setSelectedSort] = useState<"lowest" | "highest" | null>(
     null
   );
@@ -121,37 +120,31 @@ export default function SearchPage() {
 
   // --- Filtering Logic ---
   const filteredAndSortedRoutes = useMemo(() => {
-    let routes = allBusRoutes.filter((route) => {
+    let filteredRoutes = routes.filter((route) => {
       // Match origin and destination (case-insensitive)
       const originMatch =
-        !fromCity || route.originCity.toLowerCase() === fromCity.toLowerCase();
+        !fromCity || route.origin.toLowerCase() === fromCity.toLowerCase();
       const destinationMatch =
-        !toCity || route.destinationCity.toLowerCase() === toCity.toLowerCase();
+        !toCity || route.destination.toLowerCase() === toCity.toLowerCase();
 
       // Match Price Range
       const priceMatch =
         route.price >= appliedFilters.price[0] &&
         route.price <= appliedFilters.price[1];
 
-      // Match Stops (if filter applied)
-      // If appliedFilters.stops is empty, it means no stop filter is active, so all routes pass
-      const stopsMatch =
-        appliedFilters.stops.length === 0 ||
-        appliedFilters.stops.includes(route.stops);
-
-      return originMatch && destinationMatch && priceMatch && stopsMatch;
+      return originMatch && destinationMatch && priceMatch;
     });
 
     // Apply Sorting
     if (appliedFilters.sortBy === "lowest") {
-      routes.sort((a, b) => a.price - b.price);
+      filteredRoutes.sort((a, b) => a.price - b.price);
     } else if (appliedFilters.sortBy === "highest") {
-      routes.sort((a, b) => b.price - a.price);
+      filteredRoutes.sort((a, b) => b.price - a.price);
     }
     // else no sort or default sort (by ID or original order)
 
     setIsLoading(false); // Filtering done, set loading to false
-    return routes;
+    return filteredRoutes;
   }, [fromCity, toCity, appliedFilters]); // Re-run when cities or applied filters change
 
   // --- Event Handlers ---

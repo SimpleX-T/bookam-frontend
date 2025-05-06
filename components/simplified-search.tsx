@@ -27,7 +27,6 @@ import { CalendarIcon, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { extractUniqueLocations, LocationOption } from "@/lib/helpers";
 import { useApp } from "@/contexts/app-context";
-import { sampleRoutes } from "@/lib/constants";
 
 const searchSchema = z.object({
   from: z.string({ required_error: "Please select departure city" }),
@@ -46,7 +45,7 @@ export default function SimplifiedSearch() {
   const { routes } = useApp();
 
   const destinations: LocationOption[] = extractUniqueLocations(
-    routes.length ? routes : sampleRoutes
+    routes
   );
 
   const initialFrom = searchParams.get("from") || "";

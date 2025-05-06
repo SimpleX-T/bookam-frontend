@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import { useUsers, useBuses } from "@/hooks/use-api-queries";
 import { formatNumber } from "@/lib/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useApp } from "@/contexts/app-context";
 
 export function SectionCards() {
@@ -31,7 +31,10 @@ export function SectionCards() {
       (acc, booking) => {
         if (booking.completed) {
           acc.completedBookings.push(booking);
-          acc.totalRevenue += Number(booking.routeId) || 0;
+
+          booking.routes.forEach(
+            (route) => (acc.totalRevenue += Number(route.price) || 0)
+          );
         }
         return acc;
       },

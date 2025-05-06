@@ -27,15 +27,15 @@ type ChartConfig = {
 const chartConfig: ChartConfig = {
   bookings: {
     label: "Bookings",
-    color: "#0891b2", // cyan-600
+    color: "#0891b2",
   },
   users: {
     label: "Users",
-    color: "#2563eb", // blue-600
+    color: "#2563eb",
   },
   revenue: {
     label: "Revenue",
-    color: "#7c3aed", // violet-600
+    color: "#7c3aed",
   },
 };
 
@@ -85,7 +85,12 @@ export function ChartAreaInteractive() {
       );
       const dayRevenue = dayBookings
         .filter((b) => b.completed)
-        .reduce((sum, b) => sum + (Number(b.routeId) || 0), 0);
+        .reduce((sum, booking) => {
+          return booking.routes.reduce(
+            (routeSum, route) => routeSum + (Number(route.price) || 0),
+            sum
+          );
+        }, 0);
 
       return {
         date,

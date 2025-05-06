@@ -5,14 +5,7 @@ import { Button } from "@/components/ui/button";
 import SimplifiedSearch from "@/components/simplified-search";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  ArrowRight,
-  Bus,
-  Calendar as CalendarIcon,
-  MapPin,
-  Star,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -30,6 +23,13 @@ import { Footer } from "@/components/footer";
 import MobileTicketPage from "./mobile-ticket/page";
 import EmptyState from "@/components/search/states/empty";
 
+import scenicViewOfLagos from "@/public/images/hero/hero1.jpg";
+import zumaRock from "@/public/images/hero/hero2.jpg";
+import yankariGamesReserve from "@/public/images/hero/hero3.jpg";
+import obuduCattleRanch from "@/public/images/hero/hero4.jpg";
+import FeaturesGrid from "@/components/features-grid";
+import { features } from "@/lib/constants";
+
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("search");
   const router = useRouter();
@@ -42,6 +42,7 @@ export default function HomePage() {
       }&from=${route.origin.toLowerCase()}&to=${route.destination.toLowerCase()}`
     );
   }
+
   return (
     <>
       <Header />
@@ -67,6 +68,7 @@ export default function HomePage() {
                       <span className="text-primary font-bold">Nigeria</span>
                     </p>
                   </motion.div>
+
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -76,34 +78,38 @@ export default function HomePage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="relative h-40 md:h-60 rounded-lg overflow-hidden transform rotate-3">
                         <Image
-                          src="/images/hero/hero1.jpg"
+                          src={scenicViewOfLagos}
                           alt="Scenic view of Lagos"
                           fill
                           className="object-cover"
+                          placeholder="blur"
                         />
                       </div>
                       <div className="relative h-40 md:h-60 rounded-lg overflow-hidden transform -rotate-3 mt-8">
                         <Image
-                          src="/images/hero/hero2.jpg"
+                          src={zumaRock}
                           alt="Zuma Rock"
                           fill
                           className="object-cover"
+                          placeholder="blur"
                         />
                       </div>
                       <div className="relative h-40 md:h-60 rounded-lg overflow-hidden transform -rotate-6 -mt-4">
                         <Image
-                          src="/images/hero/hero3.jpg"
+                          src={yankariGamesReserve}
                           alt="Yankari Game Reserve"
                           fill
                           className="object-cover"
+                          placeholder="blur"
                         />
                       </div>
                       <div className="relative h-40 md:h-60 rounded-lg overflow-hidden transform rotate-6">
                         <Image
-                          src="/images/hero/hero4.jpg"
+                          src={obuduCattleRanch}
                           alt="Obudu Cattle Ranch"
                           fill
                           className="object-cover"
+                          placeholder="blur"
                         />
                       </div>
                     </div>
@@ -171,7 +177,7 @@ export default function HomePage() {
               <JourneyPlanner
                 max={4}
                 onContinue={handleContinue}
-                routes={routes.slice(0, 3)}
+                routes={routes}
               />
             ) : (
               <EmptyState title="routes" hasFilters={false} />
@@ -187,71 +193,12 @@ export default function HomePage() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-background p-6 rounded-lg shadow-sm"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Bus className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Modern Fleet</h3>
-                <p className="text-muted-foreground">
-                  Travel in comfort with our modern, well-maintained buses
-                  equipped with amenities for a pleasant journey.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                className="bg-background p-6 rounded-lg shadow-sm"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <MapPin className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Extensive Network</h3>
-                <p className="text-muted-foreground">
-                  With routes covering all major cities and towns across
-                  Nigeria, we get you where you need to go.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
-                className="bg-background p-6 rounded-lg shadow-sm"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <CalendarIcon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Easy Booking</h3>
-                <p className="text-muted-foreground">
-                  Book your tickets online in minutes with our simple,
-                  user-friendly booking system.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 }}
-                className="bg-background p-6 rounded-lg shadow-sm"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Star className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Customer Satisfaction
-                </h3>
-                <p className="text-muted-foreground">
-                  Our dedicated team ensures your journey is comfortable, safe,
-                  and exceeds your expectations.
-                </p>
-              </motion.div>
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <FeaturesGrid feature={feature} Icon={Icon} index={index} />
+                );
+              })}
             </div>
           </div>
         </section>
