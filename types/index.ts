@@ -118,3 +118,5 @@ export interface BookingFormData {
 export interface FormSubmitEvent extends React.FormEvent<HTMLFormElement> {
   preventDefault: () => void;
 }
+
+// Just found a new, hot 🔥 pick-up line. add your comment under this if you're interested in Knowing it
