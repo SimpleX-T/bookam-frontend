@@ -28,6 +28,7 @@ export interface Booking {
     destination: string;
     duration: string;
     description: string;
+    price: number;
   }[];
   seatNumber: number | string;
   completed: boolean;

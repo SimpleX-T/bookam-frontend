@@ -22,7 +22,6 @@ const MapView = dynamic(() => import("./map-view"), {
   loading: () => <p>Loading map...</p>,
 });
 import { Route } from "@/types";
-import { sampleRoutes } from "@/lib/constants";
 
 interface JourneyPlannerProps {
   routes?: Route[];
@@ -31,7 +30,7 @@ interface JourneyPlannerProps {
 }
 
 export function JourneyPlanner({
-  routes = sampleRoutes,
+  routes = [],
   onContinue,
   max,
 }: JourneyPlannerProps) {
