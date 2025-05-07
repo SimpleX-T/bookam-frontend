@@ -49,28 +49,28 @@ export default function MobileTicketPage() {
   };
 
   const handleDownloadPDF = async () => {
-    // if (booking) {
-    //   await generatePDF(booking);
-    // }
+    if (booking) {
+      await generatePDF(booking);
+    }
 
     alert("coming soon...");
   };
 
   const handleShare = async () => {
     alert("coming soon...");
-    // if (navigator.share) {
-    //   try {
-    //     await navigator.share({
-    //       title: "My bookAM Ticket",
-    //       text: `My journey from ${booking.journey.from.city} to ${booking.journey.to.city} on ${booking.journey.date}. Booking reference: ${booking.reference}`,
-    //       url: window.location.href,
-    //     });
-    //   } catch (error) {
-    //     console.error("Error sharing:", error);
-    //   }
-    // } else {
-    //   alert("Web Share API not supported in your browser");
-    // }
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My bookAM Ticket",
+          text: `My journey from ${booking.journey.from.city} to ${booking.journey.to.city} on ${booking.journey.date}. Booking reference: ${booking.reference}`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      alert("Web Share API not supported in your browser");
+    }
   };
 
   if (isLoading) {
@@ -145,10 +145,12 @@ export default function MobileTicketPage() {
               Back
             </Button>
             <h1 className="text-2xl font-bold">Mobile Ticket</h1>
-            {/* <p className="text-muted-foreground">
-              Your journey from {booking.journey.from.city} to{" "}
-              {booking.journey.to.city}
-            </p> */}
+            {booking.routes.length && (
+              <p className="text-muted-foreground">
+                Your journey from {booking.routes[0].origin} to{" "}
+                {booking.routes[0].destination}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col items-center">

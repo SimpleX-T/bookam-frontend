@@ -16,6 +16,7 @@ interface TicketDisplayProps {
   className?: string;
   compact?: boolean;
 }
+
 const dummyBooking = {
   reference: "BKAM123456",
   checkIn: {
@@ -70,7 +71,7 @@ export function TicketDisplay({
     setIsFlipped(!isFlipped);
   };
 
-  // const passenger = booking.passengers[0];
+  const passenger = booking.user ? booking.user[0] : {};
   // const journey = booking.journey;
 
   return (
@@ -111,34 +112,22 @@ export function TicketDisplay({
             </div>
 
             <div className={cn("space-y-4", compact ? "p-3" : "p-6")}>
-              {/* <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       "flex items-center justify-center bg-primary/10 rounded-md",
                       compact ? "w-8 h-8" : "w-10 h-10"
                     )}
-                  >
-                    <span className="font-medium text-primary">
-                      {journey.logo}
-                    </span>
-                  </div>
+                  ></div>
                   <div>
-                    <div
-                      className={cn(
-                        "font-medium",
-                        compact ? "text-sm" : "text-base"
-                      )}
-                    >
-                      {journey.company}
-                    </div>
                     <div
                       className={cn(
                         "text-muted-foreground",
                         compact ? "text-xs" : "text-sm"
                       )}
                     >
-                      {journey.journeyNumber}
+                      {booking.routeId}
                     </div>
                   </div>
                 </div>
@@ -146,9 +135,9 @@ export function TicketDisplay({
                   variant="outline"
                   className={compact ? "text-xs" : "text-sm"}
                 >
-                  {passenger.seat}
+                  {booking.seatNumber}
                 </Badge>
-              </div> */}
+              </div>
 
               {/* <div className="flex justify-between items-center">
                 <div className="text-center">
@@ -210,12 +199,12 @@ export function TicketDisplay({
                     {journey.to.city}
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               <div
                 className={cn("text-center", compact ? "text-xs" : "text-sm")}
               >
-                <div className="font-medium">{journey.date}</div>
+                <div className="font-medium">{booking.bookingDate}</div>
                 <div className="text-muted-foreground">
                   Check-in: {booking.checkIn.date} at {booking.checkIn.time}
                 </div>
@@ -223,7 +212,7 @@ export function TicketDisplay({
 
               <Separator />
 
-              <div className="text-center">
+              {/* <div className="text-center">
                 <div
                   className={cn(
                     "font-medium mb-1",

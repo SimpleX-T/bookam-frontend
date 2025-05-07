@@ -20,7 +20,6 @@ import appStore from "@/public/images/appstore.png";
 import mobileApp from "@/public/images/mobile.png";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import MobileTicketPage from "./mobile-ticket/page";
 import EmptyState from "@/components/search/states/empty";
 
 import scenicViewOfLagos from "@/public/images/hero/hero1.jpg";
@@ -203,50 +202,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Current Promotions */}
-        {/* <section className="py-16">
-        <div className="container">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">Current Promotions</h2>
-            <Button variant="outline" asChild>
-              <Link href="/promotions">
-                View All Promotions
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {promotions.map((promo, index) => (
-              <motion.div
-                key={promo.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <Card className="h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <TrendingUp className="h-5 w-5 text-primary" />
-                      <h3 className="text-xl font-bold">{promo.title}</h3>
-                    </div>
-                    <p className="text-muted-foreground mb-4">
-                      {promo.description}
-                    </p>
-                    <div className="bg-muted p-3 rounded-md text-center mb-4">
-                      <span className="font-mono font-bold">{promo.code}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Valid until: {promo.validUntil}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
         {/* Download App Section */}
         <section className="py-16 bg-primary text-primary-foreground relative">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm w-full h-full cursor-not-allowed z-20 flex items-center justify-center">
@@ -300,7 +255,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <MobileTicketPage />
       <Footer />
     </>
   );
