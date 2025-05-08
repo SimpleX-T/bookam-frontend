@@ -71,7 +71,7 @@ export function TicketDisplay({
     setIsFlipped(!isFlipped);
   };
 
-  const passenger = booking.user ? booking.user[0] : {};
+  const passenger = Array.isArray(booking.user) && booking.user.length > 0 ? booking.user[0] : {};
   // const journey = booking.journey;
 
   return (
