@@ -145,7 +145,7 @@ export default function MobileTicketPage() {
               Back
             </Button>
             <h1 className="text-2xl font-bold">Mobile Ticket</h1>
-            {booking.routes.length && (
+            {booking.routes && booking.routes.length > 0 && (
               <p className="text-muted-foreground">
                 Your journey from {booking.routes[0].origin} to{" "}
                 {booking.routes[0].destination}
